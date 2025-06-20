@@ -27,11 +27,9 @@ public class ProductController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        if(brand == null && gender == null && volume == null) {
-            return ResponseEntity.ok(productService.getAllProducts());
-        } else {
-            return ResponseEntity.ok(productService.getFilteredPagedProducts(brand, gender, volume, page, size));
-        }
+        return ResponseEntity.ok(
+                productService.getFilteredPagedProducts(brand, gender, volume, page, size)
+        );
     }
 
     @PostMapping
