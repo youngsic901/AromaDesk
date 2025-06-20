@@ -11,6 +11,8 @@ const ProductListPage = () => {
       try {
         setLoading(true);
         const data = await getProducts();
+        console.log("API로부터 받은 데이터:", data);
+        console.log("데이터 타입:", typeof data);
         setProducts(data);
         setError(null);
       } catch (err) {
