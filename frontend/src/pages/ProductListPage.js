@@ -42,7 +42,7 @@ const ProductListPage = () => {
         <p>상품이 없습니다.</p>
       ) : (
         <ul>
-          {products.map((product) => (
+          {products.content.map((product) => (
             <li key={product.id}>
               {product.name} - {product.price}원
             </li>

@@ -14,6 +14,8 @@ public class ProductResponseDTO {
     private String volumeCategory;
     private int price;
     private String imageUrl;
+//    private String description;
+//    private String createdAt;
 
     public ProductResponseDTO(Product product) {
         this.id = product.getId();
@@ -23,5 +25,9 @@ public class ProductResponseDTO {
         this.volumeCategory = product.getVolumeCategory();
         this.price = product.getPrice();
         this.imageUrl = product.getImageUrl();
+//        this.description = product.getDescription();
+//        this.createdAt = product.getCreatedAt() != null
+//                ? product.getCreatedAt().toString().substring(0, 10)
+//                : null;
     }
 }
