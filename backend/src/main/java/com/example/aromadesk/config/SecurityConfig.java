@@ -3,20 +3,26 @@ package com.example.aromadesk.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
-// product 테이블 권한 설정 테스트용
-// 기능 테스트 후 혹은 인가 기능 구현 후 삭제 필!!!!!!
+@EnableWebSecurity
 public class SecurityConfig {
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (API 호출 시 필수)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/products/**").permitAll() // 상품 API 모두 허용
-                        .anyRequest().authenticated()
-                );
+            .csrf(csrf -> csrf.disable()) // CSRF 보호 비활성화 (API 서버에서는 보통 비활성화)
+            .cors(withDefaults()) // Cors 설정 활성화
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 비활성화
+            .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/api/health", "/api/products/**").permitAll() // 인증 없이 허용
+                .anyRequest().authenticated() // 나머지는 인증 필요
+            );
 
         return http.build();
     }
