@@ -1,7 +1,7 @@
 package com.example.aromadesk.auth.service;
 
-import com.example.aromadesk.member.Entity.Member;
-import com.example.aromadesk.member.Service.MemberRepository;
+import com.example.aromadesk.member.entity.Member;
+import com.example.aromadesk.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
