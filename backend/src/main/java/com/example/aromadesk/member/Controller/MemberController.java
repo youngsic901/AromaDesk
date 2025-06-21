@@ -1,7 +1,7 @@
 package com.example.aromadesk.member.Controller;
 
-import com.example.aromadesk.member.Service.MemberRepository;
-import com.example.aromadesk.member.Entity.Member;
+import com.example.aromadesk.member.repository.MemberRepository;
+import com.example.aromadesk.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
