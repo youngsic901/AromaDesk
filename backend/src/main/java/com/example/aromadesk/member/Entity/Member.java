@@ -1,4 +1,4 @@
-package com.example.aromadesk.member;
+package com.example.aromadesk.member.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -36,7 +36,7 @@ public class Member {
     private String address;
 
     @Column(length = 20)
-    private String role = "USER";
+    private String role;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();

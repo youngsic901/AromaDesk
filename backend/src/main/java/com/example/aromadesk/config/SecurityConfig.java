@@ -25,17 +25,19 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
 				// 1) 인증 없이 허용할 경로
+				.csrf(csrf -> csrf.disable()) // ★ 추가!
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers(
-								"/",                      // 홈 접근도 스프링 시큐리티가 제어하지 않고 컨트롤러가 담당
+								"/",
 								"/auth/login",
 								"/auth/login-process",
 								"/auth/logout",
 								"/css/**", "/js/**", "/images/**",
-								"/api/health", "/api/products/**"
+								"/api/health", "/api/products/**",
+								"/api/members", "/api/members/**"
 						).permitAll()
-						// 2) 나머지는 모두 인증된 사용자만
 						.anyRequest().authenticated()
+				
 				)
 				// 3) 폼 로그인 커스터마이징
 				.formLogin(form -> form

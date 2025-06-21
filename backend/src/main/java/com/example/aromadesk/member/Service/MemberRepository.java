@@ -1,5 +1,6 @@
-package com.example.aromadesk.member;
+package com.example.aromadesk.member.Service;
 
+import com.example.aromadesk.member.Entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
