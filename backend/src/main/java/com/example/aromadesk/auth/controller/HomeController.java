@@ -17,6 +17,6 @@ public class HomeController {
             return "home";
         }
         // 아니면 로그인 폼으로 리다이렉트
-        return "forward:/auth/login";
+        return "redirect:/auth/login";
     }
 }
