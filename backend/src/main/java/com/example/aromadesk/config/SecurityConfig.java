@@ -1,9 +1,10 @@
 package com.example.aromadesk.config;
 
+import com.example.aromadesk.auth.service.AdminLoginService;
+import com.example.aromadesk.auth.service.MemberLoginService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,43 +14,37 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+	private final MemberLoginService memberLoginService;
+	private final AdminLoginService adminLoginService;
 
-	// AuthenticationManager 빈 등록
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConf) throws Exception {
-		return authConf.getAuthenticationManager();
+	public SecurityConfig(MemberLoginService memberLoginService, AdminLoginService adminLoginService) {
+		this.memberLoginService = memberLoginService;
+		this.adminLoginService = adminLoginService;
 	}
 
-	// Security 필터 체인 설정
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	@Order(2)
+	public SecurityFilterChain userSecurityFilterChain(HttpSecurity http) throws Exception {
 		http
-				// 1) 인증 없이 허용할 경로
-				.csrf(csrf -> csrf.disable()) // ★ 추가!
+				.userDetailsService(memberLoginService)
+				.securityMatcher("/**")
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers(
-								"/",
-								"/auth/login",
-								"/auth/login-process",
-								"/auth/logout",
+								"/", "/auth/login", "/auth/login-process", "/auth/logout",
 								"/css/**", "/js/**", "/images/**",
-								"/api/health", "/api/products/**",
-								"/api/members", "/api/members/**"
+								"/api/health", "/api/products/**", "/api/members/**", "/error"
 						).permitAll()
 						.anyRequest().authenticated()
-				
 				)
-				// 3) 폼 로그인 커스터마이징
 				.formLogin(form -> form
-						.loginPage("/auth/login")             // GET 로그인 폼 보여줄 URL
-						.loginProcessingUrl("/auth/login-process") // POST 인증 처리 URL
-						.usernameParameter("memberId")        // 폼의 name 이름
+						.loginPage("/auth/login")
+						.loginProcessingUrl("/auth/login-process")
+						.usernameParameter("memberId")
 						.passwordParameter("password")
-						.defaultSuccessUrl("/", true)         // 로그인 성공 후 "홈(/)"으로
-						.failureUrl("/auth/login?error")      // 인증 실패 시
+						.defaultSuccessUrl("/", true)
+						.failureUrl("/auth/login?error")
 						.permitAll()
 				)
-				// 4) 로그아웃 설정
 				.logout(logout -> logout
 						.logoutUrl("/auth/logout")
 						.logoutSuccessUrl("/auth/login?logout")
@@ -57,11 +52,38 @@ public class SecurityConfig {
 						.deleteCookies("JSESSIONID")
 						.permitAll()
 				);
-
 		return http.build();
 	}
 
-	// 비밀번호 암호화 방식
+	@Bean
+	@Order(1)
+	public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
+		http
+				.userDetailsService(adminLoginService)
+				.securityMatcher("/admin/**")
+				.authorizeHttpRequests(auth -> auth
+						.requestMatchers("/admin/login", "/admin/login-process").permitAll()
+						.anyRequest().hasRole("ADMIN")
+				)
+				.formLogin(form -> form
+						.loginPage("/admin/login")
+						.loginProcessingUrl("/admin/login-process")
+						.usernameParameter("username")
+						.passwordParameter("password")
+						.defaultSuccessUrl("/admin/dashboard", true)
+						.failureUrl("/admin/login?error")
+						.permitAll()
+				)
+				.logout(logout -> logout
+						.logoutUrl("/admin/logout")
+						.logoutSuccessUrl("/admin/login?logout")
+						.invalidateHttpSession(true)
+						.deleteCookies("JSESSIONID")
+						.permitAll()
+				);
+		return http.build();
+	}
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
