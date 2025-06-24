@@ -27,7 +27,7 @@ public class MemberLoginService implements UserDetailsService{
 
         return User.builder()
                 .username(member.getMemberId())
-                .password(passwordEncoder.encode(member.getPassword()))
+                .password(member.getPassword())
                 .roles(member.getRole())
                 .build();
     }
