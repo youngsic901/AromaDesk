@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getProducts } from "../api/productApi";
 
 const ProductListPage = () => {
-  const [products, setProducts] = useState([]);
+  const [pageData, setPageData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -12,15 +12,7 @@ const ProductListPage = () => {
         setLoading(true);
         const data = await getProducts();
         console.log("API로부터 받은 데이터:", data);
-        console.log("데이터 타입:", typeof data);
-
-        // 백엔드 응답이 페이징 객체일 수도, 배열일 수도 있으므로 둘 다 처리
-        const productList = Array.isArray(data) ? data : data.content;
-
-        console.log("실제 사용할 상품 배열:", productList);
-
-        setProducts(productList);
-        setError(null);
+        setPageData(data);
       } catch (err) {
         setError("상품 목록을 불러올 수 없습니다.");
         console.error(err);
@@ -30,10 +22,13 @@ const ProductListPage = () => {
     };
 
     fetchProducts();
-  }, []); // []를 사용하여 컴포넌트가 처음 렌더링될 때 한 번만 실행
+  }, []);
 
   if (loading) return <div>로딩 중...</div>;
   if (error) return <div>오류: {error}</div>;
+
+  const products =
+    pageData && Array.isArray(pageData.content) ? pageData.content : [];
 
   return (
     <div>
@@ -42,7 +37,7 @@ const ProductListPage = () => {
         <p>상품이 없습니다.</p>
       ) : (
         <ul>
-          {products.content.map((product) => (
+          {products.map((product) => (
             <li key={product.id}>
               {product.name} - {product.price}원
             </li>

@@ -2,28 +2,63 @@ package com.example.aromadesk.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    // AuthenticationManager 빈 등록
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConf) throws Exception {
+        return authConf.getAuthenticationManager();
+    }
+
+    // Security 필터 체인 설정
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // CSRF 보호 비활성화 (API 서버에서는 보통 비활성화)
-            .cors(with0Defaults()) // Cors 설정 활성화
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 비활성화
-            .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/health", "/api/products/**").permitAll() // 인증 없이 허용
-                .anyRequest().authenticated() // 나머지는 인증 필요
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                    "/", "/auth/login", "/auth/login-process", "/auth/logout",
+                    "/css/**", "/js/**", "/images/**",
+                    "/api/health", "/api/products/**",
+                    "/api/members", "/api/members/**"
+                ).permitAll()
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
+                .loginPage("/auth/login")
+                .loginProcessingUrl("/auth/login-process")
+                .usernameParameter("memberId")
+                .passwordParameter("password")
+                .defaultSuccessUrl("/", true)
+                .failureUrl("/auth/login?error")
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutUrl("/auth/logout")
+                .logoutSuccessUrl("/auth/login?logout")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .permitAll()
             );
 
         return http.build();
+    }
+
+    // 비밀번호 암호화 방식
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
