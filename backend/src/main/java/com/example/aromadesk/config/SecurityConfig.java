@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -16,12 +17,13 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 	private final MemberLoginService memberLoginService;
 	private final AdminLoginService adminLoginService;
-
+  
+  
 	public SecurityConfig(MemberLoginService memberLoginService, AdminLoginService adminLoginService) {
 		this.memberLoginService = memberLoginService;
 		this.adminLoginService = adminLoginService;
 	}
-
+  // Security 필터 체인 설정
 	@Bean
 	@Order(2)
 	public SecurityFilterChain userSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -54,7 +56,7 @@ public class SecurityConfig {
 				);
 		return http.build();
 	}
-
+  // Security 필터 체인 설정
 	@Bean
 	@Order(1)
 	public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -83,7 +85,7 @@ public class SecurityConfig {
 				);
 		return http.build();
 	}
-
+  // 비밀번호 암호화 방식
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
