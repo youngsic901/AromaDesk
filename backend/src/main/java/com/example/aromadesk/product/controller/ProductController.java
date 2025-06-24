@@ -21,11 +21,11 @@ public class ProductController {
     // 필터링된 상품 목록 출력
     @GetMapping
     public ResponseEntity<?> getFilteredPagedProducts(
-            @RequestParam(required = false) String brand,
-            @RequestParam(required = false) String gender,
-            @RequestParam(required = false) String volume,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(name = "brand", required = false) String brand,
+            @RequestParam(name = "gender", required = false) String gender,
+            @RequestParam(name = "volume", required = false) String volume,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size
     ) {
         return ResponseEntity.ok(
                 productService.getFilteredPagedProducts(brand, gender, volume, page, size)
@@ -40,7 +40,8 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDTO> getProduct(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(productService.getProductById(id));
+        ProductResponseDTO dto = productService.getProductById(id);
+        return ResponseEntity.ok(dto);
     }
 
     @PutMapping("/{id}")

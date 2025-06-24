@@ -1,4 +1,4 @@
-package com.example.aromadesk.member.entity;
+package com.example.aromadesk.member.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
