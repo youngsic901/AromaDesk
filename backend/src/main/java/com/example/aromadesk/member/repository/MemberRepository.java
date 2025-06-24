@@ -1,5 +1,6 @@
 package com.example.aromadesk.member.repository;
 
+
 import com.example.aromadesk.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
