@@ -21,6 +21,7 @@ function App() {
       <main style={{ padding: "20px" }}>
         <Routes>
           <Route path="/" element={<MainPage />} />
+          <Route path="/mypage" element={<MyPage />} />
           <Route path="/products" element={<ProductListPage />} />
           <Route path="/products/:id" element={<ProductDetailPage />} />
           <Route path="/login" element={<LoginPage />} />

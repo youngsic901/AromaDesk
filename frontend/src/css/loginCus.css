@@ -1,0 +1,116 @@
+/* 전체 로그인 페이지 컨테이너 */
+.login-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding-top: 40px;
+}
+
+/* 로고 컨테이너 스타일 */
+.logo-container {
+  margin-bottom: 40px;
+  cursor: pointer;
+}
+
+.logo-text {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+}
+
+.login-container {
+    width: 350px;
+    padding: 40px 30px 30px 30px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .login-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    align-self: flex-start;
+  }
+  
+  .login-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .login-btn {
+    width: 100%;
+    background: #0076ff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 12px 0;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .login-btn:hover {
+    background: #005fcc;
+  }
+  
+  .google-btn {
+    width: 100%;
+    background: #fff;
+    color: #444;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px 0;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+  
+  .kakao-btn {
+    width: 100%;
+    background: #ffe812;
+    color: #3c1e1e;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 0;
+    font-size: 1rem;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+  
+  .icon {
+    width: 22px;
+    height: 22px;
+    margin-right: 4px;
+  }
+  
+  .signup-link {
+    color: #0076ff;
+    text-decoration: none;
+    font-size: 0.95rem;
+    align-self: flex-end;
+    margin-top: 5px;
+  }
+  .signup-link:hover {
+    text-decoration: underline;
+  }
+  
