@@ -22,7 +22,7 @@ public class OrderResponseDto {
         return OrderResponseDto.builder()
                 .orderId(order.getId())
                 .orderDate(order.getOrderDate())
-                .status(order.getOrderStatus().name())
+                .status(order.getOrderStatus())
                 .productNames(order.getOrderItems().stream()
                         .map(item -> item.getProduct().getName())
                         .collect(Collectors.toList()))

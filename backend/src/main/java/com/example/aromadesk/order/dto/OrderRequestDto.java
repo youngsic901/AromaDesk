@@ -11,6 +11,6 @@ import java.util.List;
 public class OrderRequestDto {
     private List<OrderItemDto> items;
     private Long deliveryId;
-    private PaymentMethod paymentMethod;
+    private String paymentMethod;
 
 }
