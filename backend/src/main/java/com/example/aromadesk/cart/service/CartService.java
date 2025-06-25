@@ -44,7 +44,7 @@ public class CartService {
     /**
      * 장바구니에 상품 추가 (상품이 있으면 수량 추가)
      *
-     * @param memberId 특정 고객의 장바구니 id
+     * @param memberId 특정 고객의 id
      * @param productId 추가할 상품의 id
      * @param quantity 장바구니에 적용될 상품의 수량
      * @return 상품 추가된 DTO, 또는 에러메세지 반환
@@ -60,7 +60,7 @@ public class CartService {
         Cart cart;
         if (optionalCart.isPresent()) {
             cart = optionalCart.get();
-            cart.updateQuantity(quantity);
+            cart.updateQuantity(cart.getQuantity() + quantity);
         } else {
             cart = new Cart(member, product, quantity);
         }

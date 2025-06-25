@@ -32,11 +32,13 @@ public class SecurityConfig {
 		http
 				.userDetailsService(memberLoginService)
 				.securityMatcher("/**")
+				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers(
 								"/", "/auth/login", "/auth/login-process", "/auth/logout",
 								"/css/**", "/js/**", "/images/**",
-								"/api/health", "/api/products/**", "/api/members/**", "/error"
+								"/api/health", "/api/products/**", "/api/members/**", "/error",
+								"/api/cart/**","/members/**"
 						).permitAll()
 						.anyRequest().authenticated()
 				)
