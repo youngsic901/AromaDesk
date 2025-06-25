@@ -7,7 +7,7 @@ export const API_ENDPOINTS = {
   KAKAO_CALLBACK: '/api/auth/kakao/callback'
 };
 
-// 소셜 로그인 설정
+// 소셜 로그인 설정1
 export const SOCIAL_LOGIN_CONFIG = {
   GOOGLE: {
     CLIENT_ID: "dummy-client-id", // 실제 사용 안하니까 더미 값

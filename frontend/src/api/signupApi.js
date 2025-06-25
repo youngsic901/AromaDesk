@@ -1,6 +1,6 @@
 import apiClient from "./index";
 
-// 회원가입 API 함수
+// 회원가입 API 함수1
 export const signUpAPI = async (signUpData) => {
   try {
     const response = await apiClient.post('/api/signup', signUpData);

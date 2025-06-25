@@ -25,7 +25,7 @@ export const updateMyPageInfo = async (userId, updateData) => {
   }
 };
 
-// 비밀번호 확인
+// 비밀번호 확인1
 export const checkPassword = async (userId, password) => {
   try {
     const response = await apiClient.post(`/api/members/check-password/${userId}`, { password });

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { signUpAPI, checkMemberIdAPI } from './signupApi.js';
 
+//1
 export const useSignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');

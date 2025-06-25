@@ -9,7 +9,7 @@ export const useLogin = () => {
   const [user, setUser] = useState(null);
   const dispatch = useDispatch();
 
-  // 로그인 함수
+  // 로그인 함수1
   const login = useCallback(async (memberId, password) => {
     setIsLoading(true);
     setError(null);

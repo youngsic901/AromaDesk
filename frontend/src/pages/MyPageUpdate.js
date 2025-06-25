@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { updateMyPageInfo } from '../api/mypageApi';
 
+//1
 function MyPageUpdate({ user, field, onClose, onUpdate }) {
   const [form, setForm] = useState({
     name: user.name,

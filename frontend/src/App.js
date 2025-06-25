@@ -13,6 +13,8 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import CartPage from "./pages/CartPage";
 import MyPage from "./pages/MyPage";
+import AdminLoginPage from "./pages/AdminLoginPage";
+import AdminMainPage from "./pages/AdminMainPage";
 
 function App() {
   return (
@@ -28,6 +30,8 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/mypage" element={<MyPage />} />
+          <Route path="/adminlogin" element={<AdminLoginPage />} />
+          <Route path="/admin" element={<AdminMainPage />} />
         </Routes>
       </main>
       <Footer />

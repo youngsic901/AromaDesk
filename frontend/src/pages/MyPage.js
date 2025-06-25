@@ -15,7 +15,7 @@ function MyPage() {
   const [user, setUser] = useState(null);
   const [showUpdate, setShowUpdate] = useState(false);
   const [showPwChange, setShowPwChange] = useState(false);
-  const [pwStep, setPwStep] = useState(1); // 1: 현재 비번 확인, 2: 새 비번 입력
+  const [pwStep, setPwStep] = useState(1); // 1: 현재 비번 확인, 2: 새 비번 입력1
   const [pwInput, setPwInput] = useState({ current: '', next: '', nextCheck: '' });
   const [pwError, setPwError] = useState('');
   const navigate = useNavigate();

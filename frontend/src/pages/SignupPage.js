@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSignUp } from '../api/useSignUp';
 import '../css/loginCus.css';
 
+//1
 const SignupPage = () => {
   const [formData, setFormData] = useState({
     member_id: '',

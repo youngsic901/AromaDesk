@@ -1,7 +1,7 @@
 import apiClient from "./index";
 
 export const loginAPI = {
-  // 일반 로그인
+  // 일반 로그인123
   login: async (memberId, password) => {
     try {
       console.log('API 호출: 로그인 요청');

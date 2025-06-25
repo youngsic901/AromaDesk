@@ -16,7 +16,7 @@ const LoginPage = () => {
       return;
     }
 
-    // 전송할 JSON 데이터 준비
+    // 전송할 JSON 데이터 준비1
     const loginData = {
       memberId: memberId.trim(),
       password: password.trim()
