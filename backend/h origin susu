@@ -1,0 +1,31 @@
+[33m5f68061[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32msusu[m[33m)[m feat: 주문 상태 enum 정의 (OrderStatus)
+[33mc1b6942[m Merge origin/main into susu
+[33m44db24c[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge pull request #11 from youngsic901/youngsic/test
+[33m5cbd0a0[m[33m ([m[1;31morigin/youngsic/test[m[33m)[m test
+[33m659d790[m main 브랜치에서 ProductListPage.js 변경사항 반영
+[33m5962c49[m Merge pull request #10 from youngsic901/frontend-setting
+[33m1502115[m[33m ([m[1;31morigin/frontend-setting[m[33m)[m 상품
+[33mf6a0bfe[m Merge pull request #9 from youngsic901/frontend-setting
+[33m7b24ec1[m 프론트 프로젝트 파일구조
+[33mbc2721f[m Merge pull request #8 from youngsic901/chunwoo-config-security-cors
+[33m4d63451[m[33m ([m[1;31morigin/chunwoo-config-security-cors[m[33m)[m Merge branch 'main' into chunwoo-config-security-cors
+[33me24d9f6[m 프론트서버요청받을수있게 cors설정, 시큐리티 설정
+[33m87942a0[m Merge pull request #7 from youngsic901/youngsic/product-category
+[33mff1ef8f[m[33m ([m[1;31morigin/youngsic/product-category[m[33m)[m 2025.06.20 product RESTful
+[33m391ad02[m Merge pull request #6 from youngsic901/uihwan-react-setting
+[33m8c977c5[m[33m ([m[1;31morigin/uihwan[m[33m)[m uihwan 기본 환경 브랜치 작업 커밋
+[33m44be7a0[m Merge pull request #5 from youngsic901/youngsic/product-category
+[33mcc928b2[m 2025.06.19 상품 필터링 추가
+[33m3ebe603[m Merge pull request #4 from youngsic901/youngsic/product-print
+[33m1964b3c[m[33m ([m[1;31morigin/youngsic/product-print[m[33m)[m 2025.06.18. 최영식 상품목록 전체조회
+[33m7885476[m Merge pull request #3 from youngsic901/uihwan
+[33m3df7f83[m 테스트 의환
+[33md12ddd9[m Merge pull request #2 from youngsic901/feature/cheonwoo-frontend
+[33m784e20d[m Merge remote-tracking branch 'origin/main'
+[33mf9abd46[m 2025.06.18. 백엔드 파일 구조 및 .gitignore 작성
+[33mb268b7d[m[33m ([m[1;31morigin/feature/cheonwoo-frontend[m[33m)[m 두번째 테스트
+[33maf43754[m 두번째 테스트
+[33m6a66ea7[m Merge pull request #1 from youngsic901/feature/cheonwoo-frontend-project
+[33m0d16dbb[m[33m ([m[1;31morigin/feature/cheonwoo-frontend-project[m[33m)[m chore: frontend 및 backend 작업 폴더 생성
+[33m25fed6c[m 2025.06.18 .gitignore
+[33m610b702[m Initial commit

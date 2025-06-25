@@ -5,6 +5,8 @@ import com.example.aromadesk.auth.service.MemberLoginService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -31,12 +33,14 @@ public class SecurityConfig {
 				.csrf(csrf -> csrf.disable())
 				.userDetailsService(memberLoginService)
 				.securityMatcher("/**")
+				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers(
 								"/api/members/login", "/api/members/logout",
 								"/", "/auth/login", "/auth/login-process", "/auth/logout",
 								"/css/**", "/js/**", "/images/**",
-								"/api/health", "/api/products/**", "/api/members/**", "/error"
+								"/api/health", "/api/products/**", "/api/members/**", "/error",
+								"/api/cart/**","/members/**"
 						).permitAll()
 						.anyRequest().authenticated()
 				);
