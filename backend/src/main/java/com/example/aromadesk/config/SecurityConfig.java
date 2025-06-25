@@ -30,33 +30,19 @@ public class SecurityConfig {
 	@Order(2)
 	public SecurityFilterChain userSecurityFilterChain(HttpSecurity http) throws Exception {
 		http
+				.csrf(csrf -> csrf.disable())
 				.userDetailsService(memberLoginService)
 				.securityMatcher("/**")
 				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers(
+								"/api/members/login", "/api/members/logout",
 								"/", "/auth/login", "/auth/login-process", "/auth/logout",
 								"/css/**", "/js/**", "/images/**",
 								"/api/health", "/api/products/**", "/api/members/**", "/error",
 								"/api/cart/**","/members/**"
 						).permitAll()
 						.anyRequest().authenticated()
-				)
-				.formLogin(form -> form
-						.loginPage("/auth/login")
-						.loginProcessingUrl("/auth/login-process")
-						.usernameParameter("memberId")
-						.passwordParameter("password")
-						.defaultSuccessUrl("/", true)
-						.failureUrl("/auth/login?error")
-						.permitAll()
-				)
-				.logout(logout -> logout
-						.logoutUrl("/auth/logout")
-						.logoutSuccessUrl("/auth/login?logout")
-						.invalidateHttpSession(true)
-						.deleteCookies("JSESSIONID")
-						.permitAll()
 				);
 		return http.build();
 	}
@@ -71,27 +57,29 @@ public class SecurityConfig {
 						.requestMatchers("/admin/login", "/admin/login-process").permitAll()
 						.anyRequest().hasRole("ADMIN")
 				)
-				.formLogin(form -> form
-						.loginPage("/admin/login")
-						.loginProcessingUrl("/admin/login-process")
-						.usernameParameter("username")
-						.passwordParameter("password")
-						.defaultSuccessUrl("/admin/dashboard", true)
-						.failureUrl("/admin/login?error")
-						.permitAll()
-				)
-				.logout(logout -> logout
-						.logoutUrl("/admin/logout")
-						.logoutSuccessUrl("/admin/login?logout")
-						.invalidateHttpSession(true)
-						.deleteCookies("JSESSIONID")
-						.permitAll()
-				);
+//				.formLogin(form -> form
+//						.loginPage("/admin/login")
+//						.loginProcessingUrl("/admin/login-process")
+//						.usernameParameter("username")
+//						.passwordParameter("password")
+//						.defaultSuccessUrl("/admin/dashboard", true)
+//						.failureUrl("/admin/login?error")
+//						.permitAll()
+//				)
+//				.logout(logout -> logout
+//						.logoutUrl("/admin/logout")
+//						.logoutSuccessUrl("/admin/login?logout")
+//						.invalidateHttpSession(true)
+//						.deleteCookies("JSESSIONID")
+//						.permitAll()
+//				)
+				;
 		return http.build();
 	}
   // 비밀번호 암호화 방식
 	@Bean
 	public PasswordEncoder passwordEncoder() {
+
 		return new BCryptPasswordEncoder();
 	}
 }
