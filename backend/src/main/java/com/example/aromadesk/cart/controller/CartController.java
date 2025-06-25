@@ -1,8 +1,8 @@
 package com.example.aromadesk.cart.controller;
 
-import com.example.aromadesk.cart.dto.CartAddRequest;
-import com.example.aromadesk.cart.dto.CartResponseDTO;
-import com.example.aromadesk.cart.dto.CartUpdateQuantityRequest;
+import com.example.aromadesk.cart.dto.CartAddRequestDto;
+import com.example.aromadesk.cart.dto.CartResponseDto;
+import com.example.aromadesk.cart.dto.CartUpdateQuantityRequestDto;
 import com.example.aromadesk.cart.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +26,8 @@ public class CartController {
      * GET /api/cart/{memberId}
      */
     @GetMapping("/cart/{memberId}")
-    public ResponseEntity<List<CartResponseDTO>> getCartItems(@PathVariable Long memberId) {
-        List<CartResponseDTO> cartItems = cartService.getCartItems(memberId);
+    public ResponseEntity<List<CartResponseDto>> getCartItems(@PathVariable Long memberId) {
+        List<CartResponseDto> cartItems = cartService.getCartItems(memberId);
         return ResponseEntity.ok(cartItems);
     }
 
@@ -37,11 +37,11 @@ public class CartController {
      * Body: { "productId": 5, "quantity": 2 }
      */
     @PostMapping("/members/{memberId}/cart")
-    public ResponseEntity<CartResponseDTO> addToCart(
+    public ResponseEntity<CartResponseDto> addToCart(
             @PathVariable Long memberId,
-            @RequestBody CartAddRequest request
+            @RequestBody CartAddRequestDto request
     ) {
-        CartResponseDTO cart = cartService.addToCart(memberId, request.getProductId(), request.getQuantity());
+        CartResponseDto cart = cartService.addToCart(memberId, request.getProductId(), request.getQuantity());
         return ResponseEntity.ok(cart);
     }
 
@@ -51,12 +51,12 @@ public class CartController {
      * Body: { "quantity": 7 }
      */
     @PutMapping("/members/{memberId}/cart/{productId}")
-    public ResponseEntity<CartResponseDTO> updateQuantity(
+    public ResponseEntity<CartResponseDto> updateQuantity(
             @PathVariable Long memberId,
             @PathVariable Long productId,
-            @RequestBody CartUpdateQuantityRequest request
+            @RequestBody CartUpdateQuantityRequestDto request
     ) {
-        CartResponseDTO updated = cartService.updateQuantity(memberId, productId, request.getQuantity());
+        CartResponseDto updated = cartService.updateQuantity(memberId, productId, request.getQuantity());
         return ResponseEntity.ok(updated);
     }
 

@@ -7,13 +7,13 @@ import lombok.Getter;
 /**
  * @author : youngsic
  * @packageName : com.example.aromadesk.cart.dto
- * @fileName : CartResponseDTO
+ * @fileName : CartResponseDto
  * @date : 25. 6. 21.
  * @see
  **/
 
 @Getter
-public class CartResponseDTO {
+public class CartResponseDto {
     private Long productId;
     private String name;
     private String imageUrl;
@@ -24,7 +24,7 @@ public class CartResponseDTO {
      *
      * @param cart DTO로 변환할 Cart 타입 엔티티
      */
-    public CartResponseDTO(Cart cart) {
+    public CartResponseDto(Cart cart) {
         Product product = cart.getProduct();
         this.productId = product.getId();
         this.name = product.getName();

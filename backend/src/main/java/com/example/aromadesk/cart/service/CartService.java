@@ -1,6 +1,6 @@
 package com.example.aromadesk.cart.service;
 
-import com.example.aromadesk.cart.dto.CartResponseDTO;
+import com.example.aromadesk.cart.dto.CartResponseDto;
 import com.example.aromadesk.cart.entity.Cart;
 import com.example.aromadesk.cart.repository.CartRepository;
 import com.example.aromadesk.member.entity.Member;
@@ -37,8 +37,8 @@ public class CartService {
      * @param memberId 해당 장바구니를 소유한 고객 id
      * @return 해당 고객의 장바구니
      */
-    public List<CartResponseDTO> getCartItems(Long memberId) {
-        return cartRepository.findByMemberId(memberId).stream().map(CartResponseDTO::new).collect(Collectors.toList());
+    public List<CartResponseDto> getCartItems(Long memberId) {
+        return cartRepository.findByMemberId(memberId).stream().map(CartResponseDto::new).collect(Collectors.toList());
     }
 
     /**
@@ -49,7 +49,7 @@ public class CartService {
      * @param quantity 장바구니에 적용될 상품의 수량
      * @return 상품 추가된 DTO, 또는 에러메세지 반환
      */
-    public CartResponseDTO addToCart(Long memberId, Long productId, int quantity) {
+    public CartResponseDto addToCart(Long memberId, Long productId, int quantity) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 고객을 찾을 수 없습니다."));
 
@@ -66,7 +66,7 @@ public class CartService {
         }
 
         cartRepository.save(cart);
-        return new CartResponseDTO(cart);
+        return new CartResponseDto(cart);
     }
 
     /**
@@ -77,7 +77,7 @@ public class CartService {
      * @param quantity 장바구니에 적용될 수량
      * @return 수량이 변경된 상품 DTO, 또는 에러메세지 반환
      */
-    public CartResponseDTO updateQuantity(Long memberId, Long productId, int quantity) {
+    public CartResponseDto updateQuantity(Long memberId, Long productId, int quantity) {
         if(quantity <= 0 ) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수량은 1개 이상이어야 합니다.");
         }
@@ -87,7 +87,7 @@ public class CartService {
 
         cart.updateQuantity(quantity);
         cartRepository.save(cart);
-        return new CartResponseDTO(cart);
+        return new CartResponseDto(cart);
     }
 
     /**
