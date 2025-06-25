@@ -88,7 +88,7 @@ public class OrderService {
         Order order = Order.builder()
                 .member(member)
                 .delivery(delivery)
-                .orderStatus("ORDERED")
+                .orderStatus(OrderStatus.ORDERED)
                 .paymentMethod(dto.getPaymentMethod())
                 .orderDate(LocalDateTime.now())
                 .totalPrice(totalPrice)
