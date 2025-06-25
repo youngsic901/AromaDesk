@@ -33,7 +33,6 @@ public class SecurityConfig {
 				.csrf(csrf -> csrf.disable())
 				.userDetailsService(memberLoginService)
 				.securityMatcher("/**")
-				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers(
 								"/api/members/login", "/api/members/logout",

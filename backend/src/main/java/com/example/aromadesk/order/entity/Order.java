@@ -27,15 +27,16 @@ public class Order {
     @JoinColumn(name="member_id")
     private Member member;
 
+    @Builder.Default
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
 
 
     @Column(name = "payment_method", nullable = false, length = 20)
-    private PaymentMethod paymentMethod;
+    private String paymentMethod;
 
-    @Enumerated(EnumType.STRING)
-    private OrderStatus orderStatus;
+    // @Enumerated(EnumType.STRING)
+    private String orderStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "delivery_id")
