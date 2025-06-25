@@ -16,13 +16,19 @@ public class OrderResponseDto {
     private Long orderId;
     private LocalDateTime orderDate;
     private String status;
+    private String paymentMethod;
+    private int totalPrice;
+    private Long deliveryId;
     private List<String> productNames;
 
     public static OrderResponseDto from(Order order) {
         return OrderResponseDto.builder()
                 .orderId(order.getId())
                 .orderDate(order.getOrderDate())
-                .status(order.getOrderStatus())
+                .status(order.getOrderStatus().name())
+                .paymentMethod(order.getPaymentMethod().name())
+                .totalPrice(order.getTotalPrice())
+                .deliveryId(order.getDelivery() != null ? order.getDelivery().getId() : null)
                 .productNames(order.getOrderItems().stream()
                         .map(item -> item.getProduct().getName())
                         .collect(Collectors.toList()))

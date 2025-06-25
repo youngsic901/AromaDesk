@@ -39,7 +39,7 @@ public class SecurityConfig {
 								"/", "/auth/login", "/auth/login-process", "/auth/logout",
 								"/css/**", "/js/**", "/images/**",
 								"/api/health", "/api/products/**", "/api/members/**", "/error",
-								"/api/cart/**","/members/**"
+								"/api/cart/**","/members/**","/api/orders/**"
 						).permitAll()
 						.anyRequest().authenticated()
 				);
