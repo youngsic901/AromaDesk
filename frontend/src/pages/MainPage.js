@@ -1,208 +1,152 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { fetchFilteredProducts } from "../app/slices/productSlice";
 import { fetchCartItems } from "../app/slices/cartSlice";
 import ProductCard from "../components/common/ProductCard";
-import CategorySidebar from "../components/layout/CategorySidebar";
-import { FaSearch, FaShoppingCart, FaBars } from "react-icons/fa";
+import FilterBar from "../components/FilterBar";
 
 const MainPage = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { products, loading, error } = useSelector((state) => state.product);
-  const { totalQuantity } = useSelector((state) => state.cart);
+  const { category, brand } = useParams();
 
-  // 상태 관리
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedBrand, setSelectedBrand] = useState("");
-  const [selectedGender, setSelectedGender] = useState("");
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
+  // 필터 상태
+  const [filters, setFilters] = useState({
+    brand: brand || "",
+    volume: "",
+    gender: category || "",
+    price: "",
+  });
 
-  // 초기 데이터 로드
+  // URL 파라미터가 바뀔 때마다 filters 동기화
   useEffect(() => {
-    dispatch(fetchFilteredProducts());
+    setFilters((prev) => ({
+      ...prev,
+      brand: brand || "",
+      gender: category || "",
+    }));
+  }, [category, brand]);
+
+  // 필터 변경 핸들러
+  const handleFilterChange = ({ type, value }) => {
+    setFilters((prev) => ({ ...prev, [type]: value }));
+  };
+
+  // 상품 fetch (필터/카테고리/브랜드 변경 시)
+  useEffect(() => {
+    const params = {};
+    if (filters.brand) params.brand = filters.brand;
+    if (filters.volume) params.volume = filters.volume;
+    if (filters.gender) params.gender = filters.gender;
+    if (filters.price) params.maxPrice = filters.price;
+    dispatch(fetchFilteredProducts(params));
     dispatch(fetchCartItems(1)); // memberId = 1 (임시)
-  }, [dispatch]);
+  }, [dispatch, filters]);
 
-  // 필터 적용
-  const applyFilters = () => {
-    const filters = {};
-    if (selectedBrand) filters.brand = selectedBrand;
-    if (selectedGender) filters.gender = selectedGender;
-    if (minPrice) filters.minPrice = minPrice;
-    if (maxPrice) filters.maxPrice = maxPrice;
-    dispatch(fetchFilteredProducts(filters));
-  };
-
-  // 검색 처리
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchTerm.trim()) {
-      dispatch(fetchFilteredProducts({ name: searchTerm }));
+  // 페이지 제목 설정
+  const getPageTitle = () => {
+    if (category) {
+      const map = {
+        MALE: "남자향수",
+        FEMALE: "여자향수",
+        UNISEX: "남여공용",
+      };
+      return map[category.toUpperCase()] || "카테고리 상품";
     }
+    if (brand) {
+      const map = {
+        CHANEL: "샤넬",
+        DIOR: "디올",
+        GUCCI: "구찌",
+        YSL: "입생로랑",
+        HERMES: "에르메스",
+      };
+      return map[brand.toUpperCase()] || "브랜드 상품";
+    }
+    return "추천 상품";
   };
-
-  // 필터 초기화
-  const clearFilters = () => {
-    setSelectedBrand("");
-    setSelectedGender("");
-    setMinPrice("");
-    setMaxPrice("");
-    dispatch(fetchFilteredProducts());
-  };
-
-  // 장바구니 페이지로 이동
-  const goToCart = () => {
-    navigate("/cart");
-  };
-
-  // 브랜드/성별 옵션
-  const brandOptions = [
-    "CHANEL",
-    "DIOR",
-    "HERMES",
-    "JO MALONE",
-    "TOM FORD",
-    "YSL",
-    "GUCCI",
-    "PRADA",
-    "BOTTEGA VENETA",
-    "BYREDO",
-  ];
-  const genderOptions = ["남성", "여성", "중성"];
 
   return (
-    <div>
-      {/* 히어로 섹션 */}
-      <section className="py-5 mb-4 bg-primary bg-gradient text-white text-center">
-        <div className="container">
-          <h1 className="display-4 fw-bold mb-3">AromaDesk</h1>
-          <p className="lead mb-4">당신만의 특별한 향기를 찾아보세요</p>
-          <form
-            className="mx-auto"
-            style={{ maxWidth: 600 }}
-            onSubmit={handleSearch}
-          >
-            <div className="input-group shadow rounded-pill overflow-hidden">
-              <span className="input-group-text bg-white border-0">
-                <FaSearch />
-              </span>
-              <input
-                type="text"
-                className="form-control border-0"
-                placeholder="향수 이름, 브랜드, 노트를 검색해보세요..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <button className="btn btn-light text-primary px-4" type="submit">
-                검색
-              </button>
-            </div>
-          </form>
+    <main className="flex-grow-1">
+      {/* 홈이 아닐 때만 상단에 필터 바 노출 */}
+      {(category || brand) && (
+        <div className="bg-light rounded-3 p-4 mb-4">
+          <h2 className="fw-bold text-center mb-3">향수 상품 목록</h2>
+          <FilterBar
+            brand={filters.brand}
+            volume={filters.volume}
+            gender={filters.gender}
+            price={filters.price}
+            onChange={handleFilterChange}
+          />
         </div>
-      </section>
-
-      <div className="container-fluid py-4">
-        <div className="row">
-          {/* 모바일: Offcanvas 사이드바 토글 */}
-          <div className="d-md-none mb-3">
-            <button
-              className="btn btn-outline-secondary"
-              data-bs-toggle="offcanvas"
-              data-bs-target="#sidebarOffcanvas"
+      )}
+      {/* 홈(메인)에서만 배너 노출 */}
+      {!category && !brand && (
+        <section
+          className="main-hero-banner d-flex align-items-center justify-content-center mb-4"
+          style={{
+            minHeight: 220,
+            borderRadius: 32,
+            boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.15)",
+            background: "linear-gradient(120deg, #7b2ff2 0%, #f357a8 100%)",
+            color: "#fff",
+            position: "relative",
+            overflow: "hidden",
+            margin: "32px 0 0 0",
+          }}
+        >
+          <div className="container py-5">
+            <h1
+              className="display-3 fw-bold mb-2"
+              style={{
+                letterSpacing: 1.5,
+                textShadow: "0 2px 16px rgba(123,47,242,0.12)",
+                fontWeight: 800,
+              }}
             >
-              <FaBars /> 카테고리
-            </button>
+              AromaDesk
+            </h1>
+            <p
+              className="lead mb-0"
+              style={{
+                fontSize: 22,
+                fontWeight: 500,
+                textShadow: "0 1px 8px rgba(243,87,168,0.10)",
+              }}
+            >
+              당신만의 특별한 향기를 찾아보세요
+            </p>
           </div>
-          {/* Offcanvas 사이드바 (모바일) */}
-          <div
-            className="offcanvas offcanvas-start"
-            tabIndex="-1"
-            id="sidebarOffcanvas"
-          >
-            <div className="offcanvas-header">
-              <h5 className="offcanvas-title">카테고리</h5>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="offcanvas"
-              ></button>
-            </div>
-            <div className="offcanvas-body">
-              <CategorySidebar
-                brandOptions={brandOptions}
-                genderOptions={genderOptions}
-                selectedBrand={selectedBrand}
-                setSelectedBrand={setSelectedBrand}
-                selectedGender={selectedGender}
-                setSelectedGender={setSelectedGender}
-                minPrice={minPrice}
-                setMinPrice={setMinPrice}
-                maxPrice={maxPrice}
-                setMaxPrice={setMaxPrice}
-                applyFilters={applyFilters}
-                clearFilters={clearFilters}
-              />
-            </div>
-          </div>
-          {/* PC용 사이드바 */}
-          <aside className="col-md-3 d-none d-md-block">
-            <CategorySidebar
-              brandOptions={brandOptions}
-              genderOptions={genderOptions}
-              selectedBrand={selectedBrand}
-              setSelectedBrand={setSelectedBrand}
-              selectedGender={selectedGender}
-              setSelectedGender={setSelectedGender}
-              minPrice={minPrice}
-              setMinPrice={setMinPrice}
-              maxPrice={maxPrice}
-              setMaxPrice={setMaxPrice}
-              applyFilters={applyFilters}
-              clearFilters={clearFilters}
-            />
-          </aside>
-          {/* 상품 그리드 */}
-          <main className="col-md-9">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-              <h2 className="fw-bold mb-0">추천 상품</h2>
-              <button
-                className="btn btn-outline-dark position-relative"
-                onClick={goToCart}
-              >
-                <FaShoppingCart />
-                {totalQuantity > 0 && (
-                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                    {totalQuantity}
-                  </span>
-                )}
-              </button>
-            </div>
-            {loading ? (
-              <div className="text-center py-5">상품을 불러오는 중...</div>
-            ) : error ? (
-              <div className="alert alert-danger">오류: {error}</div>
-            ) : (
-              <div className="row g-4">
-                {products.length === 0 ? (
-                  <div className="col-12 text-center text-muted">
-                    상품이 없습니다.
-                  </div>
-                ) : (
-                  products.map((product) => (
-                    <div className="col-12 col-sm-6 col-lg-4" key={product.id}>
-                      <ProductCard product={product} />
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
-          </main>
+        </section>
+      )}
+      <div className="container-fluid py-4">
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h2 className="fw-bold mb-0">{getPageTitle()}</h2>
         </div>
+        {loading ? (
+          <div className="text-center py-5">상품을 불러오는 중...</div>
+        ) : error ? (
+          <div className="alert alert-danger">오류: {error}</div>
+        ) : (
+          <div className="row g-4">
+            {products.length === 0 ? (
+              <div className="col-12 text-center text-muted">
+                해당 조건의 상품이 없습니다.
+              </div>
+            ) : (
+              products.map((product) => (
+                <div className="col-12 col-sm-6 col-lg-4" key={product.id}>
+                  <ProductCard product={product} />
+                </div>
+              ))
+            )}
+          </div>
+        )}
       </div>
-    </div>
+    </main>
   );
 };
+
 export default MainPage;

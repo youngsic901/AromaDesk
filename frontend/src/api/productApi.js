@@ -6,19 +6,38 @@ export const productApi = {
   // 필터링된 상품 목록 조회 (페이징 포함)
   getFilteredProducts: async (params = {}) => {
     try {
-      const { brand, gender, volume, page = 1, size = 10 } = params;
+      const { brand, gender, volume, name, page = 1, size = 10 } = params;
+
+      // 백엔드 API 엔드포인트와 파라미터 구조 맞춤
+      const queryParams = {};
+      if (brand) queryParams.brand = brand;
+      if (gender) queryParams.gender = gender;
+      if (volume) queryParams.volume = volume;
+      if (page) queryParams.page = page;
+      if (size) queryParams.size = size;
 
       const response = await apiClient.get("/api/products", {
-        params: {
-          brand,
-          gender,
-          volume,
-          page,
-          size,
-        },
+        params: queryParams,
       });
 
-      return handleApiSuccess(response);
+      // 백엔드 응답 구조: { content: [], totalElements: number, page: number, size: number, totalPages: number }
+      const result = handleApiSuccess(response);
+
+      // name 검색은 프론트엔드에서 필터링 (백엔드에 name 파라미터가 없으므로)
+      if (name && result.content) {
+        const filteredContent = result.content.filter(
+          (product) =>
+            product.name.toLowerCase().includes(name.toLowerCase()) ||
+            product.brand.toLowerCase().includes(name.toLowerCase())
+        );
+        return {
+          ...result,
+          content: filteredContent,
+          totalElements: filteredContent.length,
+        };
+      }
+
+      return result;
     } catch (error) {
       throw handleApiError(error);
     }

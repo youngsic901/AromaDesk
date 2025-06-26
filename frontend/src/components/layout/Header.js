@@ -26,8 +26,8 @@ const Header = () => {
         </button>
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <form
-            className="d-flex mx-auto"
-            style={{ maxWidth: 400 }}
+            className="d-flex mx-auto align-items-center"
+            style={{ maxWidth: 400, minHeight: 48 }}
             onSubmit={(e) => {
               e.preventDefault();
               navigate("/products");
@@ -38,8 +38,13 @@ const Header = () => {
               type="search"
               placeholder="향수 검색..."
               aria-label="Search"
+              style={{ height: 44, fontSize: 16 }}
             />
-            <button className="btn btn-outline-primary" type="submit">
+            <button
+              className="btn btn-outline-primary"
+              type="submit"
+              style={{ height: 44, minWidth: 64, fontSize: 16 }}
+            >
               검색
             </button>
           </form>
