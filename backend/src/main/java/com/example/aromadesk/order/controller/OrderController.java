@@ -5,6 +5,8 @@ import com.example.aromadesk.cart.dto.CartRequestDto;
 import com.example.aromadesk.member.entity.Member;
 import com.example.aromadesk.order.dto.OrderRequestDto;
 import com.example.aromadesk.order.dto.OrderResponseDto;
+import com.example.aromadesk.order.entity.Order;
+import com.example.aromadesk.order.repository.OrderRepository;
 import com.example.aromadesk.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +22,8 @@ import java.util.List;
  /* MODIFIVATION LOG :
  /* DATA         AUTHOR          DESC.
  /*--------     ---------    ----------------------
- /*2025.06.25   SUSU           INITIAL RELEASE
- /*
+ /*2025.06.25   SUSU        상품 상세보기 및 장바구니 주문 처리
+ /*2025.06.26   SUSU        결제 완료 처리 
  /*************************************************************/
 
 @RestController
@@ -30,6 +32,7 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+    private final OrderRepository orderRepository;
 
     /**
      * 단일 상품 주문 생성 (상품 상세 -> 바로 주문)
@@ -65,6 +68,25 @@ public class OrderController {
         Member loginMember = user.getMember();
         List<OrderResponseDto> orders = orderService.getOrdersByMemberID(loginMember);
         return ResponseEntity.ok(orders);
+    }
+    
+    /**
+     * 결제 완료 처리
+     */
+    @PostMapping("/{orderId}/pay")
+    public ResponseEntity<String> completePayment(@PathVariable("orderId") Long orderId) {
+        orderService.completePayment(orderId);
+        return ResponseEntity.ok("결제가 완료되었습니다.");
+    }
+
+    /**
+     *주문 상태 확인용
+     */
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderResponseDto> getOrder(@PathVariable("orderId") Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다."));
+        return ResponseEntity.ok(OrderResponseDto.from(order));
     }
 
 
