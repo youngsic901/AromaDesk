@@ -63,7 +63,7 @@ const Header = () => {
               </button>
             </li>
             <li className="nav-item">
-              <button className="btn" onClick={() => navigate("/login")}>
+              <button className="btn" onClick={() => navigate("/mypage")}>
                 <FaUser size={20} />
               </button>
             </li>
