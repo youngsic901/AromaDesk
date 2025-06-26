@@ -5,7 +5,7 @@ import com.example.aromadesk.product.entity.Product;
 import lombok.Getter;
 
 /**
- * @author : youngsic
+ * @author : young
  * @packageName : com.example.aromadesk.cart.dto
  * @fileName : CartResponseDto
  * @date : 25. 6. 21.
@@ -21,7 +21,6 @@ public class CartResponseDto {
     private int quantity;
 
     /**
-     *
      * @param cart DTO로 변환할 Cart 타입 엔티티
      */
     public CartResponseDto(Cart cart) {

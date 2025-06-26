@@ -37,9 +37,8 @@ public class Order {
     private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status", nullable = false) // HEAD 쪽 유지
     private OrderStatus orderStatus;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "delivery_id")
@@ -48,7 +47,7 @@ public class Order {
     @Column(name = "total_price", nullable = false)
     private int totalPrice;
 
-    @Column(name="created_at", updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist

@@ -19,15 +19,15 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
 	private final MemberLoginService memberLoginService;
 	private final AdminLoginService adminLoginService;
-  
-  
+
 	public SecurityConfig(MemberLoginService memberLoginService, AdminLoginService adminLoginService) {
 		this.memberLoginService = memberLoginService;
 		this.adminLoginService = adminLoginService;
 	}
-  // Security 필터 체인 설정
+
 	@Bean
 	@Order(2)
 	public SecurityFilterChain userSecurityFilterChain(HttpSecurity http, MemberRepository memberRepository) throws Exception {
@@ -46,17 +46,16 @@ public class SecurityConfig {
 						).permitAll()
 						.anyRequest().authenticated()
 				)
-				// 소셜 로그인 기능 활성화
 				.oauth2Login(oauth2 -> oauth2
-						.loginPage("/auth/login") // 소셜, 자체 로그인 모두 동일한 페이지 사용
+						.loginPage("/auth/login")
 						.defaultSuccessUrl("/", true)
 						.userInfoEndpoint(userInfo -> userInfo
-								.userService(customOAuth2UserService(memberRepository)) // 커스텀 서비스 구현 필요!
+								.userService(customOAuth2UserService(memberRepository))
 						)
 				);
 		return http.build();
 	}
-  // Security 필터 체인 설정
+
 	@Bean
 	@Order(1)
 	public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -70,15 +69,20 @@ public class SecurityConfig {
 				);
 		return http.build();
 	}
-  // 비밀번호 암호화 방식
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-
 		return new BCryptPasswordEncoder();
 	}
 
 	@Bean
 	public CustomOAuth2UserService customOAuth2UserService(MemberRepository memberRepository) {
 		return new CustomOAuth2UserService(memberRepository);
+	}
+
+	// 선택: 만약 authenticationManager 필요하면 아래 포함
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConf) throws Exception {
+		return authConf.getAuthenticationManager();
 	}
 }

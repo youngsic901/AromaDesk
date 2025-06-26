@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,7 +35,6 @@ import java.util.stream.Collectors;
  /*2025.06.26   susu        member 객체로 변경
  /*************************************************************/
 
-
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -48,23 +46,20 @@ public class OrderService {
     private final CartRepository cartRepository;
 
     /**
-     * 단일 상품 주문 처리 (상품 상세 페이지에서 바로 구매
-     *
+     * 단일 상품 주문 처리 (상품 상세 페이지에서 바로 구매)
      */
-
     @Transactional
     public void createSingleOrder(OrderRequestDto dto, Member member) {
-
         if (dto.getItems() == null || dto.getItems().isEmpty()) {
             throw new IllegalArgumentException("주문 항목이 비어 있습니다.");
         }
 
         Delivery delivery = deliveryRepository.findById(dto.getDeliveryId())
-                .orElseThrow(() -> new IllegalArgumentException(" 배송지가 없습니다. id" + dto.getDeliveryId()));
+                .orElseThrow(() -> new IllegalArgumentException("배송지가 없습니다. id = " + dto.getDeliveryId()));
 
         List<OrderItem> orderItems = dto.getItems().stream().map(itemDto -> {
             Product product = productRepository.findById(itemDto.getProductId())
-                    .orElseThrow(() -> new IllegalArgumentException(" 상품이 존재하지 않습니다. id.= " + itemDto.getProductId()));
+                    .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않습니다. id = " + itemDto.getProductId()));
 
             if (product.getStock() < itemDto.getQuantity()) {
                 throw new IllegalArgumentException("재고가 부족합니다. " + product.getName());
@@ -103,11 +98,9 @@ public class OrderService {
 
     /**
      * 장바구니 기반 주문 처리(cartItemIds 사용)
-     *
      */
     @Transactional
-    public void createOrderFromCart(CartRequestDto dto,Member member) {
-
+    public void createOrderFromCart(CartRequestDto dto, Member member) {
         Delivery delivery = deliveryRepository.findById(dto.getDeliveryId())
                 .orElseThrow(() -> new IllegalArgumentException("배송지가 없습니다. id = " + dto.getDeliveryId()));
 
@@ -169,18 +162,18 @@ public class OrderService {
                 .map(OrderResponseDto::from)
                 .collect(Collectors.toList());
     }
+
     /**
-     *결제 완료 처리
+     * 결제 완료 처리
      */
     @Transactional
     public void completePayment(Long orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다," + orderId));
+                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다. id = " + orderId));
         if(order.getOrderStatus() != OrderStatus.ORDERED) {
             throw new IllegalArgumentException("이미 결제된 주문입니다.");
         }
         order.setOrderStatus(OrderStatus.PAID);
-
     }
 
 }

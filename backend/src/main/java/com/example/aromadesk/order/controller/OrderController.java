@@ -23,7 +23,7 @@ import java.util.List;
  /* DATA         AUTHOR          DESC.
  /*--------     ---------    ----------------------
  /*2025.06.25   SUSU        상품 상세보기 및 장바구니 주문 처리
- /*2025.06.26   SUSU        결제 완료 처리 
+ /*2025.06.26   SUSU        결제 완료 처리
  /*************************************************************/
 
 @RestController
@@ -69,7 +69,7 @@ public class OrderController {
         List<OrderResponseDto> orders = orderService.getOrdersByMemberID(loginMember);
         return ResponseEntity.ok(orders);
     }
-    
+
     /**
      * 결제 완료 처리
      */
@@ -80,7 +80,7 @@ public class OrderController {
     }
 
     /**
-     *주문 상태 확인용
+     * 주문 상태 확인용
      */
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponseDto> getOrder(@PathVariable("orderId") Long orderId) {
@@ -88,6 +88,5 @@ public class OrderController {
                 .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다."));
         return ResponseEntity.ok(OrderResponseDto.from(order));
     }
-
 
 }
