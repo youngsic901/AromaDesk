@@ -1,4 +1,4 @@
-package com.example.aromadesk.member.Controller;
+package com.example.aromadesk.member.controller;
 
 import com.example.aromadesk.member.repository.MemberRepository;
 import com.example.aromadesk.member.entity.Member;
