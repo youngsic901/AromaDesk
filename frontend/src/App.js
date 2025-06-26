@@ -11,6 +11,15 @@ import MainPage from "./pages/MainPage";
 import ProductListPage from "./pages/ProductListPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import CartPage from "./pages/CartPage";
+import MyPage from "./pages/MyPage";
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
+import AdminLoginPage from "./pages/AdminLoginPage";
+import AdminMainPage from "./pages/AdminMainPage";
+import AdminLoginPage from "./pages/AdminLoginPage";
+
+
+function App() {
 import CategoryPage from "./pages/CategoryPage";
 import BrandPage from "./pages/BrandPage";
 
@@ -20,6 +29,21 @@ const AppContent = () => {
 
   return (
     <Router>
+      <Header />
+      <main style={{ padding: "20px" }}>
+        <Routes>
+          <Route path="/" element={<MainPage />} />
+          <Route path="/mypage" element={<MyPage />} />
+          <Route path="/products" element={<ProductListPage />} />
+          <Route path="/products/:id" element={<ProductDetailPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/admin" element={<AdminMainPage />} />
+          <Route path="/admin/login" element={<AdminLoginPage />} />
+        </Routes>
+      </main>
       <Header setSidebarOpen={setSidebarOpen} />
       <div className="d-flex" style={{ minHeight: "100vh" }}>
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />

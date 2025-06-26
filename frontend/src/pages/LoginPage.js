@@ -16,16 +16,8 @@ const LoginPage = () => {
       return;
     }
 
-    // 전송할 JSON 데이터 준비
-    const loginData = {
-      memberId: memberId.trim(),
-      password: password.trim()
-    };
-
-    console.log('백엔드로 전송할 JSON 데이터:', loginData);
-
     try {
-      const result = await login(memberId, password);
+      const result = await login(memberId.trim(), password.trim());
       if (result.success) {
         console.log('로그인 성공:', result.data);
         alert('로그인 성공!');

@@ -1,23 +1,23 @@
 import apiClient from "./axiosConfig";
 import { handleApiError, handleApiSuccess } from "./errorHandler";
 
-export const loginAPI = {
-  // 일반 로그인
-  login: async (memberId, password) => {
+export const adminLoginAPI = {
+  // 관리자 로그인
+  login: async (username, password) => {
     try {
-      console.log('API 호출: 로그인 요청');
-      console.log('요청 데이터:', { memberId, password });
+      console.log('API 호출: 관리자 로그인 요청');
+      console.log('요청 데이터:', { username, password });
 
-      // POST /api/members/login으로 로그인 요청
-      const response = await apiClient.post('/api/members/login', {
-        memberId: memberId,
+      // POST /admin/login으로 관리자 로그인 요청
+      const response = await apiClient.post('/admin/login', {
+        username: username,
         password: password
       });
 
       console.log('백엔드 응답:', response.data);
       return { success: true, data: handleApiSuccess(response) };
     } catch (error) {
-      console.error('로그인 API 에러:', error);
+      console.error('관리자 로그인 API 에러:', error);
       const errorMessage = handleApiError(error).message;
       return { 
         success: false, 
@@ -26,10 +26,10 @@ export const loginAPI = {
     }
   },
 
-  // 로그아웃
+  // 관리자 로그아웃
   logout: async () => {
     try {
-      const response = await apiClient.post('/api/members/logout');
+      const response = await apiClient.post('/admin/logout');
       return { success: true, data: handleApiSuccess(response) };
     } catch (error) {
       const errorMessage = handleApiError(error).message;
@@ -40,15 +40,15 @@ export const loginAPI = {
     }
   },
 
-  // 사용자 정보 조회
-  getUserInfo: async () => {
+  // 관리자 정보 조회
+  getAdminInfo: async () => {
     try {
-      // 로컬스토리지에서 사용자 정보 조회
-      const userInfo = localStorage.getItem('CusUser');
-      if (userInfo) {
-        return { success: true, data: JSON.parse(userInfo) };
+      // 로컬스토리지에서 관리자 정보 조회
+      const adminInfo = localStorage.getItem('AdminUser');
+      if (adminInfo) {
+        return { success: true, data: JSON.parse(adminInfo) };
       } else {
-        return { success: false, error: '로그인된 사용자 정보가 없습니다.' };
+        return { success: false, error: '로그인된 관리자 정보가 없습니다.' };
       }
     } catch (error) {
       const errorMessage = handleApiError(error).message;
