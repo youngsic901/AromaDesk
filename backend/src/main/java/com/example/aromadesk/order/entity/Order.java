@@ -20,22 +20,26 @@ import java.util.List;
 @Builder
 public class Order {
 
-    @Id@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="member_id")
+    @JoinColumn(name = "member_id")
     private Member member;
 
+    @Builder.Default
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
 
-
-    @Column(name = "payment_method", nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method", nullable = false)
     private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "order_status", nullable = false)
     private OrderStatus orderStatus;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "delivery_id")
@@ -43,7 +47,6 @@ public class Order {
 
     @Column(name = "total_price", nullable = false)
     private int totalPrice;
-
 
     private LocalDateTime orderDate;
 }

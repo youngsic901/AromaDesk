@@ -41,8 +41,12 @@ public class SecurityConfig {
 								"/api/members",
 								"/css/**", "/js/**", "/images/**",
 								"/api/health", "/api/products/**", "/api/members/**", "/error",
+<<<<<<< kang
 								"/api/cart/**","/members/**",
 								"/oauth2/**", "/login/oauth2/**", "/oauth2/authorization/**"
+=======
+								"/api/cart/**","/members/**","/api/orders/**"
+>>>>>>> main
 						).permitAll()
 						.anyRequest().authenticated()
 				)

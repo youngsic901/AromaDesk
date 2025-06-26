@@ -1,11 +1,21 @@
 import { configureStore } from "@reduxjs/toolkit";
-import userReducer from "./slices/userSlice";
+import productReducer from "./slices/productSlice";
+import cartReducer from "./slices/cartSlice";
+import deliveryReducer from "./slices/deliverySlice";
 
 export const store = configureStore({
   reducer: {
-    user: userReducer,
-    // cart: cartReducer, // 나중에 장바구니 슬라이스 추가
+    product: productReducer,
+    cart: cartReducer,
+    delivery: deliveryReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // 비동기 액션의 pending 상태를 직렬화 체크에서 제외
+        ignoredActions: ["persist/PERSIST"],
+      },
+    }),
 });
 
 export default store;
