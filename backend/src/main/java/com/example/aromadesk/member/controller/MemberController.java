@@ -99,4 +99,13 @@ public class MemberController {
         session.removeAttribute("CusUser");
         return ResponseEntity.ok("로그아웃되었습니다.");
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getMyInfo(HttpSession session) {
+        Object user = session.getAttribute("CusUser");
+        if (user == null) {
+            return ResponseEntity.status(401).body("로그인 필요");
+        }
+        return ResponseEntity.ok(user);
+    }
 }
