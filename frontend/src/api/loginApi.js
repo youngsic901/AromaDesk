@@ -7,7 +7,11 @@ export const loginAPI = {
       console.log('API 호출: 로그인 요청');
       console.log('요청 데이터:', { memberId, password });
 
-      const response = await apiClient.post('/api/members/login', { memberId, password });
+      // POST /api/members/login으로 로그인 요청
+      const response = await apiClient.post('/api/members/login', {
+        memberId: memberId,
+        password: password
+      });
 
       console.log('백엔드 응답:', response.data);
       return { success: true, data: response.data };
@@ -15,9 +19,23 @@ export const loginAPI = {
       console.error('로그인 API 에러:', error);
       console.error('에러 응답:', error.response?.data);
       
+      // 에러 객체에서 message 필드만 추출
+      let errorMessage = '로그인 중 오류가 발생했습니다.';
+      if (error.response?.data) {
+        if (typeof error.response.data === 'string') {
+          errorMessage = error.response.data;
+        } else if (error.response.data.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.response.data.error) {
+          errorMessage = error.response.data.error;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       return { 
         success: false, 
-        error: error.response?.data || error.message || '로그인 중 오류가 발생했습니다.' 
+        error: errorMessage
       };
     }
   },
@@ -28,9 +46,23 @@ export const loginAPI = {
       const response = await apiClient.post('/api/members/logout');
       return { success: true, data: response.data };
     } catch (error) {
+      // 에러 객체에서 message 필드만 추출
+      let errorMessage = '로그아웃 중 오류가 발생했습니다.';
+      if (error.response?.data) {
+        if (typeof error.response.data === 'string') {
+          errorMessage = error.response.data;
+        } else if (error.response.data.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.response.data.error) {
+          errorMessage = error.response.data.error;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       return { 
         success: false, 
-        error: error.response?.data || '로그아웃 중 오류가 발생했습니다.' 
+        error: errorMessage
       };
     }
   },
@@ -38,12 +70,31 @@ export const loginAPI = {
   // 사용자 정보 조회
   getUserInfo: async () => {
     try {
-      const response = await apiClient.get('/api/user/info');
-      return { success: true, data: response.data };
+      // 로컬스토리지에서 사용자 정보 조회
+      const userInfo = localStorage.getItem('CusUser');
+      if (userInfo) {
+        return { success: true, data: JSON.parse(userInfo) };
+      } else {
+        return { success: false, error: '로그인된 사용자 정보가 없습니다.' };
+      }
     } catch (error) {
+      // 에러 객체에서 message 필드만 추출
+      let errorMessage = '사용자 정보 조회 중 오류가 발생했습니다.';
+      if (error.response?.data) {
+        if (typeof error.response.data === 'string') {
+          errorMessage = error.response.data;
+        } else if (error.response.data.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.response.data.error) {
+          errorMessage = error.response.data.error;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       return { 
         success: false, 
-        error: error.response?.data || '사용자 정보 조회 중 오류가 발생했습니다.' 
+        error: errorMessage
       };
     }
   }

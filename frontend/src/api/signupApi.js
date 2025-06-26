@@ -3,7 +3,7 @@ import apiClient from "./index";
 // 회원가입 API 함수
 export const signUpAPI = async (signUpData) => {
   try {
-    const response = await apiClient.post('/api/signup', signUpData);
+    const response = await apiClient.post('/api/members', signUpData);
     return {
       success: true,
       data: response.data
@@ -17,13 +17,17 @@ export const signUpAPI = async (signUpData) => {
   }
 };
 
-// 아이디 중복 확인 API
+// 아이디 중복 확인 API (백엔드에 없는 기능이므로 클라이언트에서 처리)
 export const checkMemberIdAPI = async (memberId) => {
   try {
-    const response = await apiClient.get(`/api/check-member-id?memberId=${memberId}`);
+    // 전체 회원 목록을 가져와서 클라이언트에서 중복 확인
+    const response = await apiClient.get('/api/members');
+    const members = response.data;
+    const isAvailable = !members.some(member => member.memberId === memberId);
+    
     return {
       success: true,
-      isAvailable: response.data.isAvailable
+      isAvailable: isAvailable
     };
   } catch (error) {
     console.error('아이디 중복 확인 API 오류:', error);
@@ -34,13 +38,17 @@ export const checkMemberIdAPI = async (memberId) => {
   }
 };
 
-// 이메일 중복 확인 API
+// 이메일 중복 확인 API (백엔드에 없는 기능이므로 클라이언트에서 처리)
 export const checkEmailAPI = async (email) => {
   try {
-    const response = await apiClient.get(`/api/check-email?email=${email}`);
+    // 전체 회원 목록을 가져와서 클라이언트에서 중복 확인
+    const response = await apiClient.get('/api/members');
+    const members = response.data;
+    const isAvailable = !members.some(member => member.email === email);
+    
     return {
       success: true,
-      isAvailable: response.data.isAvailable
+      isAvailable: isAvailable
     };
   } catch (error) {
     console.error('이메일 중복 확인 API 오류:', error);
