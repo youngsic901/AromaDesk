@@ -56,18 +56,33 @@ public class CartService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 상품을 찾을 수 없습니다."));
 
+        if (quantity <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수량은 1개 이상이어야 합니다.");
+        }
+
         Optional<Cart> optionalCart = cartRepository.findByMemberIdAndProductId(memberId, productId);
         Cart cart;
+        int totalQuantity;
         if (optionalCart.isPresent()) {
             cart = optionalCart.get();
-            cart.updateQuantity(cart.getQuantity() + quantity);
+            totalQuantity = cart.getQuantity() + quantity;
+            if (totalQuantity > product.getStock()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "재고를 초과했습니다. 최대 담을 수 있는 수량은 " + (product.getStock() - cart.getQuantity()) + "개입니다.");
+            }
+            cart.updateQuantity(totalQuantity);
         } else {
+            if (quantity > product.getStock()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "재고가 부족합니다. 남은 재고: " + product.getStock() + "개");
+            }
             cart = new Cart(member, product, quantity);
         }
 
         cartRepository.save(cart);
         return new CartResponseDTO(cart);
     }
+
 
     /**
      * 장바구니 내부 특정 상품의 수량 변경
@@ -84,6 +99,13 @@ public class CartService {
 
         Cart cart = cartRepository.findByMemberIdAndProductId(memberId, productId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "장바구니에 해당 상품이 없습니다."));
+
+        // 상품 재고 체크 추가
+        Product product = cart.getProduct();
+        if (quantity > product.getStock()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "재고가 부족합니다. 남은 재고: " + product.getStock() + "개");
+        }
 
         cart.updateQuantity(quantity);
         cartRepository.save(cart);
