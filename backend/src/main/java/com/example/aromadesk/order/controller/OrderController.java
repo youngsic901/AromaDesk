@@ -1,13 +1,18 @@
 package com.example.aromadesk.order.controller;
 
+import com.example.aromadesk.auth.service.CustomOAuth2User;
 import com.example.aromadesk.cart.dto.CartRequestDto;
+import com.example.aromadesk.member.entity.Member;
 import com.example.aromadesk.order.dto.OrderRequestDto;
 import com.example.aromadesk.order.dto.OrderResponseDto;
 import com.example.aromadesk.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /*************************************************************
@@ -18,6 +23,7 @@ import java.util.List;
  /* DATA         AUTHOR          DESC.
  /*--------     ---------    ----------------------
  /*2025.06.25   SUSU           INITIAL RELEASE
+ /*2025.06.26   KANG        기간별 총메출 메소드 추가
  /*************************************************************/
 
 @RestController
@@ -32,8 +38,10 @@ public class OrderController {
      */
     @PostMapping("/single")
     public ResponseEntity<String> createSingleOrder(@RequestBody OrderRequestDto dto) {
-        Long memberId = 1L; //TODO: 세션 기반 로그인 정보로 대체
-        orderService.createSingleOrder(dto, memberId);
+        CustomOAuth2User user = (CustomOAuth2User) SecurityContextHolder
+                .getContext().getAuthentication().getPrincipal();
+        Member loginMember = user.getMember();
+        orderService.createSingleOrder(dto, loginMember);
         return ResponseEntity.ok("단일 상품 주문이 성공하였습니다. ");
     }
 
@@ -42,8 +50,10 @@ public class OrderController {
      */
     @PostMapping("/from-cart")
     public ResponseEntity<String> createOrderFromCart(@RequestBody CartRequestDto dto) {
-        Long memberId = 1L; //TODO: 세션 기반 로그인 정보로 대체
-        orderService.createOrderFromCart(dto, memberId);
+        CustomOAuth2User user = (CustomOAuth2User) SecurityContextHolder
+                .getContext().getAuthentication().getPrincipal();
+        Member loginMember = user.getMember();
+        orderService.createOrderFromCart(dto, loginMember);
         return ResponseEntity.ok("장바구니 상품 주문이 완료되었습니다.");
     }
 
@@ -52,10 +62,30 @@ public class OrderController {
      */
     @GetMapping
     public ResponseEntity<List<OrderResponseDto>> getAllOrders() {
-        Long memberId = 1L; //TODO: 세션 기반 로그인 정보로 대체
-        List<OrderResponseDto> orders = orderService.getOrdersByMemberID(memberId);
+        CustomOAuth2User user = (CustomOAuth2User) SecurityContextHolder
+                .getContext().getAuthentication().getPrincipal();
+        Member loginMember = user.getMember();
+        List<OrderResponseDto> orders = orderService.getOrdersByMemberID(loginMember);
         return ResponseEntity.ok(orders);
     }
 
+    @GetMapping("/total-revenue")
+    public ResponseEntity<Long> getTotalSales(
+            @RequestParam String start,
+            @RequestParam String end) {
 
+        // 1. 문자열을 LocalDate로 변환 (ex. "2023-01-01")
+        LocalDate startDate = LocalDate.parse(start);
+        LocalDate endDate = LocalDate.parse(end);
+
+        // 2. LocalDate를 LocalDateTime(자정)으로 변환
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay(); // 다음날 00:00:00까지
+
+        // 3. 서비스 호출
+        Long total = orderService.getTotalSalesBetween(startDateTime, endDateTime);
+
+        // 4. 결과 반환
+        return ResponseEntity.ok(total);
+    }
 }

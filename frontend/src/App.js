@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./app/store";
+
+// Layout Components
 import Header from "./components/layout/Header";
 import Sidebar from "./components/layout/SideBar";
 import Footer from "./components/layout/Footer";
@@ -22,6 +24,7 @@ import AdminOrderPage from "./PagesAdmin/AdminOrderPage";
 import AdminMemberPage from "./PagesAdmin/AdminMemberPage";
 import CategoryPage from "./pages/CategoryPage";
 import BrandPage from "./pages/BrandPage";
+import SearchPage from "./pages/SearchPage";
 
 // 관리자 인증 라우트
 function AdminRoute({ children }) {
@@ -94,12 +97,13 @@ function AppContent() {
   );
 }
 
-function App() {
+// Redux Provider로 감싸기
+const App = () => {
   return (
     <Provider store={store}>
       <AppContent />
     </Provider>
   );
-}
+};
 
 export default App;

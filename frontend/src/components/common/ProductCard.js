@@ -2,6 +2,7 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { addToCartAction } from "../../app/slices/cartSlice";
+import { formatPrice } from "../../utils/formatters";
 
 const cardStyle = {
   border: "none",
@@ -60,10 +61,6 @@ const ProductCard = ({ product, memberId = 1 }) => {
 
   const handleCardClick = () => {
     navigate(`/products/${product.id}`);
-  };
-
-  const formatPrice = (price) => {
-    return price.toLocaleString("ko-KR") + "원";
   };
 
   return (
