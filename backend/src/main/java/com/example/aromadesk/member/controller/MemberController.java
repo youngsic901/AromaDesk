@@ -1,5 +1,4 @@
 package com.example.aromadesk.member.controller;
-package com.example.aromadesk.member.controller;
 
 import com.example.aromadesk.member.dto.MemberDto;
 import com.example.aromadesk.member.repository.MemberRepository;
