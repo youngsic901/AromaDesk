@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import '../css/myPage.css';
 import MyPageUpdate from './MyPageUpdate';
 import { getMyPageInfo, checkPassword, changePassword } from '../api/mypageApi';
+import apiClient from '../api/axiosConfig'; // axios 인스턴스 import
 
 const TAB_LIST = [
   { key: 'info', label: '내 정보' },
@@ -12,7 +13,8 @@ const TAB_LIST = [
 
 function MyPage() {
   const [activeTab, setActiveTab] = useState('info');
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(undefined); // null 대신 undefined로 초기화
+  const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
   const [showUpdate, setShowUpdate] = useState(false);
   const [showPwChange, setShowPwChange] = useState(false);
   const [pwStep, setPwStep] = useState(1); // 1: 현재 비번 확인, 2: 새 비번 입력
@@ -24,7 +26,6 @@ function MyPage() {
   useEffect(() => {
     const cusUserRaw = localStorage.getItem('CusUser');
     if (!cusUserRaw) {
-      alert('로그인 후 이용 가능합니다.');
       navigate('/login');
       return;
     }
@@ -38,17 +39,32 @@ function MyPage() {
     }
     const userId = cusUser?.id;
     if (!userId) {
-      alert('로그인 정보가 올바르지 않습니다.');
       navigate('/login');
       return;
     }
     
+    setIsLoading(true);
     getMyPageInfo(userId)
-      .then(data => setUser(data))
-      .catch(() => alert('마이페이지 정보를 불러오지 못했습니다.'));
+      .then(data => {
+        setUser(data);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        // API 호출 실패 시 로그인 페이지로 리다이렉트
+        navigate('/login');
+      });
   }, [navigate]);
 
-  if (!user) return null;
+  // 로딩 중이거나 사용자 정보가 없으면 로딩 화면 표시
+  if (isLoading || user === undefined) {
+    return <div>로딩 중...</div>;
+  }
+
+  // 사용자 정보가 null이면 로그인 페이지로 리다이렉트
+  if (!user) {
+    navigate('/login');
+    return null;
+  }
 
   // 내 정보 수정
   const handleUpdate = (field) => {
@@ -96,8 +112,26 @@ function MyPage() {
     }
   };
 
+  // 로그아웃 핸들러
+  const handleLogout = async () => {
+    try {
+      await apiClient.post('/api/members/logout');
+    } catch (e) {
+      // 실패해도 강제 로그아웃 처리
+    }
+    localStorage.removeItem('CusUser');
+    navigate('/login');
+  };
+
   return (
-    <div className="mypage-wrapper">
+    <div className="mypage-wrapper" style={{position:'relative'}}>
+      {/* 로그아웃 버튼 우측 상단 배치 */}
+      <button
+        style={{position:'absolute', top:20, right:20, zIndex:10, background:'#eee', border:'1px solid #ccc', borderRadius:6, padding:'6px 16px', fontWeight:'bold', cursor:'pointer'}}
+        onClick={handleLogout}
+      >
+        로그아웃
+      </button>
       <div className="mypage-profile">
         <div className="mypage-profile-icon">
           <span role="img" aria-label="profile" style={{fontSize: '48px'}}>👤</span>

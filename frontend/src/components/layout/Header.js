@@ -105,7 +105,7 @@ const Header = ({ setSidebarOpen }) => {
             </div>
           ) : (
             <Link
-              to="/login"
+              to="/mypage"
               className="btn btn-primary"
               style={{ height: 44, minWidth: 80 }}
             >

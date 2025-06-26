@@ -10,7 +10,6 @@ import com.example.aromadesk.member.entity.Member;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -21,12 +20,10 @@ import java.util.Optional;
 @RequestMapping("/api/members")   // RESTful한 url 사용 권장
 @RequiredArgsConstructor          // final 필드 생성자 자동 생성 (lombok)
 public class MemberController {
-    @Autowired
+
     private final MemberRepository memberRepository;
 
-    @Autowired
     private final PasswordEncoder passwordEncoder;
-
 
     // 회원 전체 목록 조회 (GET /api/members)
     @GetMapping
