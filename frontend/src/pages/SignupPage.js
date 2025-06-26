@@ -5,7 +5,7 @@ import '../css/loginCus.css';
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
-    member_id: '',
+    memberId: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -14,9 +14,9 @@ const SignupPage = () => {
     address: ''
   });
   const [validationStatus, setValidationStatus] = useState({
-    member_id: { checked: false, available: false }
+    memberId: { checked: false, available: false }
   });
-  const { signUp, checkMemberId, isLoading, error } = useSignUp();
+  const { signUp, checkMemberId, isLoading } = useSignUp();
   const navigate = useNavigate();
 
   const handleLogoClick = () => {
@@ -31,25 +31,25 @@ const SignupPage = () => {
     }));
 
     // 아이디나 이메일이 변경되면 중복 확인 상태 초기화
-    if (name === 'member_id') {
+    if (name === 'memberId') {
       setValidationStatus(prev => ({
         ...prev,
-        member_id: { checked: false, available: false }
+        memberId: { checked: false, available: false }
       }));
     }
   };
 
   const handleCheckMemberId = async () => {
-    if (!formData.member_id.trim()) {
+    if (!formData.memberId.trim()) {
       alert('아이디를 입력해주세요.');
       return;
     }
 
-    const result = await checkMemberId(formData.member_id);
+    const result = await checkMemberId(formData.memberId);
     if (result.success) {
       setValidationStatus(prev => ({
         ...prev,
-        member_id: { checked: true, available: result.isAvailable }
+        memberId: { checked: true, available: result.isAvailable }
       }));
       
       if (result.isAvailable) {
@@ -64,7 +64,7 @@ const SignupPage = () => {
 
   const validateForm = () => {
     // 필수 필드 검증
-    if (!formData.member_id.trim()) {
+    if (!formData.memberId.trim()) {
       alert('아이디를 입력해주세요.');
       return false;
     }
@@ -107,7 +107,7 @@ const SignupPage = () => {
     }
 
     // 중복 확인 검증
-    if (!validationStatus.member_id.checked || !validationStatus.member_id.available) {
+    if (!validationStatus.memberId.checked || !validationStatus.memberId.available) {
       alert('아이디 중복 확인을 해주세요.');
       return false;
     }
@@ -122,7 +122,7 @@ const SignupPage = () => {
 
     // 백엔드로 전송할 데이터 준비
     const signUpData = {
-      member_id: formData.member_id.trim(),
+      memberId: formData.memberId.trim(),
       email: formData.email.trim(),
       password: formData.password.trim(),
       name: formData.name.trim(),
@@ -170,9 +170,9 @@ const SignupPage = () => {
           <input
             className="login-input"
             type="text"
-            name="member_id"
+            name="memberId"
             placeholder="아이디"
-            value={formData.member_id}
+            value={formData.memberId}
             onChange={handleInputChange}
             onKeyPress={handleKeyPress}
             disabled={isLoading}
@@ -199,6 +199,17 @@ const SignupPage = () => {
         
         <input
           className="login-input"
+          type="email"
+          name="email"
+          placeholder="이메일"
+          value={formData.email}
+          onChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+          disabled={isLoading}
+        />
+        
+        <input
+          className="login-input"
           type="password"
           name="password"
           placeholder="비밀번호"
@@ -221,17 +232,6 @@ const SignupPage = () => {
         
         <input
           className="login-input"
-          type="email"
-          name="email"
-          placeholder="이메일"
-          value={formData.email}
-          onChange={handleInputChange}
-          onKeyPress={handleKeyPress}
-          disabled={isLoading}
-        />
-        
-        <input
-          className="login-input"
           type="text"
           name="name"
           placeholder="이름"
@@ -243,7 +243,7 @@ const SignupPage = () => {
         
         <input
           className="login-input"
-          type="tel"
+          type="text"
           name="phone"
           placeholder="전화번호"
           value={formData.phone}
@@ -268,14 +268,8 @@ const SignupPage = () => {
           onClick={handleSignUp}
           disabled={isLoading}
         >
-          {isLoading ? '가입 중...' : '회원가입'}
+          {isLoading ? '회원가입 중...' : '회원가입'}
         </button>
-
-        {error && (
-          <div className="error-message" style={{ color: 'red', marginTop: '10px' }}>
-            {error}
-          </div>
-        )}
         
         <a href="/login" className="signup-link">이미 계정이 있으신가요? 로그인</a>
       </div>
