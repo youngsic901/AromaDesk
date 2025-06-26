@@ -1,7 +1,9 @@
 package com.example.aromadesk.config;
 
 import com.example.aromadesk.auth.service.AdminLoginService;
+import com.example.aromadesk.auth.service.CustomOAuth2UserService;
 import com.example.aromadesk.auth.service.MemberLoginService;
+import com.example.aromadesk.member.repository.MemberRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -28,21 +30,29 @@ public class SecurityConfig {
   // Security 필터 체인 설정
 	@Bean
 	@Order(2)
-	public SecurityFilterChain userSecurityFilterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain userSecurityFilterChain(HttpSecurity http, MemberRepository memberRepository) throws Exception {
 		http
 				.csrf(csrf -> csrf.disable())
 				.userDetailsService(memberLoginService)
 				.securityMatcher("/**")
-				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers(
 								"/api/members/login", "/api/members/logout",
-								"/", "/auth/login", "/auth/login-process", "/auth/logout",
+								"/api/members",
 								"/css/**", "/js/**", "/images/**",
 								"/api/health", "/api/products/**", "/api/members/**", "/error",
-								"/api/cart/**","/members/**"
+								"/api/cart/**","/members/**",
+								"/oauth2/**", "/login/oauth2/**", "/oauth2/authorization/**"
 						).permitAll()
 						.anyRequest().authenticated()
+				)
+				// 소셜 로그인 기능 활성화
+				.oauth2Login(oauth2 -> oauth2
+						.loginPage("/auth/login") // 소셜, 자체 로그인 모두 동일한 페이지 사용
+						.defaultSuccessUrl("/", true)
+						.userInfoEndpoint(userInfo -> userInfo
+								.userService(customOAuth2UserService(memberRepository)) // 커스텀 서비스 구현 필요!
+						)
 				);
 		return http.build();
 	}
@@ -51,29 +61,13 @@ public class SecurityConfig {
 	@Order(1)
 	public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
 		http
+				.csrf(csrf -> csrf.disable())
 				.userDetailsService(adminLoginService)
 				.securityMatcher("/admin/**")
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/admin/login", "/admin/login-process").permitAll()
 						.anyRequest().hasRole("ADMIN")
-				)
-//				.formLogin(form -> form
-//						.loginPage("/admin/login")
-//						.loginProcessingUrl("/admin/login-process")
-//						.usernameParameter("username")
-//						.passwordParameter("password")
-//						.defaultSuccessUrl("/admin/dashboard", true)
-//						.failureUrl("/admin/login?error")
-//						.permitAll()
-//				)
-//				.logout(logout -> logout
-//						.logoutUrl("/admin/logout")
-//						.logoutSuccessUrl("/admin/login?logout")
-//						.invalidateHttpSession(true)
-//						.deleteCookies("JSESSIONID")
-//						.permitAll()
-//				)
-				;
+				);
 		return http.build();
 	}
   // 비밀번호 암호화 방식
@@ -81,5 +75,10 @@ public class SecurityConfig {
 	public PasswordEncoder passwordEncoder() {
 
 		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	public CustomOAuth2UserService customOAuth2UserService(MemberRepository memberRepository) {
+		return new CustomOAuth2UserService(memberRepository);
 	}
 }
