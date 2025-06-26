@@ -170,6 +170,19 @@ public class OrderService {
                 .map(OrderResponseDto::from)
                 .collect(Collectors.toList());
     }
+    /**
+     *결제 완료 처리
+     */
+    @Transactional
+    public void completePayment(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다," + orderId));
+        if(order.getOrderStatus() != OrderStatus.ORDERED) {
+            throw new IllegalArgumentException("이미 결제된 주문입니다.");
+        }
+        order.setOrderStatus(OrderStatus.PAID);
+
+    }
 
     @Transactional(readOnly = true)
     public Long getTotalSalesBetween(LocalDateTime start, LocalDateTime end) {
