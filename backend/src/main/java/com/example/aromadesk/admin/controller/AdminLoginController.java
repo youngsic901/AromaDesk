@@ -11,10 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -51,5 +48,12 @@ public class AdminLoginController {
     public ResponseEntity<?> logout(HttpSession session) {
         session.removeAttribute("Admin");
         return ResponseEntity.ok("로그아웃되었습니다.");
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Admin> getAdmin(@PathVariable Long id) {
+        Optional<Admin> admin = adminRepository.findById(id);
+        return admin.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
