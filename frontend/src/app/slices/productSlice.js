@@ -116,15 +116,20 @@ const productSlice = createSlice({
       })
       .addCase(fetchFilteredProducts.fulfilled, (state, action) => {
         state.loading = false;
-        // 백엔드 응답 구조에 따라 조정
-        // ProductResponseDTO 배열 또는 페이징된 응답
-        if (Array.isArray(action.payload)) {
-          state.products = action.payload;
-        } else if (action.payload.content) {
+        // 백엔드 응답 구조: { content: [], totalElements: number, page: number, size: number, totalPages: number }
+        if (action.payload && action.payload.content) {
           state.products = action.payload.content;
           state.pagination.total = action.payload.totalElements || 0;
-        } else {
+          state.pagination.page = action.payload.page || 1;
+          state.pagination.size = action.payload.size || 10;
+        } else if (Array.isArray(action.payload)) {
+          // 배열로 직접 반환된 경우 (기존 호환성)
           state.products = action.payload;
+          state.pagination.total = action.payload.length;
+        } else {
+          // 단일 객체인 경우
+          state.products = [action.payload];
+          state.pagination.total = 1;
         }
       })
       .addCase(fetchFilteredProducts.rejected, (state, action) => {
