@@ -1,12 +1,14 @@
 package com.example.aromadesk.member.controller;
 package com.example.aromadesk.member.controller;
 
+import com.example.aromadesk.member.dto.MemberDto;
 import com.example.aromadesk.member.repository.MemberRepository;
 
 import jakarta.servlet.http.HttpSession;
 
 import com.example.aromadesk.member.dto.MemberDto;
 import com.example.aromadesk.member.entity.Member;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,8 @@ public class MemberController {
     private final MemberRepository memberRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+
 
     // 회원 전체 목록 조회 (GET /api/members)
     @GetMapping
@@ -75,7 +78,6 @@ public class MemberController {
             return ResponseEntity.notFound().build();
         }
     }
- 
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody MemberDto dto, HttpSession session) {
