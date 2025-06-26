@@ -1,11 +1,14 @@
 package com.example.aromadesk.order.controller;
 
+import com.example.aromadesk.auth.service.CustomOAuth2User;
 import com.example.aromadesk.cart.dto.CartRequestDto;
+import com.example.aromadesk.member.entity.Member;
 import com.example.aromadesk.order.dto.OrderRequestDto;
 import com.example.aromadesk.order.dto.OrderResponseDto;
 import com.example.aromadesk.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +21,7 @@ import java.util.List;
  /* DATA         AUTHOR          DESC.
  /*--------     ---------    ----------------------
  /*2025.06.25   SUSU           INITIAL RELEASE
+ /*
  /*************************************************************/
 
 @RestController
@@ -32,8 +36,10 @@ public class OrderController {
      */
     @PostMapping("/single")
     public ResponseEntity<String> createSingleOrder(@RequestBody OrderRequestDto dto) {
-        Long memberId = 1L; //TODO: 세션 기반 로그인 정보로 대체
-        orderService.createSingleOrder(dto, memberId);
+        CustomOAuth2User user = (CustomOAuth2User) SecurityContextHolder
+                .getContext().getAuthentication().getPrincipal();
+        Member loginMember = user.getMember();
+        orderService.createSingleOrder(dto, loginMember);
         return ResponseEntity.ok("단일 상품 주문이 성공하였습니다. ");
     }
 
@@ -42,8 +48,10 @@ public class OrderController {
      */
     @PostMapping("/from-cart")
     public ResponseEntity<String> createOrderFromCart(@RequestBody CartRequestDto dto) {
-        Long memberId = 1L; //TODO: 세션 기반 로그인 정보로 대체
-        orderService.createOrderFromCart(dto, memberId);
+        CustomOAuth2User user = (CustomOAuth2User) SecurityContextHolder
+                .getContext().getAuthentication().getPrincipal();
+        Member loginMember = user.getMember();
+        orderService.createOrderFromCart(dto, loginMember);
         return ResponseEntity.ok("장바구니 상품 주문이 완료되었습니다.");
     }
 
@@ -52,8 +60,10 @@ public class OrderController {
      */
     @GetMapping
     public ResponseEntity<List<OrderResponseDto>> getAllOrders() {
-        Long memberId = 1L; //TODO: 세션 기반 로그인 정보로 대체
-        List<OrderResponseDto> orders = orderService.getOrdersByMemberID(memberId);
+        CustomOAuth2User user = (CustomOAuth2User) SecurityContextHolder
+                .getContext().getAuthentication().getPrincipal();
+        Member loginMember = user.getMember();
+        List<OrderResponseDto> orders = orderService.getOrdersByMemberID(loginMember);
         return ResponseEntity.ok(orders);
     }
 

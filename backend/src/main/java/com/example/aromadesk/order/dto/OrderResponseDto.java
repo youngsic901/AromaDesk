@@ -24,7 +24,7 @@ public class OrderResponseDto {
     public static OrderResponseDto from(Order order) {
         return OrderResponseDto.builder()
                 .orderId(order.getId())
-                .orderDate(order.getOrderDate())
+                .orderDate(order.getCreatedAt())
                 .status(order.getOrderStatus().name())
                 .paymentMethod(order.getPaymentMethod().name())
                 .totalPrice(order.getTotalPrice())

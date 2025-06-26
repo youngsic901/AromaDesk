@@ -37,7 +37,7 @@ public class Order {
     private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "order_status", nullable = false)
+    @Column(name = "status", nullable = false)
     private OrderStatus orderStatus;
 
 
@@ -48,5 +48,11 @@ public class Order {
     @Column(name = "total_price", nullable = false)
     private int totalPrice;
 
-    private LocalDateTime orderDate;
+    @Column(name="created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }
