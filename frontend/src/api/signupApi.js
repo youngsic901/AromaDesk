@@ -1,4 +1,5 @@
-import apiClient from "./index";
+import apiClient from "./axiosConfig";
+import { handleApiError, handleApiSuccess } from "./errorHandler";
 
 // 회원가입 API 함수
 export const signUpAPI = async (signUpData) => {
@@ -6,13 +7,14 @@ export const signUpAPI = async (signUpData) => {
     const response = await apiClient.post('/api/members', signUpData);
     return {
       success: true,
-      data: response.data
+      data: handleApiSuccess(response)
     };
   } catch (error) {
     console.error('회원가입 API 오류:', error);
+    const errorMessage = handleApiError(error).message;
     return {
       success: false,
-      error: error.response?.data?.message || error.message || '회원가입에 실패했습니다.'
+      error: errorMessage
     };
   }
 };
@@ -22,7 +24,7 @@ export const checkMemberIdAPI = async (memberId) => {
   try {
     // 전체 회원 목록을 가져와서 클라이언트에서 중복 확인
     const response = await apiClient.get('/api/members');
-    const members = response.data;
+    const members = handleApiSuccess(response);
     const isAvailable = !members.some(member => member.memberId === memberId);
     
     return {
@@ -31,9 +33,10 @@ export const checkMemberIdAPI = async (memberId) => {
     };
   } catch (error) {
     console.error('아이디 중복 확인 API 오류:', error);
+    const errorMessage = handleApiError(error).message;
     return {
       success: false,
-      error: error.response?.data?.message || error.message || '아이디 확인에 실패했습니다.'
+      error: errorMessage
     };
   }
 };
@@ -43,7 +46,7 @@ export const checkEmailAPI = async (email) => {
   try {
     // 전체 회원 목록을 가져와서 클라이언트에서 중복 확인
     const response = await apiClient.get('/api/members');
-    const members = response.data;
+    const members = handleApiSuccess(response);
     const isAvailable = !members.some(member => member.email === email);
     
     return {
@@ -52,9 +55,10 @@ export const checkEmailAPI = async (email) => {
     };
   } catch (error) {
     console.error('이메일 중복 확인 API 오류:', error);
+    const errorMessage = handleApiError(error).message;
     return {
       success: false,
-      error: error.response?.data?.message || error.message || '이메일 확인에 실패했습니다.'
+      error: errorMessage
     };
   }
 }; 

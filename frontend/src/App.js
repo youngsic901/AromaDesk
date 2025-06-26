@@ -12,6 +12,9 @@ import ProductListPage from "./pages/ProductListPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import CartPage from "./pages/CartPage";
 import MyPage from "./pages/MyPage";
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
+import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminMainPage from "./pages/AdminMainPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 
@@ -35,6 +38,7 @@ const AppContent = () => {
           <Route path="/products/:id" element={<ProductDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/admin" element={<AdminMainPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />

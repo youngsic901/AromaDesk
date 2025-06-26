@@ -1,13 +1,14 @@
-import apiClient from "./index";
+import apiClient from "./axiosConfig";
+import { handleApiError, handleApiSuccess } from "./errorHandler";
 
 // 마이페이지 정보 조회
 export const getMyPageInfo = async (userId) => {
   try {
     const response = await apiClient.get(`/api/members/${userId}`);
-    return response.data;
+    return handleApiSuccess(response);
   } catch (error) {
     console.error('마이페이지 정보 조회 오류:', error);
-    throw error;
+    throw handleApiError(error);
   }
 };
 
@@ -15,12 +16,13 @@ export const getMyPageInfo = async (userId) => {
 export const updateMyPageInfo = async (userId, updateData) => {
   try {
     const response = await apiClient.put(`/api/members/${userId}`, updateData);
-    return { success: true, data: response.data };
+    return { success: true, data: handleApiSuccess(response) };
   } catch (error) {
     console.error('마이페이지 정보 수정 오류:', error);
+    const errorMessage = handleApiError(error).message;
     return { 
       success: false, 
-      error: error.response?.data?.message || '수정에 실패했습니다.' 
+      error: errorMessage
     };
   }
 };
@@ -42,9 +44,10 @@ export const checkPassword = async (userId, password) => {
     }
   } catch (error) {
     console.error('비밀번호 확인 오류:', error);
+    const errorMessage = handleApiError(error).message;
     return { 
       success: false, 
-      error: '현재 비밀번호가 일치하지 않습니다.' 
+      error: errorMessage
     };
   }
 };
@@ -64,9 +67,10 @@ export const changePassword = async (userId, newPassword) => {
     }
   } catch (error) {
     console.error('비밀번호 변경 오류:', error);
+    const errorMessage = handleApiError(error).message;
     return { 
       success: false, 
-      error: '비밀번호 변경에 실패했습니다.' 
+      error: errorMessage
     };
   }
 }; 

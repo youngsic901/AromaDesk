@@ -1,4 +1,4 @@
-import apiClient from "../api/index";
+import apiClient from "../api/axiosConfig";
 
 // 임시 파일임 백엔드 구성되면 삭제 예정!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 export const socialLoginConfig = {
