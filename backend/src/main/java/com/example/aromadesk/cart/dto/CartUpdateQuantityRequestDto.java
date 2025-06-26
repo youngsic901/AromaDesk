@@ -6,12 +6,11 @@ import lombok.NoArgsConstructor;
 /**
  * @author : youngsic
  * @packageName : com.example.aromadesk.cart.dto
- * @fileName : CartAddRequest
+ * @fileName : CartUpdateQuantityRequestDto
  * @date : 25. 6. 25.
  **/
 @Getter
 @NoArgsConstructor
-public class CartAddRequest {
-    private Long productId;
+public class CartUpdateQuantityRequestDto {
     private int quantity;
 }
