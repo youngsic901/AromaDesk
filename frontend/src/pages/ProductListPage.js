@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchFilteredProducts } from "../app/slices/productSlice";
 import ProductCard from "../components/common/ProductCard";
+import Pagination from "../components/common/Pagination";
 import "./ProductListPage.css";
 
 const ProductListPage = () => {
@@ -107,27 +108,11 @@ const ProductListPage = () => {
 
       {/* 페이징 */}
       {pagination.total > pagination.size && (
-        <div className="pagination">
-          <button
-            onClick={() => handlePageChange(pagination.page - 1)}
-            disabled={pagination.page <= 1}
-            className="pagination-btn"
-          >
-            이전
-          </button>
-          <span className="pagination-info">
-            {pagination.page} / {Math.ceil(pagination.total / pagination.size)}
-          </span>
-          <button
-            onClick={() => handlePageChange(pagination.page + 1)}
-            disabled={
-              pagination.page >= Math.ceil(pagination.total / pagination.size)
-            }
-            className="pagination-btn"
-          >
-            다음
-          </button>
-        </div>
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={Math.ceil(pagination.total / pagination.size)}
+          onPageChange={handlePageChange}
+        />
       )}
     </div>
   );

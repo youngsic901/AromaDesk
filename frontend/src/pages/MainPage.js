@@ -5,6 +5,7 @@ import { fetchFilteredProducts } from "../app/slices/productSlice";
 import { fetchCartItems } from "../app/slices/cartSlice";
 import ProductCard from "../components/common/ProductCard";
 import FilterBar from "../components/FilterBar";
+import { FaBars } from "react-icons/fa";
 
 const MainPage = () => {
   const dispatch = useDispatch();
