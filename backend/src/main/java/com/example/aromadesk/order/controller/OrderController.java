@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /*************************************************************
@@ -89,5 +91,23 @@ public class OrderController {
         return ResponseEntity.ok(OrderResponseDto.from(order));
     }
 
+    @GetMapping("/total-revenue")
+    public ResponseEntity<Long> getTotalSales(
+            @RequestParam String start,
+            @RequestParam String end) {
 
+        // 1. 문자열을 LocalDate로 변환 (ex. "2023-01-01")
+        LocalDate startDate = LocalDate.parse(start);
+        LocalDate endDate = LocalDate.parse(end);
+
+        // 2. LocalDate를 LocalDateTime(자정)으로 변환
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay(); // 다음날 00:00:00까지
+
+        // 3. 서비스 호출
+        Long total = orderService.getTotalSalesBetween(startDateTime, endDateTime);
+
+        // 4. 결과 반환
+        return ResponseEntity.ok(total);
+    }
 }
