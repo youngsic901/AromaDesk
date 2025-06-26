@@ -21,6 +21,7 @@ import AdminMainPage from "./pages/AdminMainPage";
 import CategoryPage from "./pages/CategoryPage";
 import BrandPage from "./pages/BrandPage";
 import SearchPage from "./pages/SearchPage";
+import OrderCompletePage from "./pages/OrderCompletePage";
 
 // 메인 앱 컴포넌트
 const AppContent = () => {
@@ -46,6 +47,7 @@ const AppContent = () => {
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/admin/login" element={<AdminLoginPage />} />
               <Route path="/admin" element={<AdminMainPage />} />
+              <Route path="/order/complete" element={<OrderCompletePage />} />
             </Routes>
           </main>
         </div>

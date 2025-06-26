@@ -3,24 +3,66 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   updateQuantityAction,
   removeFromCartAction,
+  clearCart,
 } from "../app/slices/cartSlice";
+import { useNavigate } from "react-router-dom";
+import orderApi from "../api/orderApi";
 import { FaTrash, FaMinus, FaPlus } from "react-icons/fa";
 
 const CartPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const { items, totalQuantity, totalAmount } = useSelector(
     (state) => state.cart
   );
+  const { user } = useSelector((state) => state.user);
 
   // 수량 변경
   const handleQuantity = (productId, quantity) => {
     if (quantity < 1) return;
-    dispatch(updateQuantityAction({ memberId: 1, productId, quantity }));
+    dispatch(updateQuantityAction({ memberId: user?.id || 1, productId, quantity }));
   };
 
   // 상품 삭제
   const handleRemove = (productId) => {
-    dispatch(removeFromCartAction({ memberId: 1, productId }));
+    dispatch(removeFromCartAction({ memberId: user?.id || 1, productId }));
+  };
+
+  // 주문 처리
+  const handleOrder = async () => {
+    if (!user || !user.id) {
+      alert("로그인이 필요합니다.");
+      navigate("/login");
+      return;
+    }
+
+    if (items.length === 0) {
+      alert("장바구니가 비어 있습니다.");
+      return;
+    }
+
+    const cartItemIds = items.map((item) => item.cartItemId); // cartItemId 기준
+    const deliveryId = 1; // 임시 배송지 ID
+    const paymentMethod = "MOCK";
+
+    const response = await orderApi.createOrderFromCart({
+      cartItemIds,
+      deliveryId,
+      paymentMethod,
+    });
+
+    if (response.success) {
+      dispatch(clearCart());
+      const orderId = response.data?.orderId;
+
+      if(orderId){
+        navigate(`/order/complete?orderId=${orderId}`);
+      } else{
+        navigate("/order/complete");
+      }
+
+    }
   };
 
   return (
@@ -91,6 +133,7 @@ const CartPage = () => {
               ))}
             </div>
           </div>
+
           {/* 결제 요약/주문 */}
           <div className="col-lg-4">
             <div className="card shadow-sm p-4 sticky-top" style={{ top: 100 }}>
@@ -110,7 +153,12 @@ const CartPage = () => {
                   {totalAmount.toLocaleString()}원
                 </span>
               </div>
-              <button className="btn btn-primary btn-lg w-100">주문하기</button>
+              <button
+                className="btn btn-primary btn-lg w-100"
+                onClick={handleOrder}
+              >
+                주문하기
+              </button>
             </div>
           </div>
         </div>
