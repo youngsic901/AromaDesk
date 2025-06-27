@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLogin } from '../login/useLogin.js';
-import { socialLoginService } from '../login/socialLogin.js';
 import '../css/loginCus.css';
 
 const LoginPage = () => {
@@ -31,14 +30,6 @@ const LoginPage = () => {
       console.error('로그인 처리 중 오류:', error);
       alert('로그인 처리 중 오류가 발생했습니다.');
     }
-  };
-
-  const handleGoogleLogin = () => {
-    socialLoginService.googleLogin();
-  };
-
-  const handleKakaoLogin = () => {
-    socialLoginService.kakaoLogin();
   };
 
   const handleKeyPress = (e) => {
@@ -88,31 +79,27 @@ const LoginPage = () => {
         )}
 
         {/* 소셜 로그인 버튼들 */}
-        <button 
+        <a 
           className="google-btn" 
-          onClick={handleGoogleLogin}
-          disabled={isLoading}
+          href="http://localhost/oauth2/authorization/google"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}
         >
-          <img 
-            src="https://www.svgrepo.com/show/475656/google-color.svg" 
-            alt="구글" 
-            className="icon" 
-          />
           구글로 로그인
-        </button>
-
-        <button 
+        </a>
+        <a 
           className="kakao-btn"
-          onClick={handleKakaoLogin}
-          disabled={isLoading}
+          href="http://localhost//oauth2/authorization/kakao"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}
         >
-          <img 
-            src="https://www.svgrepo.com/show/448234/kakao.svg" 
-            alt="카카오" 
-            className="icon" 
-          /> 
           카카오로 로그인
-        </button>
+        </a>
+        <a 
+          className="naver-btn"
+          href="http://localhost//oauth2/authorization/naver"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        >
+          네이버로 로그인
+        </a>
         
         <a href="/signup" className="signup-link">회원가입</a>
       </div>
