@@ -33,7 +33,11 @@ const Header = ({ setSidebarOpen }) => {
         </button>
 
         {/* 로고 */}
-        <Link className="navbar-brand fw-bold fs-4" to="/">
+        <Link
+          className="navbar-brand fw-bold fs-4"
+          to="/"
+          style={{ color: "blue" }}
+        >
           AromaDesk
         </Link>
 
