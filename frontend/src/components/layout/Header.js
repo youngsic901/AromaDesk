@@ -5,7 +5,7 @@ import { FaShoppingCart, FaUser, FaBars } from "react-icons/fa";
 
 const Header = ({ setSidebarOpen }) => {
   const navigate = useNavigate();
-  const { totalQuantity } = useSelector((state) => state.cart);
+  const { totalQuantity = 0 } = useSelector((state) => state.cart);
   const { isLoggedIn, user } = useSelector((state) => state.user);
 
   const toggleSidebar = () => {

@@ -6,7 +6,15 @@ export const productApi = {
   // 필터링된 상품 목록 조회 (페이징 포함)
   getFilteredProducts: async (params = {}) => {
     try {
-      const { brand, gender, volume, name, page = 1, size = 10 } = params;
+      const {
+        brand,
+        gender,
+        volume,
+        name,
+        maxPrice,
+        page = 1,
+        size = 10,
+      } = params;
 
       // 백엔드 API 엔드포인트와 파라미터 구조 맞춤
       const queryParams = {};
@@ -21,16 +29,30 @@ export const productApi = {
       });
 
       // 백엔드 응답 구조: { content: [], totalElements: number, page: number, size: number, totalPages: number }
-      const result = handleApiSuccess(response);
+      let result = handleApiSuccess(response);
 
-      // name 검색은 프론트엔드에서 필터링 (백엔드에 name 파라미터가 없으므로)
-      if (name && result.content) {
-        const filteredContent = result.content.filter(
-          (product) =>
-            product.name.toLowerCase().includes(name.toLowerCase()) ||
-            product.brand.toLowerCase().includes(name.toLowerCase())
-        );
-        return {
+      // 프론트엔드에서 추가 필터링 처리
+      if (result.content) {
+        let filteredContent = result.content;
+
+        // name 검색 필터링
+        if (name) {
+          filteredContent = filteredContent.filter(
+            (product) =>
+              product.name.toLowerCase().includes(name.toLowerCase()) ||
+              product.brand.toLowerCase().includes(name.toLowerCase())
+          );
+        }
+
+        // 가격 필터링 (maxPrice)
+        if (maxPrice) {
+          filteredContent = filteredContent.filter(
+            (product) => product.price <= parseInt(maxPrice)
+          );
+        }
+
+        // 필터링된 결과로 업데이트
+        result = {
           ...result,
           content: filteredContent,
           totalElements: filteredContent.length,
@@ -111,7 +133,6 @@ export const productApi = {
       throw handleApiError(error);
     }
   },
-
 };
 
 // 개별 함수로도 export (기존 코드 호환성)
@@ -122,4 +143,3 @@ export const updateProduct = productApi.updateProduct;
 export const deleteProduct = productApi.deleteProduct;
 export const createSingleOrder = productApi.createSingleOrder;
 export const createOrderFromCart = productApi.createOrderFromCart;
-
