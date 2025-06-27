@@ -85,6 +85,33 @@ export const productApi = {
       throw handleApiError(error);
     }
   },
+
+  /**
+   * 단일 상품 주문 생성 (바로 구매)
+   * @param {Object} orderData - { items: [{ productId, quantity }], deliveryId, paymentMethod }
+   */
+  createSingleOrder: async (orderData) => {
+    try {
+      const response = await apiClient.post("/api/orders/single", orderData);
+      return handleApiSuccess(response);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  /**
+   * 장바구니 기반 주문 생성
+   * @param {Object} orderData - { cartItemIds: number[], deliveryId: number, paymentMethod: string }
+   */
+  createOrderFromCart: async (orderData) => {
+    try {
+      const response = await apiClient.post("/api/orders/from-cart", orderData);
+      return handleApiSuccess(response);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
 };
 
 // 개별 함수로도 export (기존 코드 호환성)
@@ -93,3 +120,6 @@ export const getProductById = productApi.getProductById;
 export const createProduct = productApi.createProduct;
 export const updateProduct = productApi.updateProduct;
 export const deleteProduct = productApi.deleteProduct;
+export const createSingleOrder = productApi.createSingleOrder;
+export const createOrderFromCart = productApi.createOrderFromCart;
+
