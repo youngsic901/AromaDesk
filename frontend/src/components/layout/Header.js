@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { FaShoppingCart, FaUser, FaBars } from "react-icons/fa";
+import { Dropdown } from "react-bootstrap";
+import { logout } from "../../app/slices/userSlice";
+import apiClient from "../../api/axiosConfig";
 
 const Header = ({ setSidebarOpen }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { totalQuantity } = useSelector((state) => state.cart);
   const { isLoggedIn, user } = useSelector((state) => state.user);
 
@@ -20,6 +24,33 @@ const Header = ({ setSidebarOpen }) => {
     }
   };
 
+  const handleCartClick = () => {
+    if (!isLoggedIn) {
+      navigate('/login');
+    } else {
+      navigate('/cart');
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      // 백엔드에 로그아웃 요청
+      await apiClient.post('/api/members/logout');
+    } catch (error) {
+      console.error('로그아웃 API 호출 실패:', error);
+      // API 호출이 실패해도 클라이언트 측 로그아웃은 진행
+    }
+    
+    // Redux 스토어에서 로그아웃 상태로 변경
+    dispatch(logout());
+    
+    // localStorage에서 사용자 정보 삭제
+    localStorage.removeItem('CusUser');
+    
+    // 메인 페이지로 이동
+    navigate('/');
+  };
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
       <div className="container-fluid">
@@ -33,7 +64,7 @@ const Header = ({ setSidebarOpen }) => {
         </button>
 
         {/* 로고 */}
-        <Link className="navbar-brand fw-bold fs-4" to="/">
+        <Link className="navbar-brand fw-bold fs-4" to="/" style={{ color: "blue" }}>
           AromaDesk
         </Link>
 
@@ -65,8 +96,8 @@ const Header = ({ setSidebarOpen }) => {
         {/* 우측 메뉴 */}
         <div className="d-flex align-items-center gap-2">
           {/* 장바구니 */}
-          <Link
-            to="/cart"
+          <button
+            onClick={handleCartClick}
             className="btn btn-outline-primary position-relative"
             style={{ height: 44, minWidth: 44 }}
           >
@@ -76,36 +107,34 @@ const Header = ({ setSidebarOpen }) => {
                 {totalQuantity}
               </span>
             )}
-          </Link>
+          </button>
 
-          {/* 로그인/마이페이지 */}
+          {/* 로그인/마이페이지 드롭다운 */}
           {isLoggedIn ? (
-            <div className="dropdown">
-              <button
-                className="btn btn-outline-secondary dropdown-toggle"
-                type="button"
-                data-bs-toggle="dropdown"
+            <Dropdown>
+              <Dropdown.Toggle
+                variant="outline-secondary"
                 style={{ height: 44, minWidth: 44 }}
               >
                 <FaUser />
-              </button>
-              <ul className="dropdown-menu">
-                <li>
-                  <Link className="dropdown-item" to="/mypage">
-                    마이페이지
-                  </Link>
-                </li>
-                <li>
-                  <hr className="dropdown-divider" />
-                </li>
-                <li>
-                  <button className="dropdown-item">로그아웃</button>
-                </li>
-              </ul>
-            </div>
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                <Dropdown.Item as={Link} to="/mypage">
+                  마이페이지
+                </Dropdown.Item>
+                <Dropdown.Item as={Link} to="/delivery">
+                  배송조회
+                </Dropdown.Item>
+                <Dropdown.Divider />
+                <Dropdown.Item onClick={handleLogout}>
+                  로그아웃
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
           ) : (
             <Link
-              to="/mypage"
+              to="/login"
               className="btn btn-primary"
               style={{ height: 44, minWidth: 80 }}
             >
