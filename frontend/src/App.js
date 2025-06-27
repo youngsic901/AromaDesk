@@ -25,6 +25,7 @@ import AdminMemberPage from "./PagesAdmin/AdminMemberPage";
 import CategoryPage from "./pages/CategoryPage";
 import BrandPage from "./pages/BrandPage";
 import SearchPage from "./pages/SearchPage";
+import OrderCompletePage from "./pages/OrderCompletePage";
 
 // 관리자 인증 라우트
 function AdminRoute({ children }) {
@@ -86,6 +87,7 @@ function AppContent() {
                   <Route path="/mypage" element={<MyPage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/signup" element={<SignupPage />} />
+                  <Route path="/order/complete" element={<OrderCompletePage />} />
                 </Routes>
               </main>
             </div>
