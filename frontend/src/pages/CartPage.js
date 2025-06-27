@@ -13,19 +13,24 @@ const CartPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { items, totalQuantity, totalAmount } = useSelector(
-    (state) => state.cart
-  );
+  const {
+    items = [],
+    totalQuantity,
+    totalAmount,
+  } = useSelector((state) => state.cart);
   const { user } = useSelector((state) => state.user);
 
   // 수량 변경
   const handleQuantity = (productId, quantity) => {
-    if (quantity < 1) return;
-    dispatch(updateQuantityAction({ memberId: user?.id || 1, productId, quantity }));
+    if (!productId || quantity < 1) return;
+    dispatch(
+      updateQuantityAction({ memberId: user?.id || 1, productId, quantity })
+    );
   };
 
   // 상품 삭제
   const handleRemove = (productId) => {
+    if (!productId) return;
     dispatch(removeFromCartAction({ memberId: user?.id || 1, productId }));
   };
 
@@ -78,12 +83,12 @@ const CartPage = () => {
             <div className="list-group mb-4">
               {items.map((item) => (
                 <div
-                  key={item.productId}
+                  key={item?.productId || Math.random()}
                   className="list-group-item d-flex align-items-center gap-3 py-3"
                 >
                   <img
-                    src={item.imageUrl || "/placeholder-product.jpg"}
-                    alt={item.name}
+                    src={item?.imageUrl || "/placeholder-product.jpg"}
+                    alt={item?.name || "상품"}
                     style={{
                       width: 80,
                       height: 80,
@@ -93,25 +98,33 @@ const CartPage = () => {
                     }}
                   />
                   <div className="flex-grow-1">
-                    <div className="fw-semibold">{item.name}</div>
+                    <div className="fw-semibold">
+                      {item?.name || "상품명 없음"}
+                    </div>
                     <div className="text-muted" style={{ fontSize: 14 }}>
-                      {item.brand}
+                      {item?.brand || "브랜드 없음"}
                     </div>
                   </div>
                   <div className="d-flex align-items-center gap-2">
                     <button
                       className="btn btn-light border"
                       onClick={() =>
-                        handleQuantity(item.productId, item.quantity - 1)
+                        handleQuantity(
+                          item?.productId,
+                          (item?.quantity || 0) - 1
+                        )
                       }
                     >
                       <FaMinus />
                     </button>
-                    <span className="mx-2">{item.quantity}</span>
+                    <span className="mx-2">{item?.quantity || 0}</span>
                     <button
                       className="btn btn-light border"
                       onClick={() =>
-                        handleQuantity(item.productId, item.quantity + 1)
+                        handleQuantity(
+                          item?.productId,
+                          (item?.quantity || 0) + 1
+                        )
                       }
                     >
                       <FaPlus />
@@ -121,11 +134,14 @@ const CartPage = () => {
                     className="fw-bold text-primary"
                     style={{ minWidth: 100, textAlign: "right" }}
                   >
-                    {(item.price * item.quantity).toLocaleString()}원
+                    {(
+                      (item?.price || 0) * (item?.quantity || 0)
+                    ).toLocaleString()}
+                    원
                   </div>
                   <button
                     className="btn btn-outline-danger ms-2"
-                    onClick={() => handleRemove(item.productId)}
+                    onClick={() => handleRemove(item?.productId)}
                   >
                     <FaTrash />
                   </button>

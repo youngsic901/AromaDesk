@@ -74,15 +74,17 @@ const cartSlice = createSlice({
     },
     updateLocalQuantity: (state, action) => {
       const { productId, quantity } = action.payload;
-      const item = state.items.find((item) => item.productId === productId);
+      const item = (state.items || []).find(
+        (item) => item?.productId === productId
+      );
       if (item) {
         item.quantity = quantity;
-        state.totalQuantity = state.items.reduce(
-          (total, item) => total + item.quantity,
+        state.totalQuantity = (state.items || []).reduce(
+          (total, item) => total + (item?.quantity || 0),
           0
         );
-        state.totalAmount = state.items.reduce(
-          (total, item) => total + item.price * item.quantity,
+        state.totalAmount = (state.items || []).reduce(
+          (total, item) => total + (item?.price || 0) * (item?.quantity || 0),
           0
         );
       }
@@ -98,12 +100,12 @@ const cartSlice = createSlice({
       .addCase(fetchCartItems.fulfilled, (state, action) => {
         state.loading = false;
         state.items = Array.isArray(action.payload) ? action.payload : []; // ✅ 방어 코드
-        state.totalQuantity = state.items.reduce(
-          (total, item) => total + item.quantity,
+        state.totalQuantity = (state.items || []).reduce(
+          (total, item) => total + (item?.quantity || 0),
           0
         );
-        state.totalAmount = state.items.reduce(
-          (total, item) => total + item.price * item.quantity,
+        state.totalAmount = (state.items || []).reduce(
+          (total, item) => total + (item?.price || 0) * (item?.quantity || 0),
           0
         );
       })
@@ -120,22 +122,28 @@ const cartSlice = createSlice({
       .addCase(addToCartAction.fulfilled, (state, action) => {
         state.loading = false;
         const newItem = action.payload;
+
+        // state.items가 undefined면 빈 배열로 초기화
+        if (!state.items) {
+          state.items = [];
+        }
+
         const existingIndex = state.items.findIndex(
-          (item) => item.productId === newItem.productId
+          (item) => item?.productId === newItem?.productId
         );
 
         if (existingIndex !== -1) {
-          state.items[existingIndex].quantity += newItem.quantity;
+          state.items[existingIndex].quantity += newItem?.quantity || 0;
         } else {
           state.items.push(newItem);
         }
 
         state.totalQuantity = state.items.reduce(
-          (total, item) => total + item.quantity,
+          (total, item) => total + (item?.quantity || 0),
           0
         );
         state.totalAmount = state.items.reduce(
-          (total, item) => total + item.price * item.quantity,
+          (total, item) => total + (item?.price || 0) * (item?.quantity || 0),
           0
         );
       })
@@ -152,20 +160,20 @@ const cartSlice = createSlice({
       .addCase(updateQuantityAction.fulfilled, (state, action) => {
         state.loading = false;
         const updatedItem = action.payload;
-        const index = state.items.findIndex(
-          (item) => item.productId === updatedItem.productId
+        const index = (state.items || []).findIndex(
+          (item) => item?.productId === updatedItem?.productId
         );
 
         if (index !== -1) {
           state.items[index] = updatedItem;
         }
 
-        state.totalQuantity = state.items.reduce(
-          (total, item) => total + item.quantity,
+        state.totalQuantity = (state.items || []).reduce(
+          (total, item) => total + (item?.quantity || 0),
           0
         );
-        state.totalAmount = state.items.reduce(
-          (total, item) => total + item.price * item.quantity,
+        state.totalAmount = (state.items || []).reduce(
+          (total, item) => total + (item?.price || 0) * (item?.quantity || 0),
           0
         );
       })
@@ -182,15 +190,15 @@ const cartSlice = createSlice({
       .addCase(removeFromCartAction.fulfilled, (state, action) => {
         state.loading = false;
         const removedProductId = action.payload;
-        state.items = state.items.filter(
-          (item) => item.productId !== removedProductId
+        state.items = (state.items || []).filter(
+          (item) => item?.productId !== removedProductId
         );
-        state.totalQuantity = state.items.reduce(
-          (total, item) => total + item.quantity,
+        state.totalQuantity = (state.items || []).reduce(
+          (total, item) => total + (item?.quantity || 0),
           0
         );
-        state.totalAmount = state.items.reduce(
-          (total, item) => total + item.price * item.quantity,
+        state.totalAmount = (state.items || []).reduce(
+          (total, item) => total + (item?.price || 0) * (item?.quantity || 0),
           0
         );
       })
