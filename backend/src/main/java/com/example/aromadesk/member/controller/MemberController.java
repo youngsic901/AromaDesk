@@ -1,20 +1,17 @@
 package com.example.aromadesk.member.controller;
 
 import com.example.aromadesk.member.dto.MemberDto;
-import com.example.aromadesk.member.repository.MemberRepository;
-
-import jakarta.servlet.http.HttpSession;
-
-import com.example.aromadesk.member.dto.MemberDto;
 import com.example.aromadesk.member.entity.Member;
+import com.example.aromadesk.member.repository.MemberRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/members")   // RESTful한 url 사용 권장
@@ -28,38 +25,46 @@ public class MemberController {
     // 회원 전체 목록 조회 (GET /api/members)
     @GetMapping
     public ResponseEntity<?> getAllMembers() {
-        return ResponseEntity.ok(memberRepository.findAll());
+        List<MemberDto> dtos = memberRepository.findAll()
+                .stream()
+                .map(MemberDto::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
 
     // 회원 단일 조회 (GET /api/members/{id})
     @GetMapping("/{id}")
-    public ResponseEntity<Member> getMember(@PathVariable Long id) {
+    public ResponseEntity<MemberDto> getMember(@PathVariable Long id) {
         Optional<Member> member = memberRepository.findById(id);
-        return member.map(ResponseEntity::ok)
+        return member.map(m -> ResponseEntity.ok(MemberDto.fromEntity(m)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // 회원가입 (POST /api/members)
     @PostMapping
-    public ResponseEntity<Member> createMember(@RequestBody Member member) {
+    public ResponseEntity<MemberDto> createMember(@RequestBody MemberDto dto) {
+        Member member = dto.toEntity();
+        member.setPassword(passwordEncoder.encode(dto.getPassword())); // 비밀번호 암호화
         Member newMember = memberRepository.save(member);
-        return ResponseEntity.ok(newMember);
+        return ResponseEntity.ok(MemberDto.fromEntity(newMember));
     }
 
     // 회원 정보 수정 (PUT /api/members/{id})
     @PutMapping("/{id}")
-    public ResponseEntity<Member> updateMember(@PathVariable Long id, @RequestBody Member updateRequest) {
+    public ResponseEntity<MemberDto> updateMember(@PathVariable Long id, @RequestBody MemberDto updateRequest) {
         return memberRepository.findById(id)
                 .map(member -> {
                     member.setEmail(updateRequest.getEmail());
-                    member.setPassword(updateRequest.getPassword());
+                    if (updateRequest.getPassword() != null && !updateRequest.getPassword().isEmpty()) {
+                        member.setPassword(passwordEncoder.encode(updateRequest.getPassword())); // 비밀번호 암호화
+                    }
                     member.setName(updateRequest.getName());
                     member.setPhone(updateRequest.getPhone());
                     member.setAddress(updateRequest.getAddress());
                     member.setRole(updateRequest.getRole());
                     // createdAt은 보통 변경하지 않음
                     Member updated = memberRepository.save(member);
-                    return ResponseEntity.ok(updated);
+                    return ResponseEntity.ok(MemberDto.fromEntity(updated));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -90,8 +95,9 @@ public class MemberController {
         }
 
         // 3. 로그인 성공 → JWT 토큰 발급 or 세션 처리
-        session.setAttribute("CusUser", MemberDto.fromEntity(member));
-        return ResponseEntity.ok(member);
+        MemberDto loginUserDto = MemberDto.fromEntity(member);
+        session.setAttribute("CusUser", loginUserDto);
+        return ResponseEntity.ok(loginUserDto);
     }
 
     @PostMapping("/logout")
