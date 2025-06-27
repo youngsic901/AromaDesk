@@ -46,6 +46,14 @@ public class SecurityConfig {
 						).permitAll()
 						.anyRequest().authenticated()
 				)
+				// 인증 실패 시 JSON 응답 반환
+				.exceptionHandling(exceptionHandling -> exceptionHandling
+					.authenticationEntryPoint((request, response, authException) -> {
+						response.setStatus(401);
+						response.setContentType("application/json;charset=UTF-8");
+						response.getWriter().write("{\"error\":\"로그인 필요\"}");
+					})
+				)
 				// 소셜 로그인 기능 활성화
 				.oauth2Login(oauth2 -> oauth2
 						.loginPage("/auth/login") // 소셜, 자체 로그인 모두 동일한 페이지 사용
