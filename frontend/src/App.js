@@ -35,10 +35,6 @@ import OrderCompletePage from "./pages/OrderCompletePage";
 import { loginAPI } from "./api/loginApi";
 import { login as loginAction, logout as logoutAction } from "./app/slices/userSlice";
 
-// API
-import { loginAPI } from "./api/loginApi";
-import { login as loginAction, logout as logoutAction } from "./app/slices/userSlice";
-
 // 관리자 인증 라우트
 function AdminRoute({ children }) {
   const isAdmin = !!localStorage.getItem('AdminUser');
