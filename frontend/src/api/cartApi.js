@@ -7,7 +7,8 @@ export const cartApi = {
   getCartItems: async (memberId) => {
     try {
       const response = await apiClient.get(`/api/cart/${memberId}`);
-      return handleApiSuccess(response);
+      const result = handleApiSuccess(response);
+      return result?.data ?? []; // ✅ response.data만 반환, 없으면 빈 배열
     } catch (error) {
       throw handleApiError(error);
     }
@@ -20,22 +21,20 @@ export const cartApi = {
         productId,
         quantity,
       });
-      return handleApiSuccess(response);
+      return handleApiSuccess(response).data; // ✅ data 반환
     } catch (error) {
       throw handleApiError(error);
     }
   },
 
-  // 장바구니 상품 수량 변경 (수량 UI 연동)
+  // 장바구니 상품 수량 변경
   updateQuantity: async (memberId, productId, quantity) => {
     try {
       const response = await apiClient.put(
         `/api/members/${memberId}/cart/${productId}`,
-        {
-          quantity,
-        }
+        { quantity }
       );
-      return handleApiSuccess(response);
+      return handleApiSuccess(response).data; // ✅ data 반환
     } catch (error) {
       throw handleApiError(error);
     }
@@ -44,17 +43,14 @@ export const cartApi = {
   // 장바구니에서 상품 삭제
   removeFromCart: async (memberId, productId) => {
     try {
-      const response = await apiClient.delete(
-        `/api/members/${memberId}/cart/${productId}`
-      );
-      return handleApiSuccess(response);
+      await apiClient.delete(`/api/members/${memberId}/cart/${productId}`);
+      return productId; // 삭제된 productId 반환
     } catch (error) {
       throw handleApiError(error);
     }
   },
 };
 
-// 개별 함수로도 export (기존 코드 호환성)
 export const getCartItems = cartApi.getCartItems;
 export const addToCart = cartApi.addToCart;
 export const updateQuantity = cartApi.updateQuantity;
