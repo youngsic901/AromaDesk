@@ -7,14 +7,13 @@ import com.example.aromadesk.member.repository.MemberRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -32,6 +31,7 @@ public class SecurityConfig {
 	@Order(2)
 	public SecurityFilterChain userSecurityFilterChain(HttpSecurity http, MemberRepository memberRepository) throws Exception {
 		http
+				.cors(withDefaults())
 				.csrf(csrf -> csrf.disable())
 				.userDetailsService(memberLoginService)
 				.securityMatcher("/**")
@@ -62,6 +62,7 @@ public class SecurityConfig {
 								.userService(customOAuth2UserService(memberRepository)) // 커스텀 서비스 구현 필요!
 						)
 				);
+
 		return http.build();
 	}
   // Security 필터 체인 설정
@@ -69,6 +70,7 @@ public class SecurityConfig {
 	@Order(1)
 	public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
 		http
+				.cors(withDefaults())
 				.csrf(csrf -> csrf.disable())
 				.userDetailsService(adminLoginService)
 				.securityMatcher("/admin/**")
