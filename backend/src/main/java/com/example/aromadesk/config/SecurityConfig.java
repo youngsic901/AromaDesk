@@ -1,6 +1,7 @@
 package com.example.aromadesk.config;
 
 import com.example.aromadesk.auth.service.AdminLoginService;
+import com.example.aromadesk.auth.service.CustomOAuth2SuccessHandler;
 import com.example.aromadesk.auth.service.CustomOAuth2UserService;
 import com.example.aromadesk.auth.service.MemberLoginService;
 import com.example.aromadesk.member.repository.MemberRepository;
@@ -29,7 +30,7 @@ public class SecurityConfig {
   // Security 필터 체인 설정
 	@Bean
 	@Order(2)
-	public SecurityFilterChain userSecurityFilterChain(HttpSecurity http, MemberRepository memberRepository) throws Exception {
+	public SecurityFilterChain userSecurityFilterChain(HttpSecurity http, MemberRepository memberRepository, CustomOAuth2SuccessHandler customOAuth2SuccessHandler) throws Exception {
 		http
 				.cors(withDefaults())
 				.csrf(csrf -> csrf.disable())
@@ -57,10 +58,10 @@ public class SecurityConfig {
 				// 소셜 로그인 기능 활성화
 				.oauth2Login(oauth2 -> oauth2
 						.loginPage("/auth/login") // 소셜, 자체 로그인 모두 동일한 페이지 사용
-						.defaultSuccessUrl("/", true)
 						.userInfoEndpoint(userInfo -> userInfo
-								.userService(customOAuth2UserService(memberRepository)) // 커스텀 서비스 구현 필요!
+								.userService(customOAuth2UserService(memberRepository, passwordEncoder())) // 커스텀 서비스 구현 필요!
 						)
+						.successHandler(customOAuth2SuccessHandler)
 				);
 
 		return http.build();
@@ -88,7 +89,7 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public CustomOAuth2UserService customOAuth2UserService(MemberRepository memberRepository) {
-		return new CustomOAuth2UserService(memberRepository);
+	public CustomOAuth2UserService customOAuth2UserService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
+		return new CustomOAuth2UserService(memberRepository, passwordEncoder);
 	}
 }

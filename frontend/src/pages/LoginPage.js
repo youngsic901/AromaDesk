@@ -88,14 +88,14 @@ const LoginPage = () => {
         </a>
         <a 
           className="kakao-btn"
-          href="http://localhost//oauth2/authorization/kakao"
+          href="http://localhost/oauth2/authorization/kakao"
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}
         >
           카카오로 로그인
         </a>
         <a 
           className="naver-btn"
-          href="http://localhost//oauth2/authorization/naver"
+          href="http://localhost/oauth2/authorization/naver"
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
         >
           네이버로 로그인
