@@ -1,12 +1,23 @@
 package com.example.aromadesk.member.controller;
 
+import com.example.aromadesk.auth.service.MemberLoginService;
+import com.example.aromadesk.member.dto.LoginRequest;
 import com.example.aromadesk.member.dto.MemberDto;
 import com.example.aromadesk.member.entity.Member;
 import com.example.aromadesk.member.repository.MemberRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +32,7 @@ public class MemberController {
     private final MemberRepository memberRepository;
 
     private final PasswordEncoder passwordEncoder;
+    private final MemberLoginService memberLoginService;
 
     // 회원 전체 목록 조회 (GET /api/members)
     @GetMapping
@@ -80,7 +92,7 @@ public class MemberController {
         }
     }
 
-    @PostMapping("/login")
+/*    @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody MemberDto dto, HttpSession session) {
         // 1. memberId로 DB에서 회원 찾기
         Optional<Member> memberOpt = memberRepository.findByMemberId(dto.getMemberId());
@@ -98,7 +110,29 @@ public class MemberController {
         MemberDto loginUserDto = MemberDto.fromEntity(member);
         session.setAttribute("CusUser", loginUserDto);
         return ResponseEntity.ok(loginUserDto);
+    }*/
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+        UserDetails userDetails = memberLoginService.loadUserByUsername(loginRequest.getMemberId());
+
+        if (!passwordEncoder.matches(loginRequest.getPassword(), userDetails.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 틀렸습니다");
+        }
+
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authToken);
+        SecurityContextHolder.setContext(context);
+
+        HttpSession session = request.getSession(true);
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+
+        return ResponseEntity.ok("로그인 성공");
     }
+
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpSession session) {
