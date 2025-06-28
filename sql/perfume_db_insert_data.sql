@@ -49,30 +49,30 @@ INSERT INTO common_code (code, group_name, label, parent_code, sort_order) VALUE
 
 -- ✅ 회원(member) 삽입
 INSERT INTO member (member_id, email, password, name, phone, address)
-VALUES 
-('user001', 'user001@example.com', 'pass123', '홍길동', '010-1111-1111', '서울시 강남구'),
-('user002', 'user002@example.com', 'pass123', '김영희', '010-2222-2222', '부산시 해운대구'),
-('user003', 'user003@example.com', 'pass123', '이철수', '010-3333-3333', '대전시 유성구'),
-('user004', 'user004@example.com', 'pass123', '박민수', '010-4444-4444', '인천시 남동구'),
-('user005', 'user005@example.com', 'pass123', '최지은', '010-5555-5555', '대구시 수성구');
+VALUES
+    ('user001', 'user001@example.com', '$2a$10$Mwuo/rTLcG4JEI5DFnvGzut4jDUzVAiIHKcfvTxsJx93XjeBNjEPq', '홍길동', '010-1111-1111', '서울시 강남구'),
+    ('user002', 'user002@example.com', '$2a$10$Mwuo/rTLcG4JEI5DFnvGzut4jDUzVAiIHKcfvTxsJx93XjeBNjEPq', '김영희', '010-2222-2222', '부산시 해운대구'),
+    ('user003', 'user003@example.com', '$2a$10$Mwuo/rTLcG4JEI5DFnvGzut4jDUzVAiIHKcfvTxsJx93XjeBNjEPq', '이철수', '010-3333-3333', '대전시 유성구'),
+    ('user004', 'user004@example.com', '$2a$10$Mwuo/rTLcG4JEI5DFnvGzut4jDUzVAiIHKcfvTxsJx93XjeBNjEPq', '박민수', '010-4444-4444', '인천시 남동구'),
+    ('user005', 'user005@example.com', '$2a$10$Mwuo/rTLcG4JEI5DFnvGzut4jDUzVAiIHKcfvTxsJx93XjeBNjEPq', '최지은', '010-5555-5555', '대구시 수성구');
 
 -- ✅ 관리자(admin) 삽입
 INSERT INTO admin (username, password, name)
-VALUES 
-('admin01', 'adminpass1', '관리자A'),
-('admin02', 'adminpass2', '관리자B'),
-('admin03', 'adminpass3', '관리자C'),
-('admin04', 'adminpass4', '관리자D'),
-('admin05', 'adminpass5', '관리자E');
+VALUES
+    ('admin01', '$2a$10$UFp6x8HILT5yR4qon16/xOm27.G4g6n4nztIF736mIE08wCj08poO', '관리자A'),
+    ('admin02', '$2a$10$UFp6x8HILT5yR4qon16/xOm27.G4g6n4nztIF736mIE08wCj08poO', '관리자B'),
+    ('admin03', '$2a$10$UFp6x8HILT5yR4qon16/xOm27.G4g6n4nztIF736mIE08wCj08poO', '관리자C'),
+    ('admin04', '$2a$10$UFp6x8HILT5yR4qon16/xOm27.G4g6n4nztIF736mIE08wCj08poO', '관리자D'),
+    ('admin05', '$2a$10$UFp6x8HILT5yR4qon16/xOm27.G4g6n4nztIF736mIE08wCj08poO', '관리자E');
 
 -- ✅ 상품(product) 삽입
 INSERT INTO product (name, brand, gender_category, volume_category, price, stock, image_url, description)
 VALUES
-('블루 향수', 'CHANEL', 'MALE', 'UNDER_50ML', 120000, 50, 'image1.jpg', '시원한 바다 느낌의 향수입니다.'),
-('핑크 향수', 'DIOR', 'FEMALE', 'UNDER_30ML', 90000, 30, 'image2.jpg', '부드러운 꽃향기 향수입니다.'),
-('시트러스 향수', 'HERMES', 'UNISEX', 'LARGE', 150000, 40, 'image3.jpg', '상큼한 과일향이 매력적인 향수입니다.'),
-('우디 향수', 'GUCCI', 'MALE', 'LARGE', 170000, 20, 'image4.jpg', '우디 향조로 남성미를 강조한 향수입니다.'),
-('플로럴 향수', 'YSL', 'FEMALE', 'UNDER_50ML', 110000, 25, 'image5.jpg', '은은한 꽃향기 향수입니다.');
+    ('블루 향수', 'CHANEL', 'MALE', 'UNDER_50ML', 120000, 50, 'https://www.worldperfume.co.kr/shopimages/hjwych/4070020000182.jpg?1747379028', '시원한 바다 느낌의 향수입니다.'),
+    ('핑크 향수', 'DIOR', 'FEMALE', 'UNDER_30ML', 90000, 30, 'https://www.worldperfume.co.kr/shopimages/hjwych/4070020000182.jpg?1747379028', '부드러운 꽃향기 향수입니다.'),
+    ('시트러스 향수', 'HERMES', 'UNISEX', 'LARGE', 150000, 40, 'https://www.worldperfume.co.kr/shopimages/hjwych/4070020000182.jpg?1747379028', '상큼한 과일향이 매력적인 향수입니다.'),
+    ('우디 향수', 'GUCCI', 'MALE', 'LARGE', 170000, 20, 'https://www.worldperfume.co.kr/shopimages/hjwych/4070020000182.jpg?1747379028', '우디 향조로 남성미를 강조한 향수입니다.'),
+    ('플로럴 향수', 'YSL', 'FEMALE', 'UNDER_50ML', 110000, 25, 'https://www.worldperfume.co.kr/shopimages/hjwych/4070020000182.jpg?1747379028', '은은한 꽃향기 향수입니다.');
 
 -- ✅ 주문(orders) 삽입 (payment_method: MOCK으로 통일)
 INSERT INTO orders (member_id, total_price, payment_method, status)
