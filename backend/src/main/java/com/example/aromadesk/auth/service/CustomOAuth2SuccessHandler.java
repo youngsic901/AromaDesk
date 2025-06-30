@@ -24,10 +24,10 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
         String email = oAuth2User.getEmail();
 
-        boolean exists  = !memberRepository.findByEmail(email).isPresent();
+        boolean exists  = memberRepository.findByEmail(email).isPresent();
 
         if (exists) {
-            response.sendRedirect("http://localhost:3000/signup");
+            response.sendRedirect("http://localhost:3000");
         } else {
             request.getSession().setAttribute("email", email);
             request.getSession().setAttribute("name", oAuth2User.getName());
