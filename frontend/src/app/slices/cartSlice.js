@@ -126,17 +126,14 @@ const cartSlice = createSlice({
         );
         if (existingIndex !== -1) {
           const existingItem = state.items[existingIndex];
-          if (existingItem && typeof existingItem.quantity === "number") {
-            existingItem.quantity += newItem.quantity || 1;
-          } else {
-            existingItem.quantity = newItem.quantity || 1;
-          }
-          existingItem.cartItemId = newItem.cartItemId;
+          existingItem.quantity =
+            (existingItem.quantity || 0) + (newItem.quantity || 1);
+          existingItem.cartItemId = newItem.cartItemId || existingItem.cartItemId;
         } else {
           state.items.push({
             ...newItem,
             quantity: newItem.quantity || 1,
-            cartItemId: newItem.cartItemId,
+            cartItemId: newItem.cartItemId || null,
           });
         }
         state.totalQuantity = state.items.reduce(
@@ -168,7 +165,7 @@ const cartSlice = createSlice({
         if (index !== -1) {
           state.items[index] = {
             ...updatedItem,
-            cartItemId: updatedItem.cartItemId,
+            cartItemId: updatedItem.cartItemId || state.items[index].cartItemId,
           };
         }
         state.totalQuantity = (state.items || []).reduce(

@@ -51,7 +51,7 @@ public class OrderService {
      * 단일 상품 주문 처리 (상품 상세 페이지에서 바로 구매)
      */
     @Transactional
-    public void createSingleOrder(OrderRequestDto dto, Member member) {
+    public OrderResponseDto createSingleOrder(OrderRequestDto dto, Member member) {
         if (dto.getItems() == null || dto.getItems().isEmpty()) {
             throw new IllegalArgumentException("주문 항목이 비어 있습니다.");
         }
@@ -92,6 +92,7 @@ public class OrderService {
         order.setOrderItems(orderItems);
 
         orderRepository.save(order);
+        return OrderResponseDto.from(order);
     }
 
     /**
