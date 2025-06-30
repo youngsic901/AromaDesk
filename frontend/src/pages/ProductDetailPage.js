@@ -14,6 +14,7 @@ import {
 const ProductDetailPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.user);
   const { currentProduct, loading, error } = useSelector(
     (state) => state.product
   );
@@ -43,9 +44,15 @@ const ProductDetailPage = () => {
 
   // 장바구니 담기 핸들러
   const handleAddToCart = () => {
+    // 로그인 확인
+    if (!user || !user.memberId) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
     dispatch(
       addToCartAction({
-        memberId: 1, // 임시
+        memberId: user.memberId,
         productId: currentProduct.id,
         quantity: 1,
       })

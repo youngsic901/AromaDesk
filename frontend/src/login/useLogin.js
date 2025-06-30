@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { loginAPI } from '../api/loginApi.js';
 import { login as loginAction, logout as logoutAction } from '../app/slices/userSlice.js';
+import { authManager } from '../api/authApi.js';
 
 export const useLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,15 +21,31 @@ export const useLogin = () => {
       if (result.success) {
         // 백엔드에서 세션에 CusUser로 저장하고 Member 엔티티를 반환
         const userData = result.data;
+        
+        // 로그인 후 세션 상태 확인
+        console.log('로그인 성공, 세션 상태 확인 중...');
+        const sessionResult = await authManager.checkSession();
+        
+        if (!sessionResult.success || !sessionResult.isValid) {
+          console.log('로그인 후 세션 확인 실패');
+          setError('로그인은 성공했지만 세션 설정에 문제가 있습니다.');
+          return { success: false, error: '세션 설정 실패' };
+        }
+        
+        console.log('세션 확인 성공, 사용자 정보 설정');
         setUser(userData);
         
         // Redux 스토어에 로그인 상태 저장
         dispatch(loginAction(userData));
         
-        // localStorage에도 CusUser 키로 저장 (마이페이지에서 사용)
+        // localStorage에 사용자 정보 저장
         localStorage.setItem('CusUser', JSON.stringify(userData));
         
-        console.log('로그인 성공:', userData);
+        // authManager 캐시 업데이트
+        authManager._cachedUser = userData;
+        authManager._cacheTimestamp = Date.now();
+        
+        console.log('로그인 완료:', userData);
         return { success: true, data: userData };
       } else {
         setError(result.error);
@@ -49,20 +66,18 @@ export const useLogin = () => {
     setError(null);
     
     try {
-      const result = await loginAPI.logout();
+      // 백엔드에 로그아웃 요청
+      await loginAPI.logout();
       
-      if (result.success) {
-        setUser(null);
-        // Redux 스토어에서 로그아웃 상태 저장
-        dispatch(logoutAction());
-        // localStorage에서도 CusUser 정보 삭제
-        localStorage.removeItem('CusUser');
-        console.log('로그아웃 성공');
-        return { success: true };
-      } else {
-        setError(result.error);
-        return { success: false, error: result.error };
-      }
+      setUser(null);
+      // Redux 스토어에서 로그아웃 상태 저장
+      dispatch(logoutAction());
+      
+      // localStorage에서 사용자 정보 삭제
+      localStorage.removeItem('CusUser');
+      
+      console.log('로그아웃 성공');
+      return { success: true };
     } catch (err) {
       const errorMessage = '로그아웃 중 오류가 발생했습니다.';
       setError(errorMessage);
@@ -81,6 +96,10 @@ export const useLogin = () => {
         setUser(result.data);
         // Redux 스토어에 사용자 정보 저장
         dispatch(loginAction(result.data));
+        
+        // localStorage에 사용자 정보 저장
+        localStorage.setItem('CusUser', JSON.stringify(result.data));
+        
         return { success: true, data: result.data };
       } else {
         setError(result.error);
