@@ -4,6 +4,18 @@ import { useSignUp } from '../api/useSignUp';
 import '../css/loginCus.css';
 
 const SignupPage = () => {
+
+  const handleAddressSearch = () => {
+    new window.daum.Postcode({
+      oncomplete: function(data) {
+        setFormData(prev => ({
+          ...prev,
+          address: data.address
+        }));
+      }
+    }).open();
+  };
+
   const [formData, setFormData] = useState({
     memberId: '',
     email: '',
@@ -11,7 +23,8 @@ const SignupPage = () => {
     confirmPassword: '',
     name: '',
     phone: '',
-    address: ''
+    address: '',
+    addressDetail: ''
   });
   const [validationStatus, setValidationStatus] = useState({
     memberId: { checked: false, available: false }
@@ -258,10 +271,41 @@ const SignupPage = () => {
           name="address"
           placeholder="주소"
           value={formData.address}
-          onChange={handleInputChange}
-          onKeyPress={handleKeyPress}
-          disabled={isLoading}
+          readOnly
+          style={{ marginBottom: '8px' }}
         />
+
+        <div style={{ width: '100%', marginBottom: '12px', display: 'flex', gap: '10px' }}>
+          <input
+            className="login-input"
+            type="text"
+            name="addressDetail"
+            placeholder="상세주소 (예: 101호)"
+            value={formData.addressDetail}
+            onChange={handleInputChange}
+            onKeyPress={handleKeyPress}
+            disabled={isLoading}
+            style={{ flex: 1, marginBottom: '0' }}
+          />
+          <button
+            type="button"
+            onClick={handleAddressSearch}
+            disabled={isLoading}
+            style={{
+              width: '80px',
+              padding: '10px 5px',
+              backgroundColor: '#FFE812',
+              color: '#333',
+              border: '1px solid #ddd',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              flexShrink: 0
+            }}
+          >
+            주소 검색
+          </button>
+        </div>
         
         <button 
           className="login-btn" 

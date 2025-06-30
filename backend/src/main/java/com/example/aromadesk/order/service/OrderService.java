@@ -21,7 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /*************************************************************
@@ -189,5 +191,17 @@ public class OrderService {
         // null 반환 시 0L로 처리 (매출 없는 기간이면 0 반환)
         Long total = orderRepository.getTotalSalesBetween(start, end);
         return total != null ? total : 0L;
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Long> countOrdersByStatusBetween(LocalDateTime start, LocalDateTime end) {
+        List<Object[]> result = orderRepository.countOrdersByStatusBetween(start, end);
+        Map<String, Long> countMap = new HashMap<>();
+        for (Object[] row : result) {
+            String status = row[0].toString();
+            Long count = (Long) row[1];
+            countMap.put(status, count);
+        }
+        return countMap;
     }
 }

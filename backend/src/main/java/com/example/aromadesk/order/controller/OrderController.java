@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /*************************************************************
  /* SYSTEM NAME      : Order
@@ -109,5 +110,19 @@ public class OrderController {
 
         // 4. 결과 반환
         return ResponseEntity.ok(total);
+    }
+
+    // 상태별 주문 개수 조회 (기간 선택)
+    @GetMapping("/count-by-status")
+    public ResponseEntity<Map<String, Long>> getOrderCountByStatus(@RequestParam String start,@RequestParam String end) {
+
+        LocalDate startDate = LocalDate.parse(start);
+        LocalDate endDate = LocalDate.parse(end);
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay(); // 다음날 자정
+
+        Map<String, Long> result = orderService.countOrdersByStatusBetween(startDateTime, endDateTime);
+
+        return ResponseEntity.ok(result);
     }
 }
