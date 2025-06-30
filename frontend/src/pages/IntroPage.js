@@ -23,7 +23,7 @@ function IntroPage() {
   ];
 
   useEffect(() => {
-    // 5초 후에 메뉴 표시
+    // 0.5초 후에 메뉴 표시
     const timer = setTimeout(() => {
       setShowMenu(true);
     }, 500);

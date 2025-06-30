@@ -3,8 +3,8 @@
  */
 //axios.js
 import axios from "axios";
-import store from '../app/store';
-import { logout as logoutAction } from '../app/slices/userSlice';
+import store from "../app/store";
+import { logout as logoutAction } from "../app/slices/userSlice";
 
 //API 기본 URL
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:80";
@@ -43,7 +43,7 @@ apiClient.interceptors.response.use(
       error.response?.status,
       error.response?.data
     );
-    
+
     // 401 오류는 ProtectedRoute에서 처리하므로 여기서는 단순히 에러만 반환
     return Promise.reject(error);
   }
