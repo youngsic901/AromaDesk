@@ -37,7 +37,7 @@ import CategoryPage from "./pages/CategoryPage";
 import BrandPage from "./pages/BrandPage";
 import SearchPage from "./pages/SearchPage";
 import OrderCompletePage from "./pages/OrderCompletePage";
-
+import OrderPaymentPage from "./pages/OrderPaymentPage"
 // API
 import { loginAPI } from "./api/loginApi";
 import {
@@ -193,6 +193,7 @@ function AppContent() {
                     <Route path="/mypage" element={<MyPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/signup" element={<SignupPage />} />
+                    <Route path="/order/payment" element={<OrderPaymentPage />} />
                     <Route
                       path="/order/complete"
                       element={<OrderCompletePage />}
