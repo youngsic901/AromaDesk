@@ -25,8 +25,8 @@ const AdminProductPage = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await productApi.getProducts();
-      setProducts(response.data);
+      const products = await adminProductApi.getProducts();
+      setProducts(products);
       setError(null);
     } catch (err) {
       console.error("상품 목록 조회 실패:", err);
@@ -67,10 +67,15 @@ const AdminProductPage = () => {
   // 상품 수정
   const handleUpdateProduct = async (e) => {
     e.preventDefault();
+    console.log("수정 시작:", editingProduct);
     try {
-      await adminProductApi.updateProduct(editingProduct.id, editingProduct);
+      const result = await adminProductApi.updateProduct(
+        editingProduct.id,
+        editingProduct
+      );
+      console.log("수정 성공:", result);
       setEditingProduct(null);
-      fetchProducts();
+      await fetchProducts();
       alert("상품이 성공적으로 수정되었습니다.");
     } catch (err) {
       console.error("상품 수정 실패:", err);
@@ -242,7 +247,7 @@ const AdminProductPage = () => {
               </tr>
             </thead>
             <tbody>
-              {products.map((product) => (
+              {(Array.isArray(products) ? products : []).map((product) => (
                 <tr key={product.id}>
                   <td>{product.id}</td>
                   <td>{product.name}</td>
@@ -252,7 +257,12 @@ const AdminProductPage = () => {
                   <td>{product.price?.toLocaleString()}원</td>
                   <td>{product.stock}</td>
                   <td>
-                    <button onClick={() => setEditingProduct(product)}>
+                    <button
+                      onClick={() => {
+                        console.log("수정 버튼 클릭됨:", product);
+                        setEditingProduct(product);
+                      }}
+                    >
                       수정
                     </button>
                     <button onClick={() => handleDeleteProduct(product.id)}>
@@ -267,15 +277,18 @@ const AdminProductPage = () => {
 
         {/* 상품 수정 모달 */}
         {editingProduct && (
-          <div className="modal-overlay">
-            <div className="modal">
+          <div
+            className="modal-overlay"
+            onClick={() => setEditingProduct(null)}
+          >
+            <div className="modal" onClick={(e) => e.stopPropagation()}>
               <h2>상품 수정</h2>
               <form onSubmit={handleUpdateProduct}>
                 <div className="form-group">
                   <label>상품명:</label>
                   <input
                     type="text"
-                    value={editingProduct.name}
+                    value={editingProduct.name || ""}
                     onChange={(e) =>
                       setEditingProduct({
                         ...editingProduct,
@@ -289,7 +302,7 @@ const AdminProductPage = () => {
                   <label>브랜드:</label>
                   <input
                     type="text"
-                    value={editingProduct.brand}
+                    value={editingProduct.brand || ""}
                     onChange={(e) =>
                       setEditingProduct({
                         ...editingProduct,
@@ -302,7 +315,7 @@ const AdminProductPage = () => {
                 <div className="form-group">
                   <label>성별 카테고리:</label>
                   <select
-                    value={editingProduct.genderCategory}
+                    value={editingProduct.genderCategory || ""}
                     onChange={(e) =>
                       setEditingProduct({
                         ...editingProduct,
@@ -312,15 +325,15 @@ const AdminProductPage = () => {
                     required
                   >
                     <option value="">선택하세요</option>
-                    <option value="남성">남성</option>
-                    <option value="여성">여성</option>
-                    <option value="중성">중성</option>
+                    <option value="MALE">남성</option>
+                    <option value="FEMALE">여성</option>
+                    <option value="UNISEX">중성</option>
                   </select>
                 </div>
                 <div className="form-group">
                   <label>용량 카테고리:</label>
                   <select
-                    value={editingProduct.volumeCategory}
+                    value={editingProduct.volumeCategory || ""}
                     onChange={(e) =>
                       setEditingProduct({
                         ...editingProduct,
@@ -330,20 +343,20 @@ const AdminProductPage = () => {
                     required
                   >
                     <option value="">선택하세요</option>
-                    <option value="30ml">30ml</option>
-                    <option value="50ml">50ml</option>
-                    <option value="100ml">100ml</option>
+                    <option value="UNDER_30ML">30ml</option>
+                    <option value="UNDER_50ML">50ml</option>
+                    <option value="LARGE">대용량</option>
                   </select>
                 </div>
                 <div className="form-group">
                   <label>가격:</label>
                   <input
                     type="number"
-                    value={editingProduct.price}
+                    value={editingProduct.price || ""}
                     onChange={(e) =>
                       setEditingProduct({
                         ...editingProduct,
-                        price: e.target.value,
+                        price: parseInt(e.target.value) || 0,
                       })
                     }
                     required
@@ -353,11 +366,11 @@ const AdminProductPage = () => {
                   <label>재고:</label>
                   <input
                     type="number"
-                    value={editingProduct.stock}
+                    value={editingProduct.stock || ""}
                     onChange={(e) =>
                       setEditingProduct({
                         ...editingProduct,
-                        stock: e.target.value,
+                        stock: parseInt(e.target.value) || 0,
                       })
                     }
                     required
@@ -367,7 +380,7 @@ const AdminProductPage = () => {
                   <label>이미지 URL:</label>
                   <input
                     type="text"
-                    value={editingProduct.imageUrl}
+                    value={editingProduct.imageUrl || ""}
                     onChange={(e) =>
                       setEditingProduct({
                         ...editingProduct,
@@ -380,7 +393,7 @@ const AdminProductPage = () => {
                 <div className="form-group">
                   <label>설명:</label>
                   <textarea
-                    value={editingProduct.description}
+                    value={editingProduct.description || ""}
                     onChange={(e) =>
                       setEditingProduct({
                         ...editingProduct,

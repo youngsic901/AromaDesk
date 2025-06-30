@@ -11,43 +11,37 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 
 // 관리자 상품 API
 var adminProductApi = {
-  // 상품 생성
-  createProduct: function createProduct(productData) {
+  // 상품 목록 조회
+  getProducts: function getProducts() {
     var response;
-    return regeneratorRuntime.async(function createProduct$(_context) {
+    return regeneratorRuntime.async(function getProducts$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            _context.prev = 0;
-            _context.next = 3;
-            return regeneratorRuntime.awrap(_axiosConfig["default"].post("/api/admin/products", productData));
+            _context.next = 2;
+            return regeneratorRuntime.awrap(_axiosConfig["default"].get("/api/admin/products"));
 
-          case 3:
+          case 2:
             response = _context.sent;
             return _context.abrupt("return", response.data);
 
-          case 7:
-            _context.prev = 7;
-            _context.t0 = _context["catch"](0);
-            throw _context.t0;
-
-          case 10:
+          case 4:
           case "end":
             return _context.stop();
         }
       }
-    }, null, null, [[0, 7]]);
+    });
   },
-  // 상품 수정
-  updateProduct: function updateProduct(productId, productData) {
+  // 상품 생성
+  createProduct: function createProduct(productData) {
     var response;
-    return regeneratorRuntime.async(function updateProduct$(_context2) {
+    return regeneratorRuntime.async(function createProduct$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
             _context2.prev = 0;
             _context2.next = 3;
-            return regeneratorRuntime.awrap(_axiosConfig["default"].put("/api/admin/products/".concat(productId), productData));
+            return regeneratorRuntime.awrap(_axiosConfig["default"].post("/api/admin/products", productData));
 
           case 3:
             response = _context2.sent;
@@ -65,16 +59,16 @@ var adminProductApi = {
       }
     }, null, null, [[0, 7]]);
   },
-  // 상품 삭제
-  deleteProduct: function deleteProduct(productId) {
+  // 상품 수정
+  updateProduct: function updateProduct(productId, productData) {
     var response;
-    return regeneratorRuntime.async(function deleteProduct$(_context3) {
+    return regeneratorRuntime.async(function updateProduct$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
             _context3.prev = 0;
             _context3.next = 3;
-            return regeneratorRuntime.awrap(_axiosConfig["default"]["delete"]("/api/admin/products/".concat(productId)));
+            return regeneratorRuntime.awrap(_axiosConfig["default"].put("/api/admin/products/".concat(productId), productData));
 
           case 3:
             response = _context3.sent;
@@ -88,6 +82,33 @@ var adminProductApi = {
           case 10:
           case "end":
             return _context3.stop();
+        }
+      }
+    }, null, null, [[0, 7]]);
+  },
+  // 상품 삭제
+  deleteProduct: function deleteProduct(productId) {
+    var response;
+    return regeneratorRuntime.async(function deleteProduct$(_context4) {
+      while (1) {
+        switch (_context4.prev = _context4.next) {
+          case 0:
+            _context4.prev = 0;
+            _context4.next = 3;
+            return regeneratorRuntime.awrap(_axiosConfig["default"]["delete"]("/api/admin/products/".concat(productId)));
+
+          case 3:
+            response = _context4.sent;
+            return _context4.abrupt("return", response.data);
+
+          case 7:
+            _context4.prev = 7;
+            _context4.t0 = _context4["catch"](0);
+            throw _context4.t0;
+
+          case 10:
+          case "end":
+            return _context4.stop();
         }
       }
     }, null, null, [[0, 7]]);

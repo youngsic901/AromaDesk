@@ -6,6 +6,8 @@ import com.example.aromadesk.product.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * @author : acorn
  * @packageName : com.example.aromadesk.product.controller
@@ -35,6 +37,12 @@ public class AdminProductController {
     public ResponseEntity<ProductResponseDTO> deleteProduct(@PathVariable("id") Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProductResponseDTO>> getAllProducts() {
+        List<ProductResponseDTO> products = productService.getAllProducts();
+        return ResponseEntity.ok(products);
     }
 
 }

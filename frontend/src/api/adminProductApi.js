@@ -2,6 +2,12 @@ import axios from "./axiosConfig";
 
 // 관리자 상품 API
 export const adminProductApi = {
+  // 상품 목록 조회
+  getProducts: async () => {
+    const response = await axios.get("/api/admin/products");
+    return response.data;
+  },
+
   // 상품 생성
   createProduct: async (productData) => {
     try {
