@@ -162,8 +162,7 @@ const MyPage = () => {
                     <p><strong>전화번호:</strong> {userInfo.phone || "미등록"}</p>
                   </Col>
                   <Col md={6}>
-                    <p><strong>생년월일:</strong> {userInfo.birthDate || "미등록"}</p>
-                    <p><strong>성별:</strong> {userInfo.gender || "미등록"}</p>
+                    <p><strong>가입일:</strong> {userInfo.createdAt ? new Date(userInfo.createdAt).toLocaleDateString('ko-KR') : "미등록"}</p>
                   </Col>
                 </Row>
               </Card.Body>
