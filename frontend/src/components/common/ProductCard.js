@@ -81,7 +81,7 @@ const ProductCard = ({ product }) => {
 
     dispatch(
       addToCartAction({
-        memberId: user.memberId,
+        memberId: user.id,
         productId: product.id,
         quantity: 1,
       })

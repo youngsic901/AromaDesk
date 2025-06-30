@@ -47,7 +47,7 @@ const CartPage = () => {
       return;
     }
     
-    dispatch(removeFromCartAction({ memberId: user.memberId, productId }));
+    dispatch(removeFromCartAction({ memberId: user.id, productId }));
   };
 
   // 주문 처리
