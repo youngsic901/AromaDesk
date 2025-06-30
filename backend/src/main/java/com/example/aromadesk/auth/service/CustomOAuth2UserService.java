@@ -3,6 +3,7 @@ package com.example.aromadesk.auth.service;
 import com.example.aromadesk.member.entity.Member;
 import com.example.aromadesk.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -10,12 +11,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) {
@@ -50,14 +53,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         if (memberOpt.isPresent()) {
             member = memberOpt.get();
         } else {
-            member = memberRepository.save(Member.builder()
-                    .memberId(email)
-                    .email(email)
-                    .name(name != null ? name : "이름없음")
-                    .phone(null)
-                    .address(null)
-                    .role("USER")
-                    .build());
+            return new CustomOAuth2User(email, name, attributes);
+
         }
 
         // 3. OAuth2User 리턴 (스프링 시큐리티는 OAuth2User로 인증상태 저장)
