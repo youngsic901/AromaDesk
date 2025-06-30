@@ -10,7 +10,7 @@ export const productApi = {
         brand,
         gender,
         volume,
-        name,
+        keyword,
         maxPrice,
         page = 1,
         size = 10,
@@ -21,6 +21,7 @@ export const productApi = {
       if (brand) queryParams.brand = brand;
       if (gender) queryParams.gender = gender;
       if (volume) queryParams.volume = volume;
+      if (keyword) queryParams.keyword = keyword;
       if (page) queryParams.page = page;
       if (size) queryParams.size = size;
 
@@ -31,18 +32,43 @@ export const productApi = {
       // 백엔드 응답 구조: { content: [], totalElements: number, page: number, size: number, totalPages: number }
       let result = handleApiSuccess(response);
 
-      // 프론트엔드에서 추가 필터링 처리
-      if (result.content) {
-        let filteredContent = result.content;
+      // 응답 구조 검증 및 기본값 설정
+      if (!result) {
+        result = {
+          content: [],
+          totalElements: 0,
+          page: 1,
+          size: 10,
+          totalPages: 0,
+        };
+      }
 
-        // name 검색 필터링
-        if (name) {
-          filteredContent = filteredContent.filter(
-            (product) =>
-              product.name.toLowerCase().includes(name.toLowerCase()) ||
-              product.brand.toLowerCase().includes(name.toLowerCase())
-          );
+      // content가 배열이 아닌 경우 처리
+      if (!Array.isArray(result.content)) {
+        if (Array.isArray(result)) {
+          // 배열로 직접 반환된 경우 (기존 호환성)
+          result = {
+            content: result,
+            totalElements: result.length,
+            page: 1,
+            size: result.length,
+            totalPages: 1,
+          };
+        } else {
+          // 단일 객체인 경우
+          result = {
+            content: [result],
+            totalElements: 1,
+            page: 1,
+            size: 1,
+            totalPages: 1,
+          };
         }
+      }
+
+      // 프론트엔드에서 추가 필터링 처리 (클라이언트 사이드)
+      if (result.content && maxPrice) {
+        let filteredContent = result.content;
 
         // 가격 필터링 (maxPrice)
         if (maxPrice) {
@@ -51,16 +77,19 @@ export const productApi = {
           );
         }
 
-        // 필터링된 결과로 업데이트
+        // 필터링된 결과로 업데이트 (페이징 정보는 원본 유지)
         result = {
           ...result,
           content: filteredContent,
+          // 클라이언트 필터링이 적용된 경우 totalElements 업데이트
           totalElements: filteredContent.length,
+          totalPages: Math.ceil(filteredContent.length / result.size),
         };
       }
 
       return result;
     } catch (error) {
+      console.error("검색 API 오류:", error);
       throw handleApiError(error);
     }
   },
@@ -69,7 +98,14 @@ export const productApi = {
   getProductById: async (productId) => {
     try {
       const response = await apiClient.get(`/api/products/${productId}`);
-      return handleApiSuccess(response);
+      const result = handleApiSuccess(response);
+
+      // 단일 상품 응답 검증
+      if (!result) {
+        throw new Error("상품을 찾을 수 없습니다.");
+      }
+
+      return result;
     } catch (error) {
       throw handleApiError(error);
     }
@@ -79,7 +115,13 @@ export const productApi = {
   createProduct: async (productData) => {
     try {
       const response = await apiClient.post("/api/products", productData);
-      return handleApiSuccess(response);
+      const result = handleApiSuccess(response);
+
+      if (!result) {
+        throw new Error("상품 생성에 실패했습니다.");
+      }
+
+      return result;
     } catch (error) {
       throw handleApiError(error);
     }
@@ -92,7 +134,13 @@ export const productApi = {
         `/api/products/${productId}`,
         productData
       );
-      return handleApiSuccess(response);
+      const result = handleApiSuccess(response);
+
+      if (!result) {
+        throw new Error("상품 수정에 실패했습니다.");
+      }
+
+      return result;
     } catch (error) {
       throw handleApiError(error);
     }
@@ -115,7 +163,13 @@ export const productApi = {
   createSingleOrder: async (orderData) => {
     try {
       const response = await apiClient.post("/api/orders/single", orderData);
-      return handleApiSuccess(response);
+      const result = handleApiSuccess(response);
+
+      if (!result) {
+        throw new Error("주문 생성에 실패했습니다.");
+      }
+
+      return result;
     } catch (error) {
       throw handleApiError(error);
     }
@@ -128,7 +182,13 @@ export const productApi = {
   createOrderFromCart: async (orderData) => {
     try {
       const response = await apiClient.post("/api/orders/from-cart", orderData);
-      return handleApiSuccess(response);
+      const result = handleApiSuccess(response);
+
+      if (!result) {
+        throw new Error("주문 생성에 실패했습니다.");
+      }
+
+      return result;
     } catch (error) {
       throw handleApiError(error);
     }

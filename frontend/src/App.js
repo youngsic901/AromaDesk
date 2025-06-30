@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import { Provider, useDispatch } from "react-redux";
 import store from "./app/store";
 
 // Bootstrap CSS and JS
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 // Layout Components
 import Header from "./components/layout/Header";
@@ -33,7 +39,10 @@ import OrderCompletePage from "./pages/OrderCompletePage";
 
 // API
 import { loginAPI } from "./api/loginApi";
-import { login as loginAction, logout as logoutAction } from "./app/slices/userSlice";
+import {
+  login as loginAction,
+  logout as logoutAction,
+} from "./app/slices/userSlice";
 
 // 관리자 인증 라우트
 function AdminRoute({ children }) {
@@ -53,35 +62,35 @@ function AppContent() {
   // 앱 시작 시 로그인 상태 확인
   useEffect(() => {
     const checkLoginStatus = async () => {
-      console.log('=== 앱 시작: 로그인 상태 확인 시작 ===');
+      console.log("=== 앱 시작: 로그인 상태 확인 시작 ===");
       try {
-        console.log('백엔드 세션 확인 API 호출 중...');
+        console.log("백엔드 세션 확인 API 호출 중...");
         const result = await loginAPI.getUserInfo();
-        console.log('백엔드 응답 결과:', result);
-        
+        console.log("백엔드 응답 결과:", result);
+
         if (result.success) {
-          console.log('로그인된 상태 확인됨:', result.data);
+          console.log("로그인된 상태 확인됨:", result.data);
           // 로그인된 상태: Redux 스토어에 사용자 정보 저장
           dispatch(loginAction(result.data));
           // localStorage에도 저장 (기존 호환성 유지)
-          localStorage.setItem('CusUser', JSON.stringify(result.data));
-          console.log('Redux 스토어와 localStorage에 사용자 정보 저장 완료');
+          localStorage.setItem("CusUser", JSON.stringify(result.data));
+          console.log("Redux 스토어와 localStorage에 사용자 정보 저장 완료");
         } else {
-          console.log('로그인되지 않은 상태:', result.error);
+          console.log("로그인되지 않은 상태:", result.error);
           // 로그인되지 않은 상태: Redux 스토어 초기화
           dispatch(logoutAction());
-          localStorage.removeItem('CusUser');
-          console.log('Redux 스토어와 localStorage 초기화 완료');
+          localStorage.removeItem("CusUser");
+          console.log("Redux 스토어와 localStorage 초기화 완료");
         }
       } catch (error) {
-        console.error('로그인 상태 확인 중 오류:', error);
-        console.error('오류 상세:', error.response?.data);
+        console.error("로그인 상태 확인 중 오류:", error);
+        console.error("오류 상세:", error.response?.data);
         // 오류 발생 시 로그아웃 상태로 설정
         dispatch(logoutAction());
-        localStorage.removeItem('CusUser');
-        console.log('오류로 인한 로그아웃 상태 설정 완료');
+        localStorage.removeItem("CusUser");
+        console.log("오류로 인한 로그아웃 상태 설정 완료");
       } finally {
-        console.log('=== 로그인 상태 확인 완료 ===');
+        console.log("=== 로그인 상태 확인 완료 ===");
         setIsInitialized(true);
       }
     };
@@ -91,9 +100,18 @@ function AppContent() {
 
   // 초기화가 완료될 때까지 로딩 표시
   if (!isInitialized) {
-    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-      로딩 중...
-    </div>;
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        로딩 중...
+      </div>
+    );
   }
 
   return (
@@ -159,7 +177,9 @@ function AppContent() {
                       path="/category/:category"
                       element={<CategoryPage />}
                     />
+                    <Route path="/brand" element={<BrandPage />} />
                     <Route path="/brand/:brand" element={<BrandPage />} />
+                    <Route path="/search" element={<SearchPage />} />
                     <Route path="/products" element={<ProductListPage />} />
                     <Route
                       path="/products/:id"

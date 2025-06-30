@@ -105,4 +105,13 @@ public class ProductService {
         }
         productRepository.deleteById(id);
     }
+
+    // 브랜드 목록 조회
+    public List<String> getAllBrands() {
+        return productRepository.findAll().stream()
+                .map(Product::getBrand)
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+    }
 }

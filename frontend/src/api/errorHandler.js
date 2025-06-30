@@ -31,5 +31,41 @@ export const handleApiError = (error) => {
 
 // 성공 응답 처리 공통 함수
 export const handleApiSuccess = (response) => {
+  // 응답 데이터 검증
+  if (!response || !response.data) {
+    console.warn("API 응답이 비어있습니다:", response);
+    return null;
+  }
+
+  // 응답 구조 로깅 (개발 환경에서만)
+  if (process.env.NODE_ENV === "development") {
+    console.log("API Response Structure:", {
+      hasData: !!response.data,
+      dataType: typeof response.data,
+      isArray: Array.isArray(response.data),
+      keys: response.data ? Object.keys(response.data) : null,
+    });
+  }
+
   return response.data;
+};
+
+// 응답 구조 검증 함수
+export const validateResponseStructure = (data, expectedStructure) => {
+  if (!data) return false;
+
+  for (const key of expectedStructure) {
+    if (!(key in data)) {
+      console.warn(`응답에 필수 필드가 없습니다: ${key}`, data);
+      return false;
+    }
+  }
+
+  return true;
+};
+
+// 페이징 응답 검증 함수
+export const validatePagingResponse = (data) => {
+  const requiredFields = ["content", "totalElements", "page", "size"];
+  return validateResponseStructure(data, requiredFields);
 };

@@ -33,7 +33,7 @@ public class ProductController {
             @RequestParam(name = "volume", required = false) String volume,
             @RequestParam(name = "keyword", required = false) String keyword,
             @RequestParam(name = "page", defaultValue = "1") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size
+            @RequestParam(name = "size", defaultValue = "50") int size
     ) {
         return ResponseEntity.ok(
 //                productService.getFilteredPagedProducts(brand, gender, volume, page, size)
@@ -62,5 +62,12 @@ public class ProductController {
     public ResponseEntity<ProductResponseDTO> deleteProduct(@PathVariable("id") Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // 브랜드 목록 조회
+    @GetMapping("/brands")
+    public ResponseEntity<List<String>> getBrands() {
+        List<String> brands = productService.getAllBrands();
+        return ResponseEntity.ok(brands);
     }
 }
