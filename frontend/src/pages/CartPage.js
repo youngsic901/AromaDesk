@@ -15,7 +15,6 @@ const CartPage = () => {
 
   const {
     items = [],
-    totalQuantity,
     totalAmount,
   } = useSelector((state) => state.cart);
   const { user } = useSelector((state) => state.user);

@@ -25,7 +25,7 @@ export const useLogin = () => {
         // Redux 스토어에 로그인 상태 저장
         dispatch(loginAction(userData));
         
-        // localStorage에도 CusUser 키로 저장 (마이페이지에서 사용)
+        // localStorage에 사용자 정보 저장
         localStorage.setItem('CusUser', JSON.stringify(userData));
         
         console.log('로그인 성공:', userData);
@@ -49,20 +49,18 @@ export const useLogin = () => {
     setError(null);
     
     try {
-      const result = await loginAPI.logout();
+      // 백엔드에 로그아웃 요청
+      await loginAPI.logout();
       
-      if (result.success) {
-        setUser(null);
-        // Redux 스토어에서 로그아웃 상태 저장
-        dispatch(logoutAction());
-        // localStorage에서도 CusUser 정보 삭제
-        localStorage.removeItem('CusUser');
-        console.log('로그아웃 성공');
-        return { success: true };
-      } else {
-        setError(result.error);
-        return { success: false, error: result.error };
-      }
+      setUser(null);
+      // Redux 스토어에서 로그아웃 상태 저장
+      dispatch(logoutAction());
+      
+      // localStorage에서 사용자 정보 삭제
+      localStorage.removeItem('CusUser');
+      
+      console.log('로그아웃 성공');
+      return { success: true };
     } catch (err) {
       const errorMessage = '로그아웃 중 오류가 발생했습니다.';
       setError(errorMessage);
@@ -81,6 +79,10 @@ export const useLogin = () => {
         setUser(result.data);
         // Redux 스토어에 사용자 정보 저장
         dispatch(loginAction(result.data));
+        
+        // localStorage에 사용자 정보 저장
+        localStorage.setItem('CusUser', JSON.stringify(result.data));
+        
         return { success: true, data: result.data };
       } else {
         setError(result.error);

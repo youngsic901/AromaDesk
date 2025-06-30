@@ -9,6 +9,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import Header from "./components/layout/Header";
 import Sidebar from "./components/layout/SideBar";
 import Footer from "./components/layout/Footer";
+// Common Components
+import ProtectedRoute from "./components/common/ProtectedRoute";
 // Page Components
 import MainPage from "./pages/MainPage";
 import ProductListPage from "./pages/ProductListPage";
@@ -28,8 +30,8 @@ import BrandPage from "./pages/BrandPage";
 import SearchPage from "./pages/SearchPage";
 import OrderCompletePage from "./pages/OrderCompletePage";
 // API
-import { loginAPI } from "./api/loginApi";
-import { login as loginAction, logout as logoutAction } from "./app/slices/userSlice";
+import { login as loginAction } from "./app/slices/userSlice";
+
 // 관리자 인증 라우트
 function AdminRoute({ children }) {
   const isAdmin = !!localStorage.getItem("AdminUser");
@@ -39,41 +41,42 @@ function AdminRoute({ children }) {
   }
   return children;
 }
+
 function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
   const dispatch = useDispatch();
-  // 앱 시작 시 로그인 상태 확인
+  
+  // 앱 시작 시 단순한 로그인 상태 확인
   useEffect(() => {
-    const checkLoginStatus = async () => {
+    const initializeApp = () => {
       try {
-        const result = await loginAPI.getUserInfo();
-        if (result.success) {
-          // 로그인된 상태: Redux 스토어에 사용자 정보 저장
-          dispatch(loginAction(result.data));
-          // localStorage에도 저장 (기존 호환성 유지)
-          localStorage.setItem('CusUser', JSON.stringify(result.data));
-        } else {
-          // 로그인되지 않은 상태: Redux 스토어 초기화
-          dispatch(logoutAction());
-          localStorage.removeItem('CusUser');
+        // localStorage에서 사용자 정보만 확인
+        const cusUserRaw = localStorage.getItem('CusUser');
+        if (cusUserRaw) {
+          const user = JSON.parse(cusUserRaw);
+          if (user && user.id) {
+            dispatch(loginAction(user));
+          }
         }
       } catch (error) {
-        // 오류 발생 시 로그아웃 상태로 설정
-        dispatch(logoutAction());
+        console.error('앱 초기화 오류:', error);
         localStorage.removeItem('CusUser');
       } finally {
         setIsInitialized(true);
       }
     };
-    checkLoginStatus();
+    
+    initializeApp();
   }, [dispatch]);
+  
   // 초기화가 완료될 때까지 로딩 표시
   if (!isInitialized) {
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
       로딩 중...
     </div>;
   }
+  
   return (
     <Router>
       <Routes>
@@ -144,7 +147,14 @@ function AppContent() {
                       element={<ProductDetailPage />}
                     />
                     <Route path="/cart" element={<CartPage />} />
-                    <Route path="/mypage" element={<MyPage />} />
+                    <Route 
+                      path="/mypage" 
+                      element={
+                        <ProtectedRoute>
+                          <MyPage />
+                        </ProtectedRoute>
+                      } 
+                    />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/signup" element={<SignupPage />} />
                     <Route
@@ -162,6 +172,7 @@ function AppContent() {
     </Router>
   );
 }
+
 // Redux Provider로 감싸기
 const App = () => {
   return (
@@ -170,4 +181,5 @@ const App = () => {
     </Provider>
   );
 };
+
 export default App;

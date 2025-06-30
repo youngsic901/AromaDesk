@@ -1,0 +1,146 @@
+import { loginAPI } from './loginApi';
+import apiClient from './axiosConfig';
+import { handleApiError, handleApiSuccess } from './errorHandler';
+
+// 중앙 집중식 사용자 정보 관리
+export const authManager = {
+  // 캐시된 사용자 정보 (메모리 캐시)
+  _cachedUser: null,
+  _cacheTimestamp: null,
+  _cacheExpiry: 5 * 60 * 1000, // 5분
+
+  // 사용자 정보 조회 (캐시 우선, 필요시 API 호출)
+  getUserInfo: async (forceRefresh = false) => {
+    try {
+      // 1. 캐시 확인 (강제 새로고침이 아니고, 캐시가 유효한 경우)
+      if (!forceRefresh && authManager._cachedUser && authManager._cacheTimestamp) {
+        const now = Date.now();
+        if (now - authManager._cacheTimestamp < authManager._cacheExpiry) {
+          console.log('캐시된 사용자 정보 사용');
+          return { success: true, data: authManager._cachedUser };
+        }
+      }
+
+      // 2. localStorage 확인
+      const localUser = authManager.getLocalUser();
+      if (localUser && !forceRefresh) {
+        console.log('localStorage 사용자 정보 사용');
+        authManager._cachedUser = localUser;
+        authManager._cacheTimestamp = Date.now();
+        return { success: true, data: localUser };
+      }
+
+      // 3. API 호출
+      console.log('API에서 사용자 정보 조회');
+      const response = await apiClient.get('/api/members/me');
+      const userData = handleApiSuccess(response);
+      
+      // 캐시 업데이트
+      authManager._cachedUser = userData;
+      authManager._cacheTimestamp = Date.now();
+      
+      // localStorage 업데이트
+      localStorage.setItem('CusUser', JSON.stringify(userData));
+      
+      return { success: true, data: userData };
+    } catch (error) {
+      console.error('사용자 정보 조회 실패:', error);
+      
+      // API 실패 시 localStorage 정보 반환
+      const localUser = authManager.getLocalUser();
+      if (localUser) {
+        console.log('API 실패, localStorage 정보 사용');
+        return { success: true, data: localUser };
+      }
+      
+      return { 
+        success: false, 
+        error: handleApiError(error).message 
+      };
+    }
+  },
+
+  // 사용자 정보 업데이트
+  updateUserInfo: async (updateData) => {
+    try {
+      console.log('사용자 정보 업데이트:', updateData);
+      const response = await apiClient.put('/api/members/update', updateData);
+      const updatedUser = handleApiSuccess(response);
+      
+      // 캐시 및 localStorage 업데이트
+      authManager._cachedUser = updatedUser;
+      authManager._cacheTimestamp = Date.now();
+      localStorage.setItem('CusUser', JSON.stringify(updatedUser));
+      
+      return { success: true, data: updatedUser };
+    } catch (error) {
+      console.error('사용자 정보 업데이트 실패:', error);
+      return { 
+        success: false, 
+        error: handleApiError(error).message 
+      };
+    }
+  },
+
+  // 세션 상태 확인 (실제 백엔드 세션)
+  checkSession: async () => {
+    try {
+      await apiClient.get('/api/members/me');
+      return { success: true, isValid: true };
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        return { success: true, isValid: false };
+      }
+      return { success: false, error: handleApiError(error).message };
+    }
+  },
+
+  // 세션 만료 처리
+  handleSessionExpired: () => {
+    console.log('세션 만료 처리');
+    authManager._cachedUser = null;
+    authManager._cacheTimestamp = null;
+    localStorage.removeItem('CusUser');
+  },
+
+  // 캐시 무효화
+  invalidateCache: () => {
+    authManager._cachedUser = null;
+    authManager._cacheTimestamp = null;
+  }
+};
+
+// 로그인 상태 확인 및 동기화
+export const checkAndSyncLoginStatus = async () => {
+  const result = await authManager.getUserInfo();
+  return {
+    success: result.success,
+    isLoggedIn: result.success && result.data,
+    user: result.data
+  };
+};
+
+// localStorage에서 사용자 정보 가져오기
+export const getLocalUser = () => {
+  try {
+    const cusUserRaw = localStorage.getItem('CusUser');
+    if (!cusUserRaw) return null;
+    
+    const user = JSON.parse(cusUserRaw);
+    return user;
+  } catch (e) {
+    console.error('localStorage 사용자 정보 파싱 오류:', e);
+    localStorage.removeItem('CusUser');
+    return null;
+  }
+};
+
+// 사용자 ID 가져오기 (Redux 또는 localStorage에서)
+export const getUserId = (reduxUser) => {
+  if (reduxUser && reduxUser.id) {
+    return reduxUser.id;
+  }
+  
+  const localUser = getLocalUser();
+  return localUser?.id || null;
+}; 

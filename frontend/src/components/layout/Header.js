@@ -1,16 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { FaShoppingCart, FaUser, FaBars } from "react-icons/fa";
 import { Dropdown } from "react-bootstrap";
-import { logout } from "../../app/slices/userSlice";
+import { logout as logoutAction } from "../../app/slices/userSlice";
 import apiClient from "../../api/axiosConfig";
 
 const Header = ({ setSidebarOpen }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { totalQuantity } = useSelector((state) => state.cart);
-  const { isLoggedIn, user } = useSelector((state) => state.user);
+  const { isLoggedIn } = useSelector((state) => state.user);
 
   const toggleSidebar = () => {
     setSidebarOpen((prev) => !prev);
@@ -32,17 +32,24 @@ const Header = ({ setSidebarOpen }) => {
     }
   };
 
-  const handleLogout = async () => {
+  // 마이페이지 클릭 핸들러
+  const handleMyPageClick = (e) => {
+    if (!isLoggedIn) {
+      e.preventDefault();
+      navigate('/login');
+    }
+  };
+
+  const handleLogoutClick = async () => {
     try {
       // 백엔드에 로그아웃 요청
       await apiClient.post('/api/members/logout');
     } catch (error) {
       console.error('로그아웃 API 호출 실패:', error);
-      // API 호출이 실패해도 클라이언트 측 로그아웃은 진행
     }
     
     // Redux 스토어에서 로그아웃 상태로 변경
-    dispatch(logout());
+    dispatch(logoutAction());
     
     // localStorage에서 사용자 정보 삭제
     localStorage.removeItem('CusUser');
@@ -120,14 +127,14 @@ const Header = ({ setSidebarOpen }) => {
               </Dropdown.Toggle>
 
               <Dropdown.Menu>
-                <Dropdown.Item as={Link} to="/mypage">
+                <Dropdown.Item as={Link} to="/mypage" onClick={handleMyPageClick}>
                   마이페이지
                 </Dropdown.Item>
                 <Dropdown.Item as={Link} to="/delivery">
                   배송조회
                 </Dropdown.Item>
                 <Dropdown.Divider />
-                <Dropdown.Item onClick={handleLogout}>
+                <Dropdown.Item onClick={handleLogoutClick}>
                   로그아웃
                 </Dropdown.Item>
               </Dropdown.Menu>
