@@ -43,13 +43,33 @@ public class ProductService {
         );
     }
 
+    // 필터 + 검색 + 페이징
+    public Map<String, Object> getFilteredSearchedPagedProducts(
+            String brand, String gender, String volume, String keyword, int page, int size) {
+        List<Product> all = productRepository.searchFilteredList(brand, gender, volume, keyword);
+
+        int fromIndex = Math.max((page - 1) * size, 0);
+        int toIndex = Math.min(fromIndex + size, all.size());
+        List<Product> paged = all.subList(fromIndex, toIndex);
+
+        List<ProductResponseDTO> content = paged.stream().map(ProductResponseDTO::new).toList();
+
+        return Map.of(
+                "content", content,
+                "totalElements", all.size(),
+                "page", page,
+                "size", size,
+                "totalPages", (int) Math.ceil((double) all.size() / size)
+        );
+    }
+
     public ProductResponseDTO createProduct(ProductRequestDTO dto) {
         Product product = new Product();
 
         product.setName(dto.getName());
         product.setBrand(dto.getBrand());
         product.setGenderCategory(dto.getGenderCategory());
-        product.setVolumeCategory(dto.getVoluemCategory());
+        product.setVolumeCategory(dto.getVolumeCategory());
         product.setPrice(dto.getPrice());
         product.setStock(dto.getStock());
         product.setImageUrl(dto.getImageUrl());
@@ -70,7 +90,7 @@ public class ProductService {
         product.setName(dto.getName());
         product.setBrand(dto.getBrand());
         product.setGenderCategory(dto.getGenderCategory());
-        product.setVolumeCategory(dto.getVoluemCategory());
+        product.setVolumeCategory(dto.getVolumeCategory());
         product.setPrice(dto.getPrice());
         product.setStock(dto.getStock());
         product.setImageUrl(dto.getImageUrl());

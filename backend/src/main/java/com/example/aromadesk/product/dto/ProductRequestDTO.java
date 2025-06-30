@@ -9,7 +9,7 @@ public class ProductRequestDTO {
     private String name;
     private String brand;
     private String genderCategory;
-    private String voluemCategory;
+    private String volumeCategory;
     private int price;
     private int stock;
     private String imageUrl;
