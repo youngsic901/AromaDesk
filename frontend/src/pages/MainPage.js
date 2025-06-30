@@ -25,7 +25,7 @@ const MainPage = () => {
     
     // 로그인한 사용자가 있을 때만 장바구니 불러오기
     if (user && user.memberId) {
-      dispatch(fetchCartItems(user.memberId));
+      dispatch(fetchCartItems(user.id));
     }
   }, [dispatch, user]);
 
