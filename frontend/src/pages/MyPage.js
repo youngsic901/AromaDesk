@@ -204,9 +204,9 @@ const MyPage = () => {
                   <Card.Body>
                     {user ? (
                         <div>
-                          <p><strong>우편번호:</strong> {user.zipCode || "미등록"}</p>
-                          <p><strong>주소:</strong> {user.address || "미등록"}</p>
-                          <p><strong>상세주소:</strong> {user.addressDetail || "미등록"}</p>
+                          <p><strong>우편번호:</strong> {userInfo.zipCode || "미등록"}</p>
+                          <p><strong>주소:</strong> {userInfo.address || "미등록"}</p>
+                          <p><strong>상세주소:</strong> {userInfo.addressDetail || "미등록"}</p>
                         </div>
                     ) : (
                         <div className="text-center py-4">
@@ -257,7 +257,7 @@ const MyPage = () => {
         {showAddressForm && (
             <AddressUpdate
                 user={userInfo}
-                onSuccess={handleAddressUpdateSuccess}
+                onUpdate={handleAddressUpdateSuccess}
                 onClose={() => setShowAddressForm(false)}
             />
         )}

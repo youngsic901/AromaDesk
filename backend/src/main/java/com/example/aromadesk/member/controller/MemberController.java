@@ -3,6 +3,7 @@ package com.example.aromadesk.member.controller;
 import com.example.aromadesk.auth.service.MemberLoginService;
 import com.example.aromadesk.member.dto.LoginRequest;
 import com.example.aromadesk.member.dto.MemberDto;
+import com.example.aromadesk.member.dto.UpdateAddressDto;
 import com.example.aromadesk.member.entity.Member;
 import com.example.aromadesk.member.repository.MemberRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -78,6 +79,17 @@ public class MemberController {
                     member.setAddress(updateRequest.getAddress());
                     member.setRole(updateRequest.getRole());
                     // createdAt은 보통 변경하지 않음
+                    Member updated = memberRepository.save(member);
+                    return ResponseEntity.ok(MemberDto.fromEntity(updated));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PatchMapping("/{id}/address")
+    public ResponseEntity<?> updateAddress(@PathVariable Long id, @RequestBody UpdateAddressDto request) {
+        return memberRepository.findById(id)
+                .map(member -> {
+                    member.setAddress(request.getAddress());
                     Member updated = memberRepository.save(member);
                     return ResponseEntity.ok(MemberDto.fromEntity(updated));
                 })
