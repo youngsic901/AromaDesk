@@ -19,34 +19,36 @@ export const useLogin = () => {
       const result = await loginAPI.login(memberId, password);
       
       if (result.success) {
-        // 백엔드에서 세션에 CusUser로 저장하고 Member 엔티티를 반환
-        const userData = result.data;
+        // 백엔드에서 최소한의 사용자 정보를 받음
+        const loginResponse = result.data;
+        console.log('로그인 성공, 기본 정보:', loginResponse);
         
-        // 로그인 후 세션 상태 확인
-        console.log('로그인 성공, 세션 상태 확인 중...');
-        const sessionResult = await authManager.checkSession();
+        // 세션에서 완전한 사용자 정보 조회
+        const userInfoResult = await loginAPI.getUserInfo();
         
-        if (!sessionResult.success || !sessionResult.isValid) {
-          console.log('로그인 후 세션 확인 실패');
-          setError('로그인은 성공했지만 세션 설정에 문제가 있습니다.');
-          return { success: false, error: '세션 설정 실패' };
+        if (userInfoResult.success) {
+          const userData = userInfoResult.data;
+          console.log('사용자 정보 조회 성공:', userData);
+          
+          setUser(userData);
+          
+          // Redux 스토어에 로그인 상태 저장
+          dispatch(loginAction(userData));
+          
+          // localStorage에 사용자 정보 저장
+          localStorage.setItem('CusUser', JSON.stringify(userData));
+          
+          // authManager 캐시 업데이트
+          authManager._cachedUser = userData;
+          authManager._cacheTimestamp = Date.now();
+          
+          console.log('로그인 완료:', userData);
+          return { success: true, data: userData };
+        } else {
+          console.log('사용자 정보 조회 실패:', userInfoResult.error);
+          setError('로그인은 성공했지만 사용자 정보 조회에 실패했습니다.');
+          return { success: false, error: '사용자 정보 조회 실패' };
         }
-        
-        console.log('세션 확인 성공, 사용자 정보 설정');
-        setUser(userData);
-        
-        // Redux 스토어에 로그인 상태 저장
-        dispatch(loginAction(userData));
-        
-        // localStorage에 사용자 정보 저장
-        localStorage.setItem('CusUser', JSON.stringify(userData));
-        
-        // authManager 캐시 업데이트
-        authManager._cachedUser = userData;
-        authManager._cacheTimestamp = Date.now();
-        
-        console.log('로그인 완료:', userData);
-        return { success: true, data: userData };
       } else {
         setError(result.error);
         return { success: false, error: result.error };

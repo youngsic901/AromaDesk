@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { adminLoginAPI } from '../api/adminLoginApi';
+import { loginStart, loginSuccess, loginFailure } from '../app/slices/adminSlice';
 import '../css/loginCus.css';
 
 const AdminLoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleLogin = async () => {
     if (!username.trim() || !password.trim()) {
@@ -16,7 +18,8 @@ const AdminLoginPage = () => {
       return;
     }
 
-    setIsLoading(true);
+    // 로그인 시작 상태 설정
+    dispatch(loginStart());
     setError('');
 
     try {
@@ -25,23 +28,36 @@ const AdminLoginPage = () => {
       if (result.success) {
         console.log('관리자 로그인 성공:', result.data);
         
-        // 로컬스토리지에 관리자 정보 저장
-        localStorage.setItem('AdminUser', JSON.stringify(result.data));
+        // 관리자 정보 저장 (localStorage 백업용)
+        if (result.data.admin) {
+          localStorage.setItem('AdminUser', JSON.stringify(result.data.admin));
+        }
+        
+        // 세션키는 adminLoginAPI에서 자동으로 저장됨
+        console.log('관리자 로그인 완료');
+        
+        // Redux 상태 업데이트 (페이지 이동 전에 먼저 실행)
+        dispatch(loginSuccess({
+          admin: result.data.admin,
+          sessionId: result.data.AdminUser
+        }));
         
         alert('관리자 로그인 성공!');
-        // 관리자 메인 페이지로 이동
+        
+        // Redux 상태 업데이트 후 페이지 이동
         navigate('/admin');
       } else {
         console.log('관리자 로그인 실패:', result.error);
         setError(result.error);
+        dispatch(loginFailure(result.error));
         alert('로그인 실패: ' + result.error);
       }
     } catch (error) {
       console.error('관리자 로그인 처리 중 오류:', error);
-      setError('로그인 처리 중 오류가 발생했습니다.');
-      alert('로그인 처리 중 오류가 발생했습니다.');
-    } finally {
-      setIsLoading(false);
+      const errorMessage = '로그인 처리 중 오류가 발생했습니다.';
+      setError(errorMessage);
+      dispatch(loginFailure(errorMessage));
+      alert(errorMessage);
     }
   };
 
@@ -63,7 +79,6 @@ const AdminLoginPage = () => {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           onKeyPress={handleKeyPress}
-          disabled={isLoading}
         />
         
         <input
@@ -73,15 +88,13 @@ const AdminLoginPage = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           onKeyPress={handleKeyPress}
-          disabled={isLoading}
         />
         
         <button 
           className="login-btn" 
           onClick={handleLogin}
-          disabled={isLoading}
         >
-          {isLoading ? '로그인 중...' : '관리자 로그인'}
+          관리자 로그인
         </button>
 
         {error && (
