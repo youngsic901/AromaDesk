@@ -40,9 +40,17 @@ public class AdminProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductResponseDTO>> getAllProducts() {
-        List<ProductResponseDTO> products = productService.getAllProducts();
-        return ResponseEntity.ok(products);
+    public ResponseEntity<?> getFilteredPagedProducts(
+            @RequestParam(name = "brand", required = false) String brand,
+            @RequestParam(name = "gender", required = false) String gender,
+            @RequestParam(name = "volume", required = false) String volume,
+            @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "20") int size
+    ) {
+        return ResponseEntity.ok(
+                productService.getFilteredSearchedPagedProducts(brand, gender, volume, keyword, page, size)
+        );
     }
 
 }
