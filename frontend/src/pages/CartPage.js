@@ -23,15 +23,31 @@ const CartPage = () => {
   // 수량 변경
   const handleQuantity = (productId, quantity) => {
     if (!productId || quantity < 1) return;
+    
+    // 로그인 확인
+    if (!user || !user.memberId) {
+      alert("로그인이 필요합니다.");
+      navigate("/login");
+      return;
+    }
+    
     dispatch(
-      updateQuantityAction({ memberId: user?.id || 1, productId, quantity })
+      updateQuantityAction({ memberId: user.memberId, productId, quantity })
     );
   };
 
   // 상품 삭제
   const handleRemove = (productId) => {
     if (!productId) return;
-    dispatch(removeFromCartAction({ memberId: user?.id || 1, productId }));
+    
+    // 로그인 확인
+    if (!user || !user.memberId) {
+      alert("로그인이 필요합니다.");
+      navigate("/login");
+      return;
+    }
+    
+    dispatch(removeFromCartAction({ memberId: user.memberId, productId }));
   };
 
   // 주문 처리

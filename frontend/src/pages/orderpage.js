@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import orderApi from "../api/orderApi";
 import cartApi from "../api/cartApi";
 
 const OrderPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.user);
   const { type, items = [], deliveryId, paymentMethod } = location.state || {};
 
   const [orderItems, setOrderItems] = useState([]);
@@ -17,8 +19,14 @@ const OrderPage = () => {
     if (type === "cart") {
       const fetchCartItems = async () => {
         try {
-          const memberId = 1; // 로그인 유저 정보 기반으로 대체 가능
-          const res = await cartApi.getCartItems(memberId);
+          // 로그인한 사용자의 memberId 사용
+          if (!user || !user.memberId) {
+            setMessage("로그인이 필요합니다.");
+            navigate("/login");
+            return;
+          }
+          
+          const res = await cartApi.getCartItems(user.memberId);
           const selected = res.filter((item) => items.includes(item.cartItemId));
           setOrderItems(selected);
         } catch (err) {
@@ -29,7 +37,7 @@ const OrderPage = () => {
     } else if (type === "single") {
       setOrderItems(items);
     }
-  }, [type, items]);
+  }, [type, items, user, navigate]);
 
   const handleOrder = async () => {
     if (orderItems.length === 0) {
