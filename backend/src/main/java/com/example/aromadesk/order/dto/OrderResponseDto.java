@@ -20,6 +20,7 @@ public class OrderResponseDto {
     private int totalPrice;
     private Long deliveryId;
     private List<String> productNames;
+    private String memberName;
 
     public static OrderResponseDto from(Order order) {
         return OrderResponseDto.builder()
@@ -32,6 +33,7 @@ public class OrderResponseDto {
                 .productNames(order.getOrderItems().stream()
                         .map(item -> item.getProduct().getName())
                         .collect(Collectors.toList()))
+                .memberName(order.getMember().getName())
                 .build();
     }
 

@@ -1,267 +1,299 @@
-import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { Container, Row, Col, Card, Button, Alert } from "react-bootstrap";
-import { FaUser, FaMapMarkerAlt, FaShoppingBag, FaEdit, FaSignInAlt } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
-import MyPageUpdate from "./MyPageUpdate";
-import AddressUpdate from "../components/AddressUpdate";
-import { authManager } from "../api/authApi";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '../css/myPage.css';
 
-const MyPage = () => {
-  const { user } = useSelector((state) => state.user);
-  const [activeTab, setActiveTab] = useState("info");
-  const [showUpdateForm, setShowUpdateForm] = useState(false);
-  const [showAddressForm, setShowAddressForm] = useState(false);
-  const [userInfo, setUserInfo] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+import MyPageUpdate from './MyPageUpdate';
+import {
+  getMyPageInfo,
+  checkPassword,
+  changePassword,
+  getMyOrders
+} from '../api/mypageApi';
+import apiClient from '../api/axiosConfig';
+
+const TAB_LIST = [
+  { key: 'info', label: '내 정보' },
+  { key: 'address', label: '배송지 관리' },
+  { key: 'orders', label: '주문 내역' }
+];
+
+function MyPage() {
+  const [activeTab, setActiveTab] = useState('info');
+  const [user, setUser] = useState(undefined);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showUpdate, setShowUpdate] = useState(false);
+  const [showPwChange, setShowPwChange] = useState(false);
+  const [pwStep, setPwStep] = useState(1);
+  const [pwInput, setPwInput] = useState({ current: '', next: '', nextCheck: '' });
+  const [pwError, setPwError] = useState('');
+  const [orderList, setOrderList] = useState([]);
+  const [statusFilter, setStatusFilter] = useState('ALL');
+
   const navigate = useNavigate();
 
-  // ProtectedRoute에서 인증 확인을 하므로 여기서는 단순히 사용자 정보만 가져옴
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'COMPLETED':
+      case 'PAID':
+        return '결제완료';
+      case 'CANCELED':
+      case 'CANCELLED':
+        return '취소됨';
+      case 'PENDING':
+        return '결제대기';
+      default:
+        return status;
+    }
+  };
+
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      if (!user) {
-        return;
-      }
+    const cusUserRaw = localStorage.getItem('CusUser');
+    if (!cusUserRaw) {
+      navigate('/login');
+      return;
+    }
+    let cusUser;
+    try {
+      cusUser = JSON.parse(cusUserRaw);
+    } catch {
+      localStorage.removeItem('CusUser');
+      navigate('/login');
+      return;
+    }
+    const userId = cusUser?.id;
+    if (!userId) {
+      navigate('/login');
+      return;
+    }
 
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const result = await authManager.getUserInfo();
-        
-        if (result.success) {
-          setUserInfo(result.data);
-        } else {
-          setError(result.error || "사용자 정보를 불러오는데 실패했습니다.");
-        }
-      } catch (error) {
-        console.error("사용자 정보 조회 실패:", error);
-        setError("사용자 정보를 불러오는데 실패했습니다.");
-      } finally {
-        setLoading(false);
-      }
-    };
+    setIsLoading(true);
+    getMyPageInfo(userId)
+      .then(data => {
+        setUser(data);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        navigate('/login');
+      });
+  }, [navigate]);
 
-    fetchUserInfo();
-  }, [user]);
+  useEffect(() => {
+    if (activeTab === 'orders') {
+      getMyOrders()
+        .then(data => {
+          const sorted = [...data].sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+          setOrderList(sorted);
+        })
+        .catch(() => setOrderList([]));
+    }
+  }, [activeTab]);
 
-  const handleUpdateSuccess = (updatedUser) => {
-    setUserInfo(updatedUser);
-    setShowUpdateForm(false);
-  };
-
-  const handleAddressUpdateSuccess = (updatedUser) => {
-    setUserInfo(updatedUser);
-    setShowAddressForm(false);
-  };
-
-  const handleEditClick = () => {
-    setShowUpdateForm(true);
-  };
-
-  const handleAddressEditClick = () => {
-    setShowAddressForm(true);
-  };
-
-  // 로딩 상태
-  if (loading) {
-    return (
-      <Container className="py-5">
-        <div className="text-center">
-          <div className="spinner-border" role="status">
-            <span className="visually-hidden">로딩 중...</span>
-          </div>
-        </div>
-      </Container>
-    );
+  if (isLoading || user === undefined) return <div>로딩 중...</div>;
+  if (!user) {
+    navigate('/login');
+    return null;
   }
 
-  // 에러 상태
-  if (error) {
-    return (
-      <Container className="py-5">
-        <Alert variant="danger">{error}</Alert>
-      </Container>
-    );
-  }
+  const handleUpdate = () => setShowUpdate(true);
+
+  const handlePwChange = () => {
+    setShowPwChange(true);
+    setPwStep(1);
+    setPwInput({ current: '', next: '', nextCheck: '' });
+    setPwError('');
+  };
+
+  const handlePwCheck = async () => {
+    const cusUser = JSON.parse(localStorage.getItem('CusUser') || '{}');
+    const result = await checkPassword(cusUser?.id, pwInput.current);
+    if (result.success) {
+      setPwStep(2);
+      setPwError('');
+    } else {
+      setPwError(result.error);
+    }
+  };
+
+  const handlePwUpdate = async () => {
+    if (pwInput.next !== pwInput.nextCheck) {
+      setPwError('새 비밀번호가 일치하지 않습니다.');
+      return;
+    }
+    const cusUser = JSON.parse(localStorage.getItem('CusUser') || '{}');
+    const result = await changePassword(cusUser?.id, pwInput.next);
+    if (result.success) {
+      alert('비밀번호가 변경되었습니다.');
+      setShowPwChange(false);
+    } else {
+      setPwError(result.error);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await apiClient.post('/api/members/logout');
+    } catch {}
+    localStorage.removeItem('CusUser');
+    navigate('/login');
+  };
 
   return (
-    <Container className="py-5">
-      <Row>
-        <Col lg={3}>
-          {/* 사이드바 */}
-          <Card className="mb-4">
-            <Card.Body>
-              <div className="text-center mb-3">
-                <div
-                  className={`rounded-circle d-inline-flex align-items-center justify-content-center ${
-                    user ? "bg-primary" : "bg-light"
-                  }`}
-                  style={{ width: 80, height: 80 }}
-                >
-                  <FaUser className={user ? "text-white" : "text-muted"} size={40} />
-                </div>
-                <h5 className="mt-2 mb-0">
-                  {user ? user.name : "마이페이지"}
-                </h5>
-                <small className="text-muted">
-                  {user ? user.email : "로그인하여 개인정보를 관리하세요"}
-                </small>
+    <div className="mypage-wrapper">
+      {/* 탭 메뉴 */}
+      <div className="mypage-tabs">
+        {TAB_LIST.map(tab => (
+          <button
+            key={tab.key}
+            className={`mypage-tab-btn${activeTab === tab.key ? ' active' : ''}`}
+            onClick={() => { setActiveTab(tab.key); setShowUpdate(false); setShowPwChange(false); }}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="mypage-content">
+        {activeTab === 'info' && !showUpdate && !showPwChange && (
+          <div>
+            <h3>기본 정보</h3>
+            <div className="mypage-info-row">
+              <label>닉네임</label>
+              <input value={user.name} readOnly />
+              <label>이메일</label>
+              <input value={user.email} readOnly />
+            </div>
+            <div className="mypage-info-row">
+              <label>휴대폰 번호</label>
+              <input value={user.phone} readOnly />
+            </div>
+            <button className="mypage-btn" onClick={() => handleUpdate('info')}>수정하기</button>
+            <h4>비밀번호 변경</h4>
+            <button className="mypage-btn" onClick={handlePwChange}>비밀번호 변경</button>
+          </div>
+        )}
+
+        {activeTab === 'info' && showUpdate && (
+          <MyPageUpdate user={user} field="info" onClose={() => setShowUpdate(false)} onUpdate={setUser} />
+        )}
+
+        {activeTab === 'info' && showPwChange && (
+          <div>
+            <h4>비밀번호 변경</h4>
+            {pwStep === 1 && (
+              <div>
+                <input type="password" placeholder="현재 비밀번호 입력" value={pwInput.current} onChange={e => setPwInput({ ...pwInput, current: e.target.value })} />
+                <button className="mypage-btn" onClick={handlePwCheck}>확인</button>
+                {pwError && <div style={{ color: 'red' }}>{pwError}</div>}
               </div>
-            </Card.Body>
-          </Card>
-
-          {/* 네비게이션 메뉴 */}
-          <Card>
-            <Card.Body className="p-0">
-              <div className="list-group list-group-flush">
-                <button
-                  className={`list-group-item list-group-item-action d-flex align-items-center ${
-                    activeTab === "info" ? "active" : ""
-                  }`}
-                  onClick={() => setActiveTab("info")}
-                >
-                  <FaUser className="me-2" />
-                  개인정보
-                </button>
-                <button
-                  className={`list-group-item list-group-item-action d-flex align-items-center ${
-                    activeTab === "address" ? "active" : ""
-                  }`}
-                  onClick={() => setActiveTab("address")}
-                >
-                  <FaMapMarkerAlt className="me-2" />
-                  배송지 관리
-                </button>
-                <button
-                  className={`list-group-item list-group-item-action d-flex align-items-center ${
-                    activeTab === "orders" ? "active" : ""
-                  }`}
-                  onClick={() => setActiveTab("orders")}
-                >
-                  <FaShoppingBag className="me-2" />
-                  주문내역
-                </button>
+            )}
+            {pwStep === 2 && (
+              <div>
+                <input type="password" placeholder="새 비밀번호 입력" value={pwInput.next} onChange={e => setPwInput({ ...pwInput, next: e.target.value })} />
+                <input type="password" placeholder="새 비밀번호 확인" value={pwInput.nextCheck} onChange={e => setPwInput({ ...pwInput, nextCheck: e.target.value })} />
+                <button className="mypage-btn" onClick={handlePwUpdate}>저장</button>
+                <button className="mypage-btn" onClick={() => setShowPwChange(false)}>취소</button>
+                {pwError && <div style={{ color: 'red' }}>{pwError}</div>}
               </div>
-            </Card.Body>
-          </Card>
-        </Col>
+            )}
+          </div>
+        )}
 
-        <Col lg={9}>
-          {/* 메인 콘텐츠 */}
-          {activeTab === "info" && (
-            <Card>
-              <Card.Header className="d-flex justify-content-between align-items-center">
-                <h5 className="mb-0">개인정보</h5>
-                <Button
-                  variant="outline-primary"
-                  size="sm"
-                  onClick={handleEditClick}
+        {activeTab === 'address' && !showUpdate && (
+          <div>
+            <h3>배송지 관리</h3>
+            <div className="mypage-info-row">
+              <label>배송지</label>
+              <input value={user.address} readOnly />
+            </div>
+            <button className="mypage-btn" onClick={() => handleUpdate('address')}>수정하기</button>
+          </div>
+        )}
+
+        {activeTab === 'address' && showUpdate && (
+          <MyPageUpdate user={user} field="address" onClose={() => setShowUpdate(false)} onUpdate={setUser} />
+        )}
+
+        {activeTab === 'orders' && (
+          <>
+            <div style={{ marginBottom: '12px' }}>
+              {['ALL', 'COMPLETED', 'CANCELED'].map(status => (
+                <button
+                  key={status}
+                  onClick={() => setStatusFilter(status)}
+                  style={{
+                    marginRight: '8px',
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    border: '1px solid #ccc',
+                    backgroundColor: statusFilter === status ? 'rgb(210,234,248)' : '#fff',
+                    fontWeight: statusFilter === status ? 'bold' : 'normal',
+                    cursor: 'pointer'
+                  }}
                 >
-                  <FaEdit className="me-1" />
-                  {user ? "수정" : "로그인하여 수정"}
-                </Button>
-              </Card.Header>
-              <Card.Body>
-                {user ? (
-                  <Row>
-                    <Col md={6}>
-                      <p><strong>이름:</strong> {user.name}</p>
-                      <p><strong>이메일:</strong> {user.email}</p>
-                      <p><strong>전화번호:</strong> {user.phone || "미등록"}</p>
-                    </Col>
-                    <Col md={6}>
-                      <p><strong>가입일:</strong> {user.createdAt ? new Date(user.createdAt).toLocaleDateString('ko-KR') : "미등록"}</p>
-                    </Col>
-                  </Row>
-                ) : (
-                  <div className="text-center py-4">
-                    <p className="text-muted mb-3">로그인하여 개인정보를 확인하고 관리하세요.</p>
-                    <Button variant="primary" onClick={() => navigate('/login', { state: { from: '/mypage' } })}>
-                      <FaSignInAlt className="me-2" />
-                      로그인하기
-                    </Button>
-                  </div>
-                )}
-              </Card.Body>
-            </Card>
-          )}
+                  {status === 'ALL' ? '전체' : getStatusLabel(status)}
+                </button>
+              ))}
+            </div>
 
-          {activeTab === "address" && (
-            <Card>
-              <Card.Header className="d-flex justify-content-between align-items-center">
-                <h5 className="mb-0">배송지 관리</h5>
-                <Button
-                  variant="outline-primary"
-                  size="sm"
-                  onClick={handleAddressEditClick}
-                >
-                  <FaEdit className="me-1" />
-                  {user ? "수정" : "로그인하여 수정"}
-                </Button>
-              </Card.Header>
-              <Card.Body>
-                {user ? (
-                  <div>
-                    <p><strong>우편번호:</strong> {user.zipCode || "미등록"}</p>
-                    <p><strong>주소:</strong> {user.address || "미등록"}</p>
-                    <p><strong>상세주소:</strong> {user.addressDetail || "미등록"}</p>
+            <div className="order-list">
+              {orderList
+                .filter(order => {
+                  if (statusFilter === 'ALL') return true;
+                  if (statusFilter === 'COMPLETED') return ['COMPLETED', 'PAID'].includes(order.status);
+                  return order.status === statusFilter;
+                })
+                .map(order => (
+                  <div key={order.orderId} className="order-card">
+                    <div className="order-header">
+                      <span className="order-id">주문번호: {order.orderId}</span>
+                      <span className="order-date">{order.orderDate?.slice(0, 10)}</span>
+                    </div>
+                    <div className="order-body">
+                      <div><strong>총금액:</strong> {order.totalPrice?.toLocaleString()}원</div>
+                      <div><strong>상태:</strong> {getStatusLabel(order.status)}</div>
+                      <div><strong>결제수단:</strong> {order.paymentMethod}</div>
+                      <div><strong>상품:</strong> {order.productNames?.join(', ')}</div>
+                    </div>
                   </div>
-                ) : (
-                  <div className="text-center py-4">
-                    <p className="text-muted mb-3">로그인하여 배송지 정보를 확인하고 관리하세요.</p>
-                    <Button variant="primary" onClick={() => navigate('/login', { state: { from: '/mypage' } })}>
-                      <FaSignInAlt className="me-2" />
-                      로그인하기
-                    </Button>
-                  </div>
-                )}
-              </Card.Body>
-            </Card>
-          )}
+              ))}
+            </div>
+          </>
+        )}
+      </div>
 
-          {activeTab === "orders" && (
-            <Card>
-              <Card.Header>
-                <h5 className="mb-0">주문내역</h5>
-              </Card.Header>
-              <Card.Body>
-                {user ? (
-                  <p className="text-muted">주문내역 기능은 준비 중입니다.</p>
-                ) : (
-                  <div className="text-center py-4">
-                    <p className="text-muted mb-3">로그인하여 주문내역을 확인하세요.</p>
-                    <Button variant="primary" onClick={() => navigate('/login', { state: { from: '/mypage' } })}>
-                      <FaSignInAlt className="me-2" />
-                      로그인하기
-                    </Button>
-                  </div>
-                )}
-              </Card.Body>
-            </Card>
-          )}
-        </Col>
-      </Row>
+      <style>{`
+        .order-list {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          margin-top: 16px;
+        }
 
-      {/* 개인정보 수정 모달 */}
-      {showUpdateForm && (
-        <MyPageUpdate
-          user={userInfo}
-          onSuccess={handleUpdateSuccess}
-          onClose={() => setShowUpdateForm(false)}
-        />
-      )}
+        .order-card {
+          background-color: rgb(251, 247, 255);
+          border: 1px solid rgb(203,216,249);
+          border-radius: 12px;
+          padding: 16px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
 
-      {/* 배송지 수정 모달 */}
-      {showAddressForm && (
-        <AddressUpdate
-          user={userInfo}
-          onSuccess={handleAddressUpdateSuccess}
-          onClose={() => setShowAddressForm(false)}
-        />
-      )}
-    </Container>
+        .order-header {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 8px;
+          font-weight: bold;
+          color: rgb(15, 2, 61);
+        }
+
+        .order-body {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          font-size: 0.95rem;
+          color: #4e342e;
+        }
+      `}</style>
+    </div>
   );
 };
 
