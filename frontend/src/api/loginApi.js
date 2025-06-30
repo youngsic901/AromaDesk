@@ -53,23 +53,7 @@ export const loginAPI = {
       
       return { success: true, data: handleApiSuccess(response) };
     } catch (error) {
-      console.log('=== getUserInfo API 오류 발생 ===');
-      console.error('전체 오류 객체:', error);
-      console.error('응답 상태:', error.response?.status);
-      console.error('응답 데이터:', error.response?.data);
-      console.error('요청 설정:', error.config);
-      
-      // 401 에러는 로그인되지 않은 상태이므로 에러로 처리하지 않음
-      if (error.response?.status === 401) {
-        console.log('401 에러: 로그인되지 않은 사용자');
-        return { success: false, error: '로그인되지 않은 사용자입니다.' };
-      }
-      const errorMessage = handleApiError(error).message;
-      console.log('기타 오류 메시지:', errorMessage);
-      return { 
-        success: false, 
-        error: errorMessage
-      };
+      return handleApiError(error);
     }
   }
 }; 

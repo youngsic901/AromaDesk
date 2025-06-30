@@ -21,7 +21,7 @@ function MyPage() {
   const [pwInput, setPwInput] = useState({ current: '', next: '', nextCheck: '' });
   const [pwError, setPwError] = useState('');
   const navigate = useNavigate();
-
+  
   // 로그인 여부 및 id 체크, 데이터 fetch
   useEffect(() => {
     const cusUserRaw = localStorage.getItem('CusUser');
