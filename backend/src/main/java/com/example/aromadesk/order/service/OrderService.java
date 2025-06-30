@@ -20,10 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /*************************************************************
@@ -37,8 +34,8 @@ import java.util.stream.Collectors;
  /*2025.06.25   SUSU        단일/장바구니 주문 로직 분리 및 추가 구현
  /*2025.06.26   susu        member 객체로 변경
  /*2025.06.26   KANG        기간별 총메출 메소드 추가
+ /*2025.06.30   SUSU        장바구니 주문시 OrderResponseDto 반환 추가
  /*************************************************************/
-
 
 @Service
 @RequiredArgsConstructor
@@ -51,26 +48,23 @@ public class OrderService {
     private final CartRepository cartRepository;
 
     /**
-     * 단일 상품 주문 처리 (상품 상세 페이지에서 바로 구매
-     *
+     * 단일 상품 주문 처리 (상품 상세 페이지에서 바로 구매)
      */
-
     @Transactional
     public void createSingleOrder(OrderRequestDto dto, Member member) {
-
         if (dto.getItems() == null || dto.getItems().isEmpty()) {
             throw new IllegalArgumentException("주문 항목이 비어 있습니다.");
         }
 
         Delivery delivery = deliveryRepository.findById(dto.getDeliveryId())
-                .orElseThrow(() -> new IllegalArgumentException(" 배송지가 없습니다. id" + dto.getDeliveryId()));
+                .orElseThrow(() -> new IllegalArgumentException("배송지가 없습니다. id=" + dto.getDeliveryId()));
 
         List<OrderItem> orderItems = dto.getItems().stream().map(itemDto -> {
             Product product = productRepository.findById(itemDto.getProductId())
-                    .orElseThrow(() -> new IllegalArgumentException(" 상품이 존재하지 않습니다. id.= " + itemDto.getProductId()));
+                    .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않습니다. id=" + itemDto.getProductId()));
 
             if (product.getStock() < itemDto.getQuantity()) {
-                throw new IllegalArgumentException("재고가 부족합니다. " + product.getName());
+                throw new IllegalArgumentException("재고가 부족합니다: " + product.getName());
             }
 
             product.setStock(product.getStock() - itemDto.getQuantity());
@@ -89,7 +83,7 @@ public class OrderService {
         Order order = Order.builder()
                 .member(member)
                 .delivery(delivery)
-                .orderStatus(OrderStatus.ORDERED)
+                .orderStatus(dto.getPaymentMethod().name().equals("MOCK") ? OrderStatus.PAID : OrderStatus.ORDERED)
                 .paymentMethod(dto.getPaymentMethod())
                 .totalPrice(totalPrice)
                 .build();
@@ -97,20 +91,14 @@ public class OrderService {
         orderItems.forEach(item -> item.setOrder(order));
         order.setOrderItems(orderItems);
 
-        if(dto.getPaymentMethod().name().equals("MOCK")) {
-            order.setOrderStatus(OrderStatus.PAID);
-        }
-
         orderRepository.save(order);
     }
 
     /**
-     * 장바구니 기반 주문 처리(cartItemIds 사용)
-     *
+     * 장바구니 기반 주문 처리(cartItemIds 사용) + OrderResponseDto 반환
      */
     @Transactional
-    public void createOrderFromCart(CartRequestDto dto,Member member) {
-
+    public OrderResponseDto createOrderFromCart(CartRequestDto dto, Member member) {
         Delivery delivery = deliveryRepository.findById(dto.getDeliveryId())
                 .orElseThrow(() -> new IllegalArgumentException("배송지가 없습니다. id = " + dto.getDeliveryId()));
 
@@ -154,17 +142,16 @@ public class OrderService {
         orderItems.forEach(item -> item.setOrder(order));
         order.setOrderItems(orderItems);
 
-        if(dto.getPaymentMethod().name().equals("MOCK")) {
+        if (dto.getPaymentMethod().name().equals("MOCK")) {
             order.setOrderStatus(OrderStatus.PAID);
         }
 
-        orderRepository.save(order);
-        cartRepository.deleteAll(cartItems); // 장바구니 비우기
+        Order savedOrder = orderRepository.save(order);
+        cartRepository.deleteAll(cartItems);
+
+        return OrderResponseDto.from(savedOrder);
     }
 
-    /**
-     * 회원별 주문 목록 조회
-     */
     @Transactional(readOnly = true)
     public List<OrderResponseDto> getOrdersByMemberID(Member member) {
         List<Order> orders = orderRepository.findByMemberId(member.getId());
@@ -172,23 +159,21 @@ public class OrderService {
                 .map(OrderResponseDto::from)
                 .collect(Collectors.toList());
     }
-    /**
-     *결제 완료 처리
-     */
+
     @Transactional
     public void completePayment(Long orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다," + orderId));
-        if(order.getOrderStatus() != OrderStatus.ORDERED) {
+                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다. orderId=" + orderId));
+
+        if (order.getOrderStatus() != OrderStatus.ORDERED) {
             throw new IllegalArgumentException("이미 결제된 주문입니다.");
         }
-        order.setOrderStatus(OrderStatus.PAID);
 
+        order.setOrderStatus(OrderStatus.PAID);
     }
 
     @Transactional(readOnly = true)
     public Long getTotalSalesBetween(LocalDateTime start, LocalDateTime end) {
-        // null 반환 시 0L로 처리 (매출 없는 기간이면 0 반환)
         Long total = orderRepository.getTotalSalesBetween(start, end);
         return total != null ? total : 0L;
     }

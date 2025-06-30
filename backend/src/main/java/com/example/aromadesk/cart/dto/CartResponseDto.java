@@ -14,6 +14,7 @@ import lombok.Getter;
 
 @Getter
 public class CartResponseDto {
+    private Long cartItemId;
     private Long productId;
     private String name;
     private String imageUrl;
@@ -25,6 +26,7 @@ public class CartResponseDto {
      * @param cart DTO로 변환할 Cart 타입 엔티티
      */
     public CartResponseDto(Cart cart) {
+        this.cartItemId = cart.getId();
         Product product = cart.getProduct();
         this.productId = product.getId();
         this.name = product.getName();
