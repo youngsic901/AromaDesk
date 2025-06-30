@@ -30,6 +30,7 @@ import java.util.Map;
  /*2025.06.25   SUSU        상품 상세보기 및 장바구니 주문 처리
  /*2025.06.26   SUSU        결제 완료 처리
  /*2025.06.30   SUSU        로그인 사용자 타입 분기 처리 로직 추가
+ /*2025.06.30   SUSU        단일 상품 주문 수정
  /*************************************************************/
 
 @RestController
@@ -60,10 +61,10 @@ public class OrderController {
      * 단일 상품 주문 생성
      */
     @PostMapping("/single")
-    public ResponseEntity<String> createSingleOrder(@RequestBody OrderRequestDto dto) {
+    public ResponseEntity<OrderResponseDto> createSingleOrder(@RequestBody OrderRequestDto dto) {
         Member loginMember = extractLoginMember();
-        orderService.createSingleOrder(dto, loginMember);
-        return ResponseEntity.ok("단일 상품 주문이 성공하였습니다.");
+        OrderResponseDto response = orderService.createSingleOrder(dto, loginMember);
+        return ResponseEntity.ok(response);
     }
 
     /**

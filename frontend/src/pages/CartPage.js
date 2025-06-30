@@ -32,7 +32,7 @@ const CartPage = () => {
     }
     
     dispatch(
-      updateQuantityAction({ memberId: user.memberId, productId, quantity })
+      updateQuantityAction({ memberId: user.id, productId, quantity })
     );
   };
 
@@ -51,7 +51,7 @@ const CartPage = () => {
   };
 
   // 주문 처리
-  const handleOrder = async () => {
+  const handleOrder = () => {
     if (!user || !user.id) {
       alert("로그인이 필요합니다.");
       navigate("/login");
@@ -63,28 +63,23 @@ const CartPage = () => {
       return;
     }
 
-    const cartItemIds = items.map((item) => item.cartItemId); // cartItemId 기준
-    const deliveryId = 1; // 임시 배송지 ID
-    const paymentMethod = "MOCK";
+    const cartItemIds = items
+      .map((item) => item.cartItemId)
+      .filter((id) => id != null);
+    const totalAmount = items.reduce(
+      (sum, item) => sum + (item.price || 0) * (item.quantity || 0),
+      0
+    );
 
-    const response = await orderApi.createOrderFromCart({
-      cartItemIds,
-      deliveryId,
-      paymentMethod,
+    navigate("/order/payment", {
+      state: {
+        cartItemIds,
+        totalAmount,
+      },
     });
-
-    if (response.success) {
-      dispatch(clearCart());
-      const orderId = response.data?.orderId;
-      if (orderId) {
-        navigate(`/order/complete?orderId=${orderId}`);
-      } else {
-        navigate("/order/complete");
-      }
-    } else {
-      alert("주문 실패: " + response.error);
-    }
   };
+
+
 
   return (
     <main className="container py-5">

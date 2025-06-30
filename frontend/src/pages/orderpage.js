@@ -26,7 +26,7 @@ const OrderPage = () => {
             return;
           }
           
-          const res = await cartApi.getCartItems(user.memberId);
+          const res = await cartApi.getCartItems(user.id);
           const selected = res.filter((item) => items.includes(item.cartItemId));
           setOrderItems(selected);
         } catch (err) {

@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProductById } from "../app/slices/productSlice";
 import { addToCartAction } from "../app/slices/cartSlice";
@@ -14,11 +14,13 @@ import {
 const ProductDetailPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { user } = useSelector((state) => state.user);
   const { currentProduct, loading, error } = useSelector(
     (state) => state.product
   );
   const [selectedImg, setSelectedImg] = React.useState(0);
+  const [quantity, setQuantity] = React.useState(1);
 
   React.useEffect(() => {
     dispatch(fetchProductById(id));
@@ -28,13 +30,10 @@ const ProductDetailPage = () => {
   if (error) return <div className="alert alert-danger">{error}</div>;
   if (!currentProduct) return null;
 
-  // 실제 이미지가 있는 경우에만 썸네일 생성
   const thumbnails = currentProduct.imageUrl ? [currentProduct.imageUrl] : [];
 
-  // description에서 이미지 URL 추출 (jpg, png, gif 등)
   const extractImagesFromDescription = (description) => {
     if (!description) return [];
-
     const imageRegex = /https?:\/\/[^\s]+\.(jpg|jpeg|png|gif|webp)/gi;
     const matches = description.match(imageRegex);
     return matches || [];
@@ -42,9 +41,7 @@ const ProductDetailPage = () => {
 
   const detailImages = extractImagesFromDescription(currentProduct.description);
 
-  // 장바구니 담기 핸들러
   const handleAddToCart = () => {
-    // 로그인 확인
     if (!user || !user.memberId) {
       alert("로그인이 필요합니다.");
       return;
@@ -52,17 +49,39 @@ const ProductDetailPage = () => {
 
     dispatch(
       addToCartAction({
-        memberId: user.memberId,
+        memberId: user.id,
         productId: currentProduct.id,
-        quantity: 1,
+        quantity,
       })
-    );
+    ).then(() => {
+      navigate("/cart");
+    });
+  };
+
+  const handleBuyNow = () => {
+    if (!user || !user.memberId) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    navigate("/order/payment", {
+      state: {
+        items: [
+          {
+            productId: currentProduct.id,
+            quantity,
+          },
+        ],
+        deliveryId: 1,
+        paymentMethod: "MOCK",
+        product: currentProduct,
+      },
+    });
   };
 
   return (
     <main className="container py-5">
       <div className="row g-4">
-        {/* 좌측: 이미지/썸네일 */}
         <div className="col-md-5">
           <div className="bg-white rounded shadow-sm p-3 mb-3 text-center">
             {thumbnails.length > 0 ? (
@@ -92,35 +111,8 @@ const ProductDetailPage = () => {
               </div>
             )}
           </div>
-
-          {/* 썸네일이 있을 때만 표시 */}
-          {thumbnails.length > 1 && (
-            <div className="d-flex justify-content-center gap-2">
-              {thumbnails.map((img, idx) => (
-                <img
-                  key={idx}
-                  src={img}
-                  alt="썸네일"
-                  className={`rounded border ${
-                    selectedImg === idx ? "border-primary" : "border-light"
-                  }`}
-                  style={{
-                    width: 60,
-                    height: 60,
-                    objectFit: "cover",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => setSelectedImg(idx)}
-                  onError={(e) => {
-                    e.target.src = "/placeholder-product.jpg";
-                  }}
-                />
-              ))}
-            </div>
-          )}
         </div>
 
-        {/* 우측: 상품 정보/구매 */}
         <div className="col-md-7">
           <h2 className="fw-bold mb-2">{currentProduct.name}</h2>
           <div className="mb-2 text-muted">{currentProduct.brand}</div>
@@ -145,8 +137,17 @@ const ProductDetailPage = () => {
             </span>
           </div>
           <div className="mb-4">
-            <span className="text-success fw-semibold">무료배송</span>
-            <span className="ms-3 text-secondary">지금 주문 시 내일 도착</span>
+            <label htmlFor="quantity" className="me-2 fw-semibold">
+              수량:
+            </label>
+            <input
+              id="quantity"
+              type="number"
+              min={1}
+              value={quantity}
+              onChange={(e) => setQuantity(parseInt(e.target.value, 10))}
+              style={{ width: 80 }}
+            />
           </div>
           <div className="d-flex gap-2 mb-3">
             <button
@@ -155,7 +156,10 @@ const ProductDetailPage = () => {
             >
               장바구니 담기
             </button>
-            <button className="btn btn-danger btn-lg flex-grow-1 shadow-sm">
+            <button
+              className="btn btn-danger btn-lg flex-grow-1 shadow-sm"
+              onClick={handleBuyNow}
+            >
               바로구매
             </button>
             <button className="btn btn-outline-secondary btn-lg" title="찜하기">
@@ -180,13 +184,10 @@ const ProductDetailPage = () => {
         </div>
       </div>
 
-      {/* 하단: 상세 설명 및 이미지 */}
       <div className="mt-5">
         <div className="tab-content p-3 border bg-white rounded">
           <div>
             <h5 className="fw-bold mb-3">상품 상세정보</h5>
-
-            {/* 상세정보 이미지들 */}
             {detailImages.length > 0 && (
               <div className="mb-4">
                 {detailImages.map((imageUrl, index) => (
@@ -205,13 +206,9 @@ const ProductDetailPage = () => {
                 ))}
               </div>
             )}
-
-            {/* 텍스트 설명 */}
             <div className="mb-3">
               {currentProduct.description || "상세 설명 준비중"}
             </div>
-
-            {/* 상품 정보 테이블 */}
             <div className="table-responsive">
               <table className="table table-bordered">
                 <tbody>

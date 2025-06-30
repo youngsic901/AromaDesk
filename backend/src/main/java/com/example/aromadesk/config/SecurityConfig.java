@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -30,9 +31,10 @@ public class SecurityConfig {
   // Security 필터 체인 설정
 	@Bean
 	@Order(2)
-	public SecurityFilterChain userSecurityFilterChain(HttpSecurity http, MemberRepository memberRepository, CustomOAuth2SuccessHandler customOAuth2SuccessHandler) throws Exception {
+	public SecurityFilterChain userSecurityFilterChain(HttpSecurity http, MemberRepository memberRepository,
+	CustomOAuth2SuccessHandler customOAuth2SuccessHandler, CorsConfigurationSource corsConfigurationSource) throws Exception {
 		http
-				.cors(withDefaults())
+				.cors(cors -> cors.configurationSource(corsConfigurationSource))
 				.csrf(csrf -> csrf.disable())
 				.userDetailsService(memberLoginService)
 				.securityMatcher("/**")
@@ -69,9 +71,9 @@ public class SecurityConfig {
   // Security 필터 체인 설정
 	@Bean
 	@Order(1)
-	public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http,  CorsConfigurationSource corsConfigurationSource) throws Exception {
 		http
-				.cors(withDefaults())
+				.cors(cors -> cors.configurationSource(corsConfigurationSource))
 				.csrf(csrf -> csrf.disable())
 				.userDetailsService(adminLoginService)
 				.securityMatcher("/admin/**")
