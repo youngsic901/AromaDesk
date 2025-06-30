@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -41,7 +43,14 @@ public class AdminLoginController {
 
         // 3. 로그인 성공 → 세션 처리
         session.setAttribute("Admin", AdminDto.fromEntity(admin));
-        return ResponseEntity.ok(admin);
+        
+        // 4. 응답 데이터 구성: admin 객체와 AdminUser 세션키값 포함
+        Map<String, Object> response = new HashMap<>();
+        response.put("admin", AdminDto.fromEntity(admin));
+        response.put("AdminUser", session.getId());  // 세션키값을 AdminUser로 전달
+        response.put("message", "관리자 로그인 성공");
+        
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/logout")

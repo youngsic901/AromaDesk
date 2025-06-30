@@ -6,7 +6,7 @@ import {
   Navigate,
   useLocation,
 } from "react-router-dom";
-import { Provider, useDispatch } from "react-redux";
+import { Provider, useDispatch, useSelector } from "react-redux";
 import store from "./app/store";
 
 // Bootstrap CSS and JS
@@ -44,26 +44,54 @@ import {
   login as loginAction,
   logout as logoutAction,
 } from "./app/slices/userSlice";
+import { restoreAuth } from "./app/slices/adminSlice";
 
-// 관리자 인증 라우트
+// 관리자 인증 라우트 (Redux 상태 기반)
 function AdminRoute({ children }) {
-  const isAdmin = !!localStorage.getItem("AdminUser");
+  const { isAuthenticated } = useSelector((state) => state.admin);
+  
   const location = useLocation();
-  if (!isAdmin) {
+  if (!isAuthenticated) {
+    console.log('관리자 인증 실패: Redux 상태에서 인증되지 않음');
     return <Navigate to="/adminLogin" state={{ from: location }} replace />;
   }
   return children;
 }
 
-function AppContent() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+// 로그인 상태 확인 컴포넌트
+function LoginStatusChecker({ children }) {
   const [isInitialized, setIsInitialized] = useState(false);
   const dispatch = useDispatch();
+  const location = useLocation();
 
   // 앱 시작 시 로그인 상태 확인
   useEffect(() => {
     const checkLoginStatus = async () => {
       console.log("=== 앱 시작: 로그인 상태 확인 시작 ===");
+      
+      // 현재 경로가 어드민 페이지인지 확인
+      const isAdminPage = location.pathname.startsWith('/admin');
+      if (isAdminPage) {
+        console.log("어드민 페이지 감지됨, 사용자 로그인 상태 확인 건너뜀");
+        
+        // 관리자 인증 상태 복원 (localStorage에서)
+        const adminUser = localStorage.getItem('AdminUser');
+        const adminSessionId = localStorage.getItem('AdminSessionId');
+        
+        if (adminUser && adminSessionId) {
+          try {
+            const admin = JSON.parse(adminUser);
+            dispatch(restoreAuth({ admin, sessionId: adminSessionId }));
+            console.log('관리자 인증 상태 복원됨');
+          } catch (error) {
+            console.error('관리자 인증 상태 복원 실패:', error);
+          }
+        }
+        
+        setIsInitialized(true);
+        return;
+      }
+      
       try {
         console.log("백엔드 세션 확인 API 호출 중...");
         const result = await loginAPI.getUserInfo();
@@ -97,7 +125,7 @@ function AppContent() {
     };
 
     checkLoginStatus();
-  }, [dispatch]);
+  }, [dispatch, location.pathname]);
 
   // 초기화가 완료될 때까지 로딩 표시
   if (!isInitialized) {
@@ -115,96 +143,104 @@ function AppContent() {
     );
   }
 
+  return children;
+}
+
+function AppContent() {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
   return (
     <Router>
-      <Routes>
-        {/* 소개 페이지 (루트 경로) */}
-        <Route path="/" element={<IntroPage />} />
+      <LoginStatusChecker>
+        <Routes>
+          {/* 소개 페이지 (루트 경로) */}
+          <Route path="/" element={<IntroPage />} />
 
-        {/* 관리자 페이지 라우팅: 별도 레이아웃 */}
-        <Route path="/adminLogin" element={<AdminLoginPage />} />
-        <Route
-          path="/admin"
-          element={
-            <AdminRoute>
-              <AdminMainPage />
-            </AdminRoute>
-          }
-        />
-        <Route
-          path="/admin/dashboard"
-          element={
-            <AdminRoute>
-              <AdminDashboardPage />
-            </AdminRoute>
-          }
-        />
-        <Route
-          path="/admin/products"
-          element={
-            <AdminRoute>
-              <AdminProductPage />
-            </AdminRoute>
-          }
-        />
-        <Route
-          path="/admin/orders"
-          element={
-            <AdminRoute>
-              <AdminOrderPage />
-            </AdminRoute>
-          }
-        />
-        <Route
-          path="/admin/members"
-          element={
-            <AdminRoute>
-              <AdminMemberPage />
-            </AdminRoute>
-          }
-        />
-        {/* 일반 사용자 페이지 라우팅: 기존 레이아웃 */}
-        <Route
-          path="/*"
-          element={
-            <>
-              <Header setSidebarOpen={setSidebarOpen} />
-              <div className="d-flex" style={{ minHeight: "100vh" }}>
-                <Sidebar
-                  sidebarOpen={sidebarOpen}
-                  setSidebarOpen={setSidebarOpen}
-                />
-                <main className="flex-grow-1 p-4">
-                  <Routes>
-                    <Route path="/main" element={<MainPage />} />
-                    <Route
-                      path="/category/:category"
-                      element={<CategoryPage />}
-                    />
-                    <Route path="/brand" element={<BrandPage />} />
-                    <Route path="/brand/:brand" element={<BrandPage />} />
-                    <Route path="/search" element={<SearchPage />} />
-                    <Route path="/products" element={<ProductListPage />} />
-                    <Route
-                      path="/products/:id"
-                      element={<ProductDetailPage />}
-                    />
-                    <Route path="/cart" element={<CartPage />} />
-                    <Route path="/mypage" element={<MyPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/signup" element={<SignupPage />} />
-                    <Route
-                      path="/order/complete"
-                      element={<OrderCompletePage />}
-                    />
-                  </Routes>
-                </main>
-              </div>
-              <Footer />
-            </>
-          }
-        />
-      </Routes>
+          {/* 관리자 페이지 라우팅: 별도 레이아웃 */}
+          <Route path="/adminLogin" element={<AdminLoginPage />} />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminMainPage />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <AdminRoute>
+                <AdminDashboardPage />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/products"
+            element={
+              <AdminRoute>
+                <AdminProductPage />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/orders"
+            element={
+              <AdminRoute>
+                <AdminOrderPage />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/members"
+            element={
+              <AdminRoute>
+                <AdminMemberPage />
+              </AdminRoute>
+            }
+          />
+          {/* 일반 사용자 페이지 라우팅: 기존 레이아웃 */}
+          <Route
+            path="/*"
+            element={
+              <>
+                <Header setSidebarOpen={setSidebarOpen} />
+                <div className="d-flex" style={{ minHeight: "100vh" }}>
+                  <Sidebar
+                    sidebarOpen={sidebarOpen}
+                    setSidebarOpen={setSidebarOpen}
+                  />
+                  <main className="flex-grow-1 p-4">
+                    <Routes>
+                      <Route path="/main" element={<MainPage />} />
+                      <Route
+                        path="/category/:category"
+                        element={<CategoryPage />}
+                      />
+                      <Route path="/brand" element={<BrandPage />} />
+                      <Route path="/brand/:brand" element={<BrandPage />} />
+                      <Route path="/search" element={<SearchPage />} />
+                      <Route path="/products" element={<ProductListPage />} />
+                      <Route
+                        path="/products/:id"
+                        element={<ProductDetailPage />}
+                      />
+                      <Route path="/cart" element={<CartPage />} />
+                      <Route path="/mypage" element={<MyPage />} />
+                      <Route path="/login" element={<LoginPage />} />
+                      <Route path="/signup" element={<SignupPage />} />
+                      <Route
+                        path="/order/complete"
+                        element={<OrderCompletePage />}
+                      />
+                    </Routes>
+                  </main>
+                </div>
+                <Footer />
+              </>
+            }
+          />
+        </Routes>
+      </LoginStatusChecker>
     </Router>
   );
 }
