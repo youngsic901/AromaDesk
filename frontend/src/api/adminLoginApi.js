@@ -5,17 +5,23 @@ export const adminLoginAPI = {
   // 관리자 로그인
   login: async (username, password) => {
     try {
-      console.log('API 호출: 관리자 로그인 요청');
-      console.log('요청 데이터:', { username, password });
+      console.log('관리자 로그인 요청:', { username });
 
-      // POST /admin/login으로 관리자 로그인 요청
       const response = await apiClient.post('/admin/login', {
         username: username,
         password: password
       });
 
-      console.log('백엔드 응답:', response.data);
-      return { success: true, data: handleApiSuccess(response) };
+      const data = handleApiSuccess(response);
+      console.log('관리자 로그인 응답:', data);
+      
+      // 백엔드에서 AdminUser로 전달한 세션키값 저장 (localStorage 백업용)
+      if (data.AdminUser) {
+        localStorage.setItem('AdminSessionId', data.AdminUser);
+        console.log('관리자 세션키 저장됨 (localStorage):', data.AdminUser);
+      }
+      
+      return { success: true, data: data };
     } catch (error) {
       console.error('관리자 로그인 API 에러:', error);
       const errorMessage = handleApiError(error).message;
@@ -30,6 +36,12 @@ export const adminLoginAPI = {
   logout: async () => {
     try {
       const response = await apiClient.post('/admin/logout');
+      
+      // 관리자 세션키 삭제 (localStorage)
+      localStorage.removeItem('AdminSessionId');
+      localStorage.removeItem('AdminUser');
+      console.log('관리자 세션키 삭제됨 (localStorage)');
+      
       return { success: true, data: handleApiSuccess(response) };
     } catch (error) {
       const errorMessage = handleApiError(error).message;
@@ -40,13 +52,18 @@ export const adminLoginAPI = {
     }
   },
 
-  // 관리자 정보 조회
+  // 관리자 정보 조회 (localStorage에서)
   getAdminInfo: async () => {
     try {
-      // 로컬스토리지에서 관리자 정보 조회
       const adminInfo = localStorage.getItem('AdminUser');
-      if (adminInfo) {
-        return { success: true, data: JSON.parse(adminInfo) };
+      const sessionId = localStorage.getItem('AdminSessionId');
+      
+      if (adminInfo && sessionId) {
+        const admin = JSON.parse(adminInfo);
+        return { 
+          success: true, 
+          data: { ...admin, sessionId: sessionId } 
+        };
       } else {
         return { success: false, error: '로그인된 관리자 정보가 없습니다.' };
       }
@@ -56,6 +73,25 @@ export const adminLoginAPI = {
         success: false, 
         error: errorMessage
       };
+    }
+  },
+
+  // 관리자 세션키 조회 (localStorage에서)
+  getSessionId: () => {
+    return localStorage.getItem('AdminSessionId');
+  },
+
+  // 세션 유효성 확인 (localStorage 기반)
+  checkSession: async () => {
+    try {
+      const sessionId = localStorage.getItem('AdminSessionId');
+      if (!sessionId) {
+        return { success: false, error: '세션이 없습니다.' };
+      }
+      
+      return { success: true, data: { sessionId: sessionId } };
+    } catch (error) {
+      return { success: false, error: '세션 확인 실패' };
     }
   }
 }; 

@@ -20,6 +20,8 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -132,9 +134,17 @@ public class MemberController {
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
 
         Member member = ((MemberLoginService.CustomUserDetails) userDetails).getMember();
-        session.setAttribute("CusUser", MemberDto.fromEntity(member));
+        MemberDto memberDto = MemberDto.fromEntity(member);
+        session.setAttribute("CusUser", memberDto);
 
-        return ResponseEntity.ok("로그인 성공");
+        // 로그인 성공 시 사용자 식별에 필요한 최소한의 정보만 반환
+        Map<String, Object> response = new HashMap<>();
+        response.put("memberId", memberDto.getMemberId());
+        response.put("name", memberDto.getName());
+        response.put("email", memberDto.getEmail());
+        response.put("role", memberDto.getRole());
+        
+        return ResponseEntity.ok(response);
     }
 
 
