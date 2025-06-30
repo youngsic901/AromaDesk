@@ -133,6 +133,12 @@ const productSlice = createSlice({
         if (payload.content && Array.isArray(payload.content)) {
           if (append && state.products.length > 0) {
             // 무한 스크롤: 기존 상품에 새로운 상품 추가
+            // 빈 배열이 반환되면 더 이상 로드할 상품이 없음을 의미
+            if (payload.content.length === 0) {
+              // 빈 배열이 반환되었지만 기존 상품이 있으면 hasMore를 false로 설정할 수 있도록
+              // pagination 정보는 업데이트하지 않음
+              return;
+            }
             state.products = [...state.products, ...payload.content];
           } else {
             // 일반 로드: 기존 상품 교체
@@ -141,9 +147,16 @@ const productSlice = createSlice({
           state.pagination.total = payload.totalElements || 0;
           state.pagination.page = payload.page || 1;
           state.pagination.size = payload.size || 10;
+          state.pagination.totalPages =
+            payload.totalPages ||
+            Math.ceil((payload.totalElements || 0) / (payload.size || 10));
         } else if (Array.isArray(payload)) {
           // 배열로 직접 반환된 경우 (기존 호환성)
           if (append && state.products.length > 0) {
+            if (payload.length === 0) {
+              // 빈 배열이 반환되면 더 이상 로드할 상품이 없음
+              return;
+            }
             state.products = [...state.products, ...payload];
           } else {
             state.products = payload;
@@ -151,6 +164,7 @@ const productSlice = createSlice({
           state.pagination.total = payload.length;
           state.pagination.page = 1;
           state.pagination.size = payload.length;
+          state.pagination.totalPages = 1;
         } else if (payload && typeof payload === "object") {
           // 단일 객체인 경우
           if (append && state.products.length > 0) {
@@ -161,6 +175,7 @@ const productSlice = createSlice({
           state.pagination.total = 1;
           state.pagination.page = 1;
           state.pagination.size = 1;
+          state.pagination.totalPages = 1;
         } else {
           // 예상치 못한 응답 구조
           console.warn("예상치 못한 응답 구조:", payload);
@@ -168,6 +183,7 @@ const productSlice = createSlice({
           state.pagination.total = 0;
           state.pagination.page = 1;
           state.pagination.size = 10;
+          state.pagination.totalPages = 0;
         }
       })
       .addCase(fetchFilteredProducts.rejected, (state, action) => {

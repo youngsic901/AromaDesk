@@ -11,6 +11,7 @@ const MainPage = () => {
   );
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [lastResponseSize, setLastResponseSize] = useState(0);
 
   // 초기 로드
   useEffect(() => {
@@ -52,12 +53,36 @@ const MainPage = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
-  // 더 많은 상품이 있는지 확인
+  // 더 많은 상품이 있는지 확인 (개선된 로직)
   useEffect(() => {
-    if (pagination && pagination.totalPages) {
-      setHasMore(currentPage < pagination.totalPages);
+    if (pagination) {
+      // 방법 1: totalPages 기반 확인
+      if (pagination.totalPages !== undefined) {
+        setHasMore(currentPage < pagination.totalPages);
+      }
+      // 방법 2: 총 상품 수와 현재 로드된 상품 수 비교
+      else if (pagination.total !== undefined) {
+        setHasMore(products.length < pagination.total);
+      }
+      // 방법 3: 마지막 응답 크기로 확인 (빈 배열이면 더 이상 없음)
+      else if (lastResponseSize === 0 && currentPage > 1) {
+        setHasMore(false);
+      }
     }
-  }, [pagination, currentPage]);
+  }, [pagination, currentPage, products.length, lastResponseSize]);
+
+  // 응답된 상품 개수 추적
+  useEffect(() => {
+    if (products.length > 0) {
+      const currentResponseSize = products.length - (currentPage - 1) * 20;
+      setLastResponseSize(currentResponseSize);
+
+      // 응답된 상품이 요청한 size보다 적으면 더 이상 없음
+      if (currentResponseSize < 20 && currentPage > 1) {
+        setHasMore(false);
+      }
+    }
+  }, [products.length, currentPage]);
 
   return (
     <main className="flex-grow-1">
