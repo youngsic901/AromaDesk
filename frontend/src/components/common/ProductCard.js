@@ -62,16 +62,6 @@ const ProductCard = ({ product, memberId = 1 }) => {
   // 재고 상태 확인
   const isOutOfStock = !product.stock || product.stock <= 0;
 
-  // 디버깅: 상품 정보와 재고 상태 출력
-  React.useEffect(() => {
-    console.log(`상품 ${product.name} (ID: ${product.id}) 재고 정보:`, {
-      stock: product.stock,
-      stockType: typeof product.stock,
-      isOutOfStock: isOutOfStock,
-      fullProduct: product,
-    });
-  }, [product, isOutOfStock]);
-
   const handleAddToCart = (e) => {
     e.stopPropagation();
 
