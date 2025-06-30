@@ -39,15 +39,15 @@ public class OrderController {
 
     private final OrderService orderService;
     private final OrderRepository orderRepository;
-    
+
     /**
-     * 인증된 사용자로부터 Member 객체 추출(OAuth2 or 일반 로그인 모두 대응)
+     * 인증된 사용자로부터 Member 객체 추출 (OAuth2 또는 일반 로그인)
      */
-    private Member extractLoginMember(){
+    private Member extractLoginMember() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Object principal = authentication.getPrincipal();
 
-        if(principal instanceof CustomOAuth2User){
+        if (principal instanceof CustomOAuth2User) {
             return ((CustomOAuth2User) principal).getMember();
         } else if (principal instanceof MemberLoginService.CustomUserDetails) {
             return ((MemberLoginService.CustomUserDetails) principal).getMember();
@@ -57,27 +57,27 @@ public class OrderController {
     }
 
     /**
-     * 단일 상품 주문 생성 (상품 상세 -> 바로 주문)
+     * 단일 상품 주문 생성
      */
     @PostMapping("/single")
     public ResponseEntity<String> createSingleOrder(@RequestBody OrderRequestDto dto) {
         Member loginMember = extractLoginMember();
         orderService.createSingleOrder(dto, loginMember);
-        return ResponseEntity.ok("단일 상품 주문이 성공하였습니다. ");
+        return ResponseEntity.ok("단일 상품 주문이 성공하였습니다.");
     }
 
     /**
-     * 장바구니 기반 주문 생성
+     * 장바구니 기반 주문 생성 → OrderResponseDto 반환으로 변경
      */
     @PostMapping("/from-cart")
-    public ResponseEntity<String> createOrderFromCart(@RequestBody CartRequestDto dto) {
+    public ResponseEntity<OrderResponseDto> createOrderFromCart(@RequestBody CartRequestDto dto) {
         Member loginMember = extractLoginMember();
-        orderService.createOrderFromCart(dto, loginMember);
-        return ResponseEntity.ok("장바구니 상품 주문이 완료되었습니다.");
+        OrderResponseDto response = orderService.createOrderFromCart(dto, loginMember);
+        return ResponseEntity.ok(response);
     }
 
     /**
-     * 회원의 모든 주문 목록 조회
+     * 로그인 회원의 전체 주문 목록 조회
      */
     @GetMapping
     public ResponseEntity<List<OrderResponseDto>> getAllOrders() {
@@ -85,7 +85,7 @@ public class OrderController {
         List<OrderResponseDto> orders = orderService.getOrdersByMemberID(loginMember);
         return ResponseEntity.ok(orders);
     }
-    
+
     /**
      * 결제 완료 처리
      */
@@ -96,7 +96,7 @@ public class OrderController {
     }
 
     /**
-     *주문 상태 확인용
+     * 단건 주문 조회
      */
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponseDto> getOrder(@PathVariable("orderId") Long orderId) {
@@ -105,37 +105,25 @@ public class OrderController {
         return ResponseEntity.ok(OrderResponseDto.from(order));
     }
 
+    /**
+     * 기간별 총매출 조회
+     */
     @GetMapping("/total-revenue")
-    public ResponseEntity<Long> getTotalSales(
-            @RequestParam String start,
-            @RequestParam String end) {
-
-        // 1. 문자열을 LocalDate로 변환 (ex. "2023-01-01")
-        LocalDate startDate = LocalDate.parse(start);
-        LocalDate endDate = LocalDate.parse(end);
-
-        // 2. LocalDate를 LocalDateTime(자정)으로 변환
-        LocalDateTime startDateTime = startDate.atStartOfDay();
-        LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay(); // 다음날 00:00:00까지
-
-        // 3. 서비스 호출
+    public ResponseEntity<Long> getTotalSales(@RequestParam String start, @RequestParam String end) {
+        LocalDateTime startDateTime = LocalDate.parse(start).atStartOfDay();
+        LocalDateTime endDateTime = LocalDate.parse(end).plusDays(1).atStartOfDay();
         Long total = orderService.getTotalSalesBetween(startDateTime, endDateTime);
-
-        // 4. 결과 반환
         return ResponseEntity.ok(total);
     }
 
-    // 상태별 주문 개수 조회 (기간 선택)
+    /**
+     * 기간별 주문 상태별 개수 조회
+     */
     @GetMapping("/count-by-status")
-    public ResponseEntity<Map<String, Long>> getOrderCountByStatus(@RequestParam String start,@RequestParam String end) {
-
-        LocalDate startDate = LocalDate.parse(start);
-        LocalDate endDate = LocalDate.parse(end);
-        LocalDateTime startDateTime = startDate.atStartOfDay();
-        LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay(); // 다음날 자정
-
+    public ResponseEntity<Map<String, Long>> getOrderCountByStatus(@RequestParam String start, @RequestParam String end) {
+        LocalDateTime startDateTime = LocalDate.parse(start).atStartOfDay();
+        LocalDateTime endDateTime = LocalDate.parse(end).plusDays(1).atStartOfDay();
         Map<String, Long> result = orderService.countOrdersByStatusBetween(startDateTime, endDateTime);
-
         return ResponseEntity.ok(result);
     }
 }

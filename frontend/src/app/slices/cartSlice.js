@@ -7,7 +7,7 @@ export const fetchCartItems = createAsyncThunk(
   async (memberId, { rejectWithValue }) => {
     try {
       const items = await cartApi.getCartItems(memberId);
-      return Array.isArray(items) ? items : []; // ✅ 배열 확인 후 반환
+      return Array.isArray(items) ? items : [];
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -70,7 +70,7 @@ const calculateTotals = (items) => {
 const cartSlice = createSlice({
   name: "cart",
   initialState: {
-    items: [], // CartResponseDTO 배열
+    items: [],
     loading: false,
     error: null,
     totalQuantity: 0,
@@ -100,7 +100,6 @@ const cartSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // fetchCartItems
       .addCase(fetchCartItems.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -116,8 +115,6 @@ const cartSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      // addToCartAction
       .addCase(addToCartAction.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -125,35 +122,24 @@ const cartSlice = createSlice({
       .addCase(addToCartAction.fulfilled, (state, action) => {
         state.loading = false;
         const newItem = action.payload;
-
-        // newItem이 유효하지 않으면 처리하지 않음
-        if (!newItem || !newItem.productId) {
-          console.warn("유효하지 않은 상품 데이터:", newItem);
-          return;
-        }
-
-        // state.items가 undefined면 빈 배열로 초기화
-        if (!state.items) {
-          state.items = [];
-        }
-
+        if (!newItem || !newItem.productId) return;
+        if (!state.items) state.items = [];
         const existingIndex = state.items.findIndex(
           (item) => item?.productId === newItem.productId
         );
-
         if (existingIndex !== -1) {
-          // 기존 상품이 있으면 수량 추가
           const existingItem = state.items[existingIndex];
           if (existingItem && typeof existingItem.quantity === "number") {
             existingItem.quantity += newItem.quantity || 1;
           } else {
             existingItem.quantity = newItem.quantity || 1;
           }
+          existingItem.cartItemId = newItem.cartItemId;
         } else {
-          // 새 상품 추가
           state.items.push({
             ...newItem,
             quantity: newItem.quantity || 1,
+            cartItemId: newItem.cartItemId,
           });
         }
 
@@ -165,13 +151,10 @@ const cartSlice = createSlice({
       .addCase(addToCartAction.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-        // 재고 부족 오류인 경우 사용자에게 알림
         if (action.payload && action.payload.includes("재고")) {
           alert(action.payload);
         }
       })
-
-      // updateQuantityAction
       .addCase(updateQuantityAction.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -182,9 +165,11 @@ const cartSlice = createSlice({
         const index = (state.items || []).findIndex(
           (item) => item?.productId === updatedItem?.productId
         );
-
         if (index !== -1) {
-          state.items[index] = updatedItem;
+          state.items[index] = {
+            ...updatedItem,
+            cartItemId: updatedItem.cartItemId,
+          };
         }
 
         const { totalQuantity, totalAmount } = calculateTotals(state.items);
@@ -194,13 +179,10 @@ const cartSlice = createSlice({
       .addCase(updateQuantityAction.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-        // 재고 부족 오류인 경우 사용자에게 알림
         if (action.payload && action.payload.includes("재고")) {
           alert(action.payload);
         }
       })
-
-      // removeFromCartAction
       .addCase(removeFromCartAction.pending, (state) => {
         state.loading = true;
         state.error = null;
