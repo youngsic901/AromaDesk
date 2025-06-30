@@ -44,7 +44,7 @@ function IntroPage() {
   };
 
   const handleAdmin = () => {
-    navigate("/admin/login");
+    navigate("/admin");
   };
 
   return (

@@ -1,14 +1,32 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useLogin } from "../login/useLogin.js";
-import "../css/loginCus.css";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useLogin } from '../login/useLogin.js';
+import '../css/loginCus.css';
 
 const LoginPage = () => {
-  const [memberId, setMemberId] = useState("");
-  const [password, setPassword] = useState("");
+  const [memberId, setMemberId] = useState('');
+  const [password, setPassword] = useState('');
+  const [loginSuccess, setLoginSuccess] = useState(false);
   const { login, isLoading, error } = useLogin();
   const navigate = useNavigate();
+  
+  // Redux에서 사용자 상태 가져오기
+  const { user: reduxUser, isLoggedIn } = useSelector((state) => state.user);
+
+  // 로그인 성공 후 로딩이 완료되고 Redux 상태도 업데이트되면 페이지 이동
+  useEffect(() => {
+    if (loginSuccess && !isLoading && reduxUser && isLoggedIn) {
+      console.log('모든 로그인 정보 로드 완료, 메인 페이지로 이동');
+      console.log('사용자 정보:', reduxUser);
+      
+      // 약간의 지연을 두어 모든 상태 업데이트가 완료되도록 함
+      setTimeout(() => {
+        navigate('/main');
+        setLoginSuccess(false); // 상태 초기화
+      }, 100);
+    }
+  }, [loginSuccess, isLoading, reduxUser, isLoggedIn, navigate]);
 
   const handleLogin = async () => {
     if (!memberId.trim() || !password.trim()) {
@@ -19,10 +37,9 @@ const LoginPage = () => {
     try {
       const result = await login(memberId.trim(), password.trim());
       if (result.success) {
-        console.log("로그인 성공:", result.data);
-        alert("로그인 성공!");
-        // 로그인 성공 시 홈으로 이동
-        navigate("/");
+        console.log('로그인 성공:', result.data);
+        // 로그인 성공 상태 설정 (페이지 이동은 useEffect에서 처리)
+        setLoginSuccess(true);
       } else {
         console.log("로그인 실패:", result.error);
         alert("로그인 실패: " + result.error);
@@ -117,30 +134,8 @@ const LoginPage = () => {
         >
           네이버로 로그인
         </a>
-
-        <button
-          className="signup-link"
-          style={{
-            background: "none",
-            border: "none",
-            color: "#0076ff",
-            fontSize: "1rem",
-            cursor: "pointer",
-            padding: 0,
-            marginTop: "12px",
-            textDecoration: "none",
-          }}
-          onClick={async () => {
-            try {
-              await axios.get("/auth/clear-social-session", {
-                withCredentials: true,
-              });
-            } catch (e) {}
-            navigate("/signup");
-          }}
-        >
-          회원가입
-        </button>
+        
+        <a href="/signup" className="signup-link">회원가입</a>
       </div>
     </div>
   );
