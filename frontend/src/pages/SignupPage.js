@@ -140,7 +140,7 @@ const SignupPage = () => {
       password: formData.password.trim(),
       name: formData.name.trim(),
       phone: formData.phone.trim(),
-      address: formData.address.trim(),
+      address: (formData.address + ' ' + formData.addressDetail).trim(),
       role: 'USER' // 백엔드에서 고정값으로 설정
     };
 
