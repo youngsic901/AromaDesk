@@ -11,17 +11,18 @@ import java.util.List;
 /**
  * @author : youngsic
  * @packageName : com.example.aromadesk.product.controller
- * @fileName : ProductController
+ * @fileName : MemberProductController
  * @date : 25. 6. 19.
+ * @mostRecent : 25. 6. 30
  *
  **/
 @RestController
 @RequestMapping("/api/products")
 @CrossOrigin(origins = "http://localhost:3000")
-public class ProductController {
+public class MemberProductController {
     private final ProductService productService;
 
-    public ProductController(ProductService productService) {
+    public MemberProductController(ProductService productService) {
         this.productService = productService;
     }
 
@@ -41,27 +42,10 @@ public class ProductController {
         );
     }
 
-    @PostMapping
-    public ResponseEntity<ProductResponseDTO> createProduct(@RequestBody ProductRequestDTO productRequestDTO) {
-        System.out.println("createProduct");
-        return ResponseEntity.ok(productService.createProduct(productRequestDTO));
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDTO> getProduct(@PathVariable("id") Long id) {
         ProductResponseDTO dto = productService.getProductById(id);
         return ResponseEntity.ok(dto);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable("id") Long id, @RequestBody ProductRequestDTO productRequestDTO) {
-        return ResponseEntity.ok(productService.updateProduct(id, productRequestDTO));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ProductResponseDTO> deleteProduct(@PathVariable("id") Long id) {
-        productService.deleteProduct(id);
-        return ResponseEntity.noContent().build();
     }
 
     // 브랜드 목록 조회
