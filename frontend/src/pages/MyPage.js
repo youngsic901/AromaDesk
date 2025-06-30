@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Container, Row, Col, Card, Button, Alert } from "react-bootstrap";
-import { FaUser, FaMapMarkerAlt, FaShoppingBag, FaEdit } from "react-icons/fa";
+import { FaUser, FaMapMarkerAlt, FaShoppingBag, FaEdit, FaSignInAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import MyPageUpdate from "./MyPageUpdate";
 import AddressUpdate from "../components/AddressUpdate";
 import { authManager } from "../api/authApi";
@@ -12,17 +13,21 @@ const MyPage = () => {
   const [showUpdateForm, setShowUpdateForm] = useState(false);
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  // 사용자 정보 가져오기 (authManager 사용)
+  // ProtectedRoute에서 인증 확인을 하므로 여기서는 단순히 사용자 정보만 가져옴
   useEffect(() => {
     const fetchUserInfo = async () => {
+      if (!user) {
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
         
-        // authManager를 통한 중앙 집중식 사용자 정보 조회
         const result = await authManager.getUserInfo();
         
         if (result.success) {
@@ -38,11 +43,7 @@ const MyPage = () => {
       }
     };
 
-    if (user && user.id) {
-      fetchUserInfo();
-    } else {
-      setLoading(false);
-    }
+    fetchUserInfo();
   }, [user]);
 
   const handleUpdateSuccess = (updatedUser) => {
@@ -55,6 +56,15 @@ const MyPage = () => {
     setShowAddressForm(false);
   };
 
+  const handleEditClick = () => {
+    setShowUpdateForm(true);
+  };
+
+  const handleAddressEditClick = () => {
+    setShowAddressForm(true);
+  };
+
+  // 로딩 상태
   if (loading) {
     return (
       <Container className="py-5">
@@ -67,18 +77,11 @@ const MyPage = () => {
     );
   }
 
+  // 에러 상태
   if (error) {
     return (
       <Container className="py-5">
         <Alert variant="danger">{error}</Alert>
-      </Container>
-    );
-  }
-
-  if (!userInfo) {
-    return (
-      <Container className="py-5">
-        <Alert variant="warning">사용자 정보를 찾을 수 없습니다.</Alert>
       </Container>
     );
   }
@@ -92,13 +95,19 @@ const MyPage = () => {
             <Card.Body>
               <div className="text-center mb-3">
                 <div
-                  className="rounded-circle bg-primary d-inline-flex align-items-center justify-content-center"
+                  className={`rounded-circle d-inline-flex align-items-center justify-content-center ${
+                    user ? "bg-primary" : "bg-light"
+                  }`}
                   style={{ width: 80, height: 80 }}
                 >
-                  <FaUser className="text-white" size={40} />
+                  <FaUser className={user ? "text-white" : "text-muted"} size={40} />
                 </div>
-                <h5 className="mt-2 mb-0">{userInfo.name}</h5>
-                <small className="text-muted">{userInfo.email}</small>
+                <h5 className="mt-2 mb-0">
+                  {user ? user.name : "마이페이지"}
+                </h5>
+                <small className="text-muted">
+                  {user ? user.email : "로그인하여 개인정보를 관리하세요"}
+                </small>
               </div>
             </Card.Body>
           </Card>
@@ -148,23 +157,33 @@ const MyPage = () => {
                 <Button
                   variant="outline-primary"
                   size="sm"
-                  onClick={() => setShowUpdateForm(true)}
+                  onClick={handleEditClick}
                 >
                   <FaEdit className="me-1" />
-                  수정
+                  {user ? "수정" : "로그인하여 수정"}
                 </Button>
               </Card.Header>
               <Card.Body>
-                <Row>
-                  <Col md={6}>
-                    <p><strong>이름:</strong> {userInfo.name}</p>
-                    <p><strong>이메일:</strong> {userInfo.email}</p>
-                    <p><strong>전화번호:</strong> {userInfo.phone || "미등록"}</p>
-                  </Col>
-                  <Col md={6}>
-                    <p><strong>가입일:</strong> {userInfo.createdAt ? new Date(userInfo.createdAt).toLocaleDateString('ko-KR') : "미등록"}</p>
-                  </Col>
-                </Row>
+                {user ? (
+                  <Row>
+                    <Col md={6}>
+                      <p><strong>이름:</strong> {user.name}</p>
+                      <p><strong>이메일:</strong> {user.email}</p>
+                      <p><strong>전화번호:</strong> {user.phone || "미등록"}</p>
+                    </Col>
+                    <Col md={6}>
+                      <p><strong>가입일:</strong> {user.createdAt ? new Date(user.createdAt).toLocaleDateString('ko-KR') : "미등록"}</p>
+                    </Col>
+                  </Row>
+                ) : (
+                  <div className="text-center py-4">
+                    <p className="text-muted mb-3">로그인하여 개인정보를 확인하고 관리하세요.</p>
+                    <Button variant="primary" onClick={() => navigate('/login', { state: { from: '/mypage' } })}>
+                      <FaSignInAlt className="me-2" />
+                      로그인하기
+                    </Button>
+                  </div>
+                )}
               </Card.Body>
             </Card>
           )}
@@ -176,18 +195,28 @@ const MyPage = () => {
                 <Button
                   variant="outline-primary"
                   size="sm"
-                  onClick={() => setShowAddressForm(true)}
+                  onClick={handleAddressEditClick}
                 >
                   <FaEdit className="me-1" />
-                  수정
+                  {user ? "수정" : "로그인하여 수정"}
                 </Button>
               </Card.Header>
               <Card.Body>
-                <div>
-                  <p><strong>우편번호:</strong> {userInfo.zipCode || "미등록"}</p>
-                  <p><strong>주소:</strong> {userInfo.address || "미등록"}</p>
-                  <p><strong>상세주소:</strong> {userInfo.addressDetail || "미등록"}</p>
-                </div>
+                {user ? (
+                  <div>
+                    <p><strong>우편번호:</strong> {user.zipCode || "미등록"}</p>
+                    <p><strong>주소:</strong> {user.address || "미등록"}</p>
+                    <p><strong>상세주소:</strong> {user.addressDetail || "미등록"}</p>
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <p className="text-muted mb-3">로그인하여 배송지 정보를 확인하고 관리하세요.</p>
+                    <Button variant="primary" onClick={() => navigate('/login', { state: { from: '/mypage' } })}>
+                      <FaSignInAlt className="me-2" />
+                      로그인하기
+                    </Button>
+                  </div>
+                )}
               </Card.Body>
             </Card>
           )}
@@ -198,7 +227,17 @@ const MyPage = () => {
                 <h5 className="mb-0">주문내역</h5>
               </Card.Header>
               <Card.Body>
-                <p className="text-muted">주문내역 기능은 준비 중입니다.</p>
+                {user ? (
+                  <p className="text-muted">주문내역 기능은 준비 중입니다.</p>
+                ) : (
+                  <div className="text-center py-4">
+                    <p className="text-muted mb-3">로그인하여 주문내역을 확인하세요.</p>
+                    <Button variant="primary" onClick={() => navigate('/login', { state: { from: '/mypage' } })}>
+                      <FaSignInAlt className="me-2" />
+                      로그인하기
+                    </Button>
+                  </div>
+                )}
               </Card.Body>
             </Card>
           )}

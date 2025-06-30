@@ -1,28 +1,56 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchFilteredProducts } from "../app/slices/productSlice";
-import { fetchCartItems } from "../app/slices/cartSlice";
-import ProductCard from "../components/common/ProductCard";
+import React, { useState, useEffect, useCallback } from 'react';
+import { Container, Row, Col, Button, Alert } from 'react-bootstrap';
+import { FaShoppingCart, FaUser, FaSearch } from 'react-icons/fa';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import ProductCard from '../components/common/ProductCard';
+import FilterBar from '../components/FilterBar';
+import { productApi } from '../api';
+import { authManager } from '../api/authApi';
+import { fetchFilteredProducts } from '../app/slices/productSlice';
+import { fetchCartItems } from '../app/slices/cartSlice';
 
 const MainPage = () => {
   const dispatch = useDispatch();
   const { products, loading, error, pagination } = useSelector(
     (state) => state.product
   );
+  const { user, isLoggedIn } = useSelector((state) => state.user);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [lastResponseSize, setLastResponseSize] = useState(0);
+  const [userInfo, setUserInfo] = useState(null);
+  const [userLoading, setUserLoading] = useState(false);
+  const [userError, setUserError] = useState(null);
+  const [filters, setFilters] = useState({
+    brand: '',
+    volume: '',
+    gender: '',
+    price: ''
+  });
+  
+  const navigate = useNavigate();
 
   // 초기 로드
   useEffect(() => {
-    dispatch(
-      fetchFilteredProducts({
-        page: 1,
-        size: 20, // 한 번에 20개씩 로드
-      })
-    );
-    dispatch(fetchCartItems(1)); // memberId = 1 (임시)
-  }, [dispatch]);
+    const initializePage = async () => {
+      // 상품 데이터 로드
+      dispatch(
+        fetchFilteredProducts({
+          page: 1,
+          size: 20, // 한 번에 20개씩 로드
+        })
+      );
+
+      // 로그인한 사용자의 경우에만 장바구니 데이터 로드
+      if (isLoggedIn && user && (user.memberId || user.id)) {
+        const userId = user.memberId || user.id;
+        dispatch(fetchCartItems(userId));
+      }
+    };
+
+    initializePage();
+  }, [dispatch, isLoggedIn, user]);
 
   // 무한 스크롤 핸들러
   const handleScroll = useCallback(() => {
@@ -84,6 +112,64 @@ const MainPage = () => {
     }
   }, [products.length, currentPage]);
 
+  // 사용자 정보 조회 (로그인된 경우에만)
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        setUserLoading(true);
+        setUserError(null);
+        
+        // authManager를 통한 중앙 집중식 사용자 정보 조회
+        const result = await authManager.getUserInfo();
+        
+        if (result.success) {
+          setUserInfo(result.data);
+        } else {
+          setUserError(result.error || "사용자 정보를 불러오는데 실패했습니다.");
+        }
+      } catch (error) {
+        console.error("사용자 정보 조회 실패:", error);
+        setUserError("사용자 정보를 불러오는데 실패했습니다.");
+      } finally {
+        setUserLoading(false);
+      }
+    };
+
+    if (user && (user.memberId || user.id)) {
+      fetchUserInfo();
+    } else {
+      setUserLoading(false);
+    }
+  }, [user]);
+
+  // 필터 변경 핸들러
+  const handleFilterChange = ({ type, value }) => {
+    setFilters(prev => ({
+      ...prev,
+      [type]: value
+    }));
+  };
+
+  const handleCartClick = () => {
+    if (user && (user.memberId || user.id)) {
+      navigate('/cart');
+    } else {
+      navigate('/login');
+    }
+  };
+
+  const handleMyPageClick = () => {
+    if (user && (user.memberId || user.id)) {
+      navigate('/mypage');
+    } else {
+      navigate('/login');
+    }
+  };
+
+  const handleProductClick = (productId) => {
+    navigate(`/product/${productId}`);
+  };
+
   return (
     <main className="flex-grow-1">
       {/* 메인 배너 */}
@@ -121,6 +207,35 @@ const MainPage = () => {
           >
             당신만의 특별한 향기를 찾아보세요
           </p>
+          
+          {/* 사용자 정보 표시 (로그인된 경우에만) */}
+          {user && (user.memberId || user.id) && !userLoading && userInfo && (
+            <div className="mt-3">
+              <div className="alert alert-info d-inline-block mb-0" style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff' }}>
+                <FaUser className="me-2" />
+                안녕하세요, {userInfo.name}님! 환영합니다.
+              </div>
+            </div>
+          )}
+          
+          {/* 사용자 정보 로딩 중 */}
+          {user && (user.memberId || user.id) && userLoading && (
+            <div className="mt-3">
+              <div className="spinner-border spinner-border-sm me-2" role="status">
+                <span className="visually-hidden">로딩 중...</span>
+              </div>
+              사용자 정보를 불러오는 중...
+            </div>
+          )}
+          
+          {/* 사용자 정보 오류 */}
+          {user && (user.memberId || user.id) && userError && (
+            <div className="mt-3">
+              <div className="alert alert-warning d-inline-block mb-0" style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff' }}>
+                {userError}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -135,6 +250,17 @@ const MainPage = () => {
             </small>
           )}
         </div>
+        
+        {/* 필터 바 */}
+        <div className="mb-4">
+          <FilterBar 
+            brand={filters.brand}
+            volume={filters.volume}
+            gender={filters.gender}
+            price={filters.price}
+            onChange={handleFilterChange}
+          />
+        </div>
 
         {error ? (
           <div className="alert alert-danger">
@@ -144,8 +270,9 @@ const MainPage = () => {
           <div className="row g-4">
             {products.length === 0 && !loading ? (
               <div className="col-12 text-center text-muted py-5">
-                <h4>상품이 없습니다</h4>
-                <p>현재 등록된 상품이 없습니다.</p>
+                <FaSearch size={48} className="mb-3" />
+                <h4>상품을 찾을 수 없습니다</h4>
+                <p>다른 검색 조건을 시도해보세요.</p>
               </div>
             ) : (
               products.map((product) => (

@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { addToCartAction } from "../../app/slices/cartSlice";
 import { formatPrice } from "../../utils/formatters";
@@ -54,15 +54,16 @@ const disabledBtnStyle = {
   transition: "background 0.2s",
 };
 
-const ProductCard = ({ product, memberId = 1 }) => {
+const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.user);
   const [hover, setHover] = React.useState(false);
 
   // 재고 상태 확인
   const isOutOfStock = !product.stock || product.stock <= 0;
 
-  const handleAddToCart = (e) => {
+  const handleAddToCart = async (e) => {
     e.stopPropagation();
 
     // 재고가 없으면 추가하지 않음
@@ -71,9 +72,16 @@ const ProductCard = ({ product, memberId = 1 }) => {
       return;
     }
 
+    // 로그인 확인
+    if (!user) {
+      alert("로그인이 필요합니다.");
+      navigate("/login");
+      return;
+    }
+
     dispatch(
       addToCartAction({
-        memberId,
+        memberId: user.id,
         productId: product.id,
         quantity: 1,
       })

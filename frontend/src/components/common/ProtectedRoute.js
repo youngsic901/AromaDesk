@@ -19,14 +19,34 @@ const ProtectedRoute = ({ children }) => {
         console.log('현재 Redux 상태 - user:', reduxUser);
         console.log('현재 경로:', location.pathname);
         
-        // authManager를 통한 중앙 집중식 사용자 정보 조회
+        // 1. 먼저 세션 상태 확인
+        console.log('세션 상태 확인 중...');
+        const sessionResult = await authManager.checkSession();
+        
+        if (!sessionResult.success) {
+          console.log('세션 확인 실패:', sessionResult.error);
+          dispatch(logoutAction());
+          setIsAuthenticated(false);
+          return;
+        }
+        
+        if (!sessionResult.isValid) {
+          console.log('세션이 유효하지 않음');
+          dispatch(logoutAction());
+          setIsAuthenticated(false);
+          return;
+        }
+        
+        console.log('세션 유효, 사용자 정보 조회 중...');
+        
+        // 2. 세션이 유효하면 사용자 정보 조회
         const result = await authManager.getUserInfo();
         console.log('authManager 결과:', result);
         
-        if (result.success && result.data) {
+        if (result.success && result.data && result.data.id) {
           console.log('인증 성공, 사용자 정보:', result.data);
           // Redux 상태 동기화
-          if (!isLoggedIn || !reduxUser) {
+          if (!isLoggedIn || !reduxUser || reduxUser.id !== result.data.id) {
             console.log('Redux 상태 업데이트');
             dispatch(loginAction(result.data));
           }
@@ -47,7 +67,7 @@ const ProtectedRoute = ({ children }) => {
     };
     
     checkAuth();
-  }, [dispatch, isLoggedIn, reduxUser]);
+  }, [dispatch, isLoggedIn, reduxUser, location.pathname]);
   
   // 로딩 중이면 로딩 화면 표시
   if (isChecking) {

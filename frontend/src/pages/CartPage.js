@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  fetchCartItems,
   updateQuantityAction,
   removeFromCartAction,
   clearCart,
@@ -16,21 +17,47 @@ const CartPage = () => {
   const {
     items = [],
     totalAmount,
+    loading: cartLoading,
+    error: cartError,
   } = useSelector((state) => state.cart);
   const { user } = useSelector((state) => state.user);
+  
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // ProtectedRoute에서 인증 확인을 하므로 여기서는 단순히 장바구니 데이터만 가져옴
+  useEffect(() => {
+    const loadCartData = async () => {
+      if (user && user.id) {
+        try {
+          setLoading(true);
+          setError(null);
+          console.log('장바구니 데이터 조회 시작:', user.id);
+          dispatch(fetchCartItems(user.id));
+        } catch (error) {
+          console.error("장바구니 데이터 조회 실패:", error);
+          setError("장바구니 데이터를 불러오는데 실패했습니다.");
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadCartData();
+  }, [user, dispatch]);
 
   // 수량 변경
   const handleQuantity = (productId, quantity) => {
-    if (!productId || quantity < 1) return;
+    if (!productId || quantity < 1 || !user?.id) return;
     dispatch(
-      updateQuantityAction({ memberId: user?.id || 1, productId, quantity })
+      updateQuantityAction({ memberId: user.id, productId, quantity })
     );
   };
 
   // 상품 삭제
   const handleRemove = (productId) => {
-    if (!productId) return;
-    dispatch(removeFromCartAction({ memberId: user?.id || 1, productId }));
+    if (!productId || !user?.id) return;
+    dispatch(removeFromCartAction({ memberId: user.id, productId }));
   };
 
   // 주문 처리
@@ -69,9 +96,53 @@ const CartPage = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <main className="container py-5">
+        <div className="text-center">
+          <div className="spinner-border" role="status">
+            <span className="visually-hidden">로딩 중...</span>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="container py-5">
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      </main>
+    );
+  }
+
+  if (!user) {
+    return (
+      <main className="container py-5">
+        <div className="alert alert-warning" role="alert">
+          사용자 정보를 찾을 수 없습니다.
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="container py-5">
       <h2 className="fw-bold mb-4">장바구니</h2>
+      {cartLoading && (
+        <div className="text-center py-3">
+          <div className="spinner-border spinner-border-sm" role="status">
+            <span className="visually-hidden">장바구니 로딩 중...</span>
+          </div>
+        </div>
+      )}
+      {cartError && (
+        <div className="alert alert-danger" role="alert">
+          장바구니 로딩 실패: {cartError}
+        </div>
+      )}
       {items.length === 0 ? (
         <div className="text-center text-muted py-5">
           장바구니에 담긴 상품이 없습니다.
@@ -171,8 +242,9 @@ const CartPage = () => {
               <button
                 className="btn btn-primary btn-lg w-100"
                 onClick={handleOrder}
+                disabled={cartLoading}
               >
-                주문하기
+                {cartLoading ? "로딩 중..." : "주문하기"}
               </button>
             </div>
           </div>

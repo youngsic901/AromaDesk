@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { loginAPI } from '../api/loginApi.js';
 import { login as loginAction, logout as logoutAction } from '../app/slices/userSlice.js';
+import { authManager } from '../api/authApi.js';
 
 export const useLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,6 +21,18 @@ export const useLogin = () => {
       if (result.success) {
         // 백엔드에서 세션에 CusUser로 저장하고 Member 엔티티를 반환
         const userData = result.data;
+        
+        // 로그인 후 세션 상태 확인
+        console.log('로그인 성공, 세션 상태 확인 중...');
+        const sessionResult = await authManager.checkSession();
+        
+        if (!sessionResult.success || !sessionResult.isValid) {
+          console.log('로그인 후 세션 확인 실패');
+          setError('로그인은 성공했지만 세션 설정에 문제가 있습니다.');
+          return { success: false, error: '세션 설정 실패' };
+        }
+        
+        console.log('세션 확인 성공, 사용자 정보 설정');
         setUser(userData);
         
         // Redux 스토어에 로그인 상태 저장
@@ -28,7 +41,11 @@ export const useLogin = () => {
         // localStorage에 사용자 정보 저장
         localStorage.setItem('CusUser', JSON.stringify(userData));
         
-        console.log('로그인 성공:', userData);
+        // authManager 캐시 업데이트
+        authManager._cachedUser = userData;
+        authManager._cacheTimestamp = Date.now();
+        
+        console.log('로그인 완료:', userData);
         return { success: true, data: userData };
       } else {
         setError(result.error);

@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProductById } from "../app/slices/productSlice";
 import { addToCartAction } from "../app/slices/cartSlice";
@@ -17,7 +17,9 @@ const ProductDetailPage = () => {
   const { currentProduct, loading, error } = useSelector(
     (state) => state.product
   );
+  const { user } = useSelector((state) => state.user);
   const [selectedImg, setSelectedImg] = React.useState(0);
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     dispatch(fetchProductById(id));
@@ -42,10 +44,17 @@ const ProductDetailPage = () => {
   const detailImages = extractImagesFromDescription(currentProduct.description);
 
   // 장바구니 담기 핸들러
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
+    // 로그인 확인
+    if (!user) {
+      alert("로그인이 필요합니다.");
+      navigate("/login");
+      return;
+    }
+
     dispatch(
       addToCartAction({
-        memberId: 1, // 임시
+        memberId: user.id,
         productId: currentProduct.id,
         quantity: 1,
       })

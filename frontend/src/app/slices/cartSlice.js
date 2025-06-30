@@ -54,6 +54,19 @@ export const removeFromCartAction = createAsyncThunk(
   }
 );
 
+// 총 수량과 금액 계산 함수 (중복 제거)
+const calculateTotals = (items) => {
+  const totalQuantity = (items || []).reduce(
+    (total, item) => total + (item?.quantity || 0),
+    0
+  );
+  const totalAmount = (items || []).reduce(
+    (total, item) => total + (item?.price || 0) * (item?.quantity || 0),
+    0
+  );
+  return { totalQuantity, totalAmount };
+};
+
 const cartSlice = createSlice({
   name: "cart",
   initialState: {
@@ -79,14 +92,9 @@ const cartSlice = createSlice({
       );
       if (item) {
         item.quantity = quantity;
-        state.totalQuantity = (state.items || []).reduce(
-          (total, item) => total + (item?.quantity || 0),
-          0
-        );
-        state.totalAmount = (state.items || []).reduce(
-          (total, item) => total + (item?.price || 0) * (item?.quantity || 0),
-          0
-        );
+        const { totalQuantity, totalAmount } = calculateTotals(state.items);
+        state.totalQuantity = totalQuantity;
+        state.totalAmount = totalAmount;
       }
     },
   },
@@ -100,14 +108,9 @@ const cartSlice = createSlice({
       .addCase(fetchCartItems.fulfilled, (state, action) => {
         state.loading = false;
         state.items = Array.isArray(action.payload) ? action.payload : []; // ✅ 방어 코드
-        state.totalQuantity = (state.items || []).reduce(
-          (total, item) => total + (item?.quantity || 0),
-          0
-        );
-        state.totalAmount = (state.items || []).reduce(
-          (total, item) => total + (item?.price || 0) * (item?.quantity || 0),
-          0
-        );
+        const { totalQuantity, totalAmount } = calculateTotals(state.items);
+        state.totalQuantity = totalQuantity;
+        state.totalAmount = totalAmount;
       })
       .addCase(fetchCartItems.rejected, (state, action) => {
         state.loading = false;
@@ -155,14 +158,9 @@ const cartSlice = createSlice({
         }
 
         // 총 수량과 금액 계산
-        state.totalQuantity = state.items.reduce(
-          (total, item) => total + (item?.quantity || 0),
-          0
-        );
-        state.totalAmount = state.items.reduce(
-          (total, item) => total + (item?.price || 0) * (item?.quantity || 0),
-          0
-        );
+        const { totalQuantity, totalAmount } = calculateTotals(state.items);
+        state.totalQuantity = totalQuantity;
+        state.totalAmount = totalAmount;
       })
       .addCase(addToCartAction.rejected, (state, action) => {
         state.loading = false;
@@ -189,14 +187,9 @@ const cartSlice = createSlice({
           state.items[index] = updatedItem;
         }
 
-        state.totalQuantity = (state.items || []).reduce(
-          (total, item) => total + (item?.quantity || 0),
-          0
-        );
-        state.totalAmount = (state.items || []).reduce(
-          (total, item) => total + (item?.price || 0) * (item?.quantity || 0),
-          0
-        );
+        const { totalQuantity, totalAmount } = calculateTotals(state.items);
+        state.totalQuantity = totalQuantity;
+        state.totalAmount = totalAmount;
       })
       .addCase(updateQuantityAction.rejected, (state, action) => {
         state.loading = false;
@@ -218,14 +211,9 @@ const cartSlice = createSlice({
         state.items = (state.items || []).filter(
           (item) => item?.productId !== removedProductId
         );
-        state.totalQuantity = (state.items || []).reduce(
-          (total, item) => total + (item?.quantity || 0),
-          0
-        );
-        state.totalAmount = (state.items || []).reduce(
-          (total, item) => total + (item?.price || 0) * (item?.quantity || 0),
-          0
-        );
+        const { totalQuantity, totalAmount } = calculateTotals(state.items);
+        state.totalQuantity = totalQuantity;
+        state.totalAmount = totalAmount;
       })
       .addCase(removeFromCartAction.rejected, (state, action) => {
         state.loading = false;

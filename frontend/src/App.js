@@ -37,7 +37,8 @@ import BrandPage from "./pages/BrandPage";
 import SearchPage from "./pages/SearchPage";
 import OrderCompletePage from "./pages/OrderCompletePage";
 // API
-import { login as loginAction } from "./app/slices/userSlice";
+import { login as loginAction, logout as logoutAction } from "./app/slices/userSlice";
+import { authManager } from "./api/authApi";
 
 // 관리자 인증 라우트
 function AdminRoute({ children }) {
@@ -54,21 +55,37 @@ function AppContent() {
   const [isInitialized, setIsInitialized] = useState(false);
   const dispatch = useDispatch();
   
-  // 앱 시작 시 단순한 로그인 상태 확인
+  // 앱 시작 시 세션 상태 확인
   useEffect(() => {
-    const initializeApp = () => {
+    const initializeApp = async () => {
       try {
-        // localStorage에서 사용자 정보만 확인
+        console.log('앱 초기화 시작');
+        
+        // localStorage에서 사용자 정보 확인
         const cusUserRaw = localStorage.getItem('CusUser');
         if (cusUserRaw) {
           const user = JSON.parse(cusUserRaw);
-          if (user && user.id) {
-            dispatch(loginAction(user));
+          if (user && (user.id || user.memberId)) {
+            console.log('localStorage에서 사용자 정보 발견:', user);
+            
+            // 세션 상태 확인
+            const sessionResult = await authManager.checkSession();
+            if (sessionResult.success && sessionResult.isValid) {
+              console.log('세션 유효, 사용자 정보 설정');
+              dispatch(loginAction(user));
+            } else {
+              console.log('세션 무효, 로그아웃 처리');
+              localStorage.removeItem('CusUser');
+              dispatch(logoutAction());
+            }
           }
+        } else {
+          console.log('localStorage에 사용자 정보 없음');
         }
       } catch (error) {
         console.error('앱 초기화 오류:', error);
         localStorage.removeItem('CusUser');
+        dispatch(logoutAction());
       } finally {
         setIsInitialized(true);
       }
@@ -164,7 +181,11 @@ function AppContent() {
                       path="/products/:id"
                       element={<ProductDetailPage />}
                     />
-                    <Route path="/cart" element={<CartPage />} />
+                    <Route path="/cart" element={
+                      <ProtectedRoute>
+                        <CartPage />
+                      </ProtectedRoute>
+                    } />
                     <Route 
                       path="/mypage" 
                       element={

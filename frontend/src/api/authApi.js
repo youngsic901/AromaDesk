@@ -39,13 +39,15 @@ export const authManager = {
         }
       }
 
-      // 2. localStorage 확인
-      const localUser = authManager.getLocalUser();
-      if (localUser && !forceRefresh) {
-        console.log('localStorage 사용자 정보 사용');
-        authManager._cachedUser = localUser;
-        authManager._cacheTimestamp = Date.now();
-        return { success: true, data: localUser };
+      // 2. localStorage 확인 (forceRefresh가 아닌 경우에만)
+      if (!forceRefresh) {
+        const localUser = authManager.getLocalUser();
+        if (localUser) {
+          console.log('localStorage 사용자 정보 사용');
+          authManager._cachedUser = localUser;
+          authManager._cacheTimestamp = Date.now();
+          return { success: true, data: localUser };
+        }
       }
 
       // 3. API 호출
@@ -74,13 +76,7 @@ export const authManager = {
       console.error('에러 상태:', error.response?.status);
       console.error('에러 데이터:', error.response?.data);
       
-      // API 실패 시 localStorage 정보 반환
-      const localUser = authManager.getLocalUser();
-      if (localUser) {
-        console.log('API 실패, localStorage 정보 사용');
-        return { success: true, data: localUser };
-      }
-      
+      // API 실패 시 실패로 처리 (localStorage 정보 반환하지 않음)
       return { 
         success: false, 
         error: handleApiError(error).message 
@@ -113,9 +109,12 @@ export const authManager = {
   // 세션 상태 확인 (실제 백엔드 세션)
   checkSession: async () => {
     try {
-      await apiClient.get('/api/members/me');
+      console.log('세션 상태 확인 시작');
+      const response = await apiClient.get('/api/members/me');
+      console.log('세션 확인 성공:', response.status);
       return { success: true, isValid: true };
     } catch (error) {
+      console.log('세션 확인 실패:', error.response?.status, error.response?.data);
       if (error.response && error.response.status === 401) {
         return { success: true, isValid: false };
       }
@@ -146,14 +145,4 @@ export const checkAndSyncLoginStatus = async () => {
     isLoggedIn: result.success && result.data,
     user: result.data
   };
-};
-
-// 사용자 ID 가져오기 (Redux 또는 localStorage에서)
-export const getUserId = (reduxUser) => {
-  if (reduxUser && reduxUser.id) {
-    return reduxUser.id;
-  }
-  
-  const localUser = authManager.getLocalUser();
-  return localUser?.id || null;
 }; 
