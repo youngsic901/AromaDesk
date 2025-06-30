@@ -1,3 +1,9 @@
+DROP DATABASE perfume_db;
+
+CREATE DATABASE perfume_db;
+
+USE perfume_db;
+
 -- 회원 테이블
 CREATE TABLE member (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,

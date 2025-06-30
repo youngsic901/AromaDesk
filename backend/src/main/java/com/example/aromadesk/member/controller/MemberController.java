@@ -1,12 +1,22 @@
 package com.example.aromadesk.member.controller;
 
+import com.example.aromadesk.auth.service.MemberLoginService;
+import com.example.aromadesk.member.dto.LoginRequest;
 import com.example.aromadesk.member.dto.MemberDto;
 import com.example.aromadesk.member.entity.Member;
 import com.example.aromadesk.member.repository.MemberRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +30,7 @@ public class MemberController {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MemberLoginService memberLoginService;
 
     // 회원 전체 목록 조회 (GET /api/members)
     @GetMapping

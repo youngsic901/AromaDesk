@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import { fetchFilteredProducts } from "../app/slices/productSlice";
 import ProductCard from "../components/common/ProductCard";
 
@@ -10,21 +11,48 @@ const VOLUME_OPTIONS = [
   { code: "LARGE", label: "대용량" },
 ];
 
+const PRICE_OPTIONS = [
+  { code: "", label: "가격 전체" },
+  { code: "100000", label: "10만원 이하" },
+  { code: "200000", label: "20만원 이하" },
+  { code: "300000", label: "30만원 이하" },
+  { code: "500000", label: "50만원 이하" },
+];
+
 const CategoryPage = () => {
   const dispatch = useDispatch();
   const { products, loading, error } = useSelector((state) => state.product);
+  const { category } = useParams();
 
   const [volume, setVolume] = useState("");
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState("");
 
-  // 카테고리 정보는 URL 등에서 받아올 수 있음(여기선 예시로 MALE)
-  const gender = "MALE";
+  // URL에서 받아온 카테고리를 백엔드 API 형식에 맞게 변환
+  const gender = category ? category.toUpperCase() : "MALE";
+
+  // 카테고리 이름 매핑
+  const getCategoryName = (code) => {
+    const categoryMap = {
+      MALE: "남자향수",
+      FEMALE: "여자향수",
+      UNISEX: "남여공용",
+    };
+    return categoryMap[code] || code;
+  };
+
+  useEffect(() => {
+    // 페이지 마운트 시 필터링 상태 초기화
+    setVolume("");
+    setPrice("");
+  }, [category]);
 
   useEffect(() => {
     // 옵션에 맞는 상품 불러오기
     const params = { gender };
     if (volume) params.volume = volume;
-    if (price > 0) params.minPrice = price;
+    if (price) params.maxPrice = price;
+
+    console.log("CategoryPage 필터링 파라미터:", params);
     dispatch(fetchFilteredProducts(params));
   }, [dispatch, gender, volume, price]);
 
@@ -48,19 +76,20 @@ const CategoryPage = () => {
           </div>
           <div>
             <label className="form-label fw-semibold me-2">가격대</label>
-            <input
-              type="range"
-              min={0}
-              max={500000}
-              step={10000}
+            <select
+              className="form-select d-inline-block w-auto"
               value={price}
-              onChange={(e) => setPrice(Number(e.target.value))}
-              style={{ width: 200 }}
-            />
-            <span className="ms-2">{price.toLocaleString()}원</span>
+              onChange={(e) => setPrice(e.target.value)}
+            >
+              {PRICE_OPTIONS.map((opt) => (
+                <option key={opt.code} value={opt.code}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
-        <h3 className="fw-bold mb-3">카테고리 상품</h3>
+        <h3 className="fw-bold mb-3">{getCategoryName(gender)}</h3>
         {/* 상품 리스트 */}
         <div className="row g-4">
           {loading ? (
