@@ -62,15 +62,13 @@ public class CartService {
 
         Optional<Cart> optionalCart = cartRepository.findByMemberIdAndProductId(memberId, productId);
         Cart cart;
-        int totalQuantity;
         if (optionalCart.isPresent()) {
             cart = optionalCart.get();
-            totalQuantity = cart.getQuantity() + quantity;
-            if (totalQuantity > product.getStock()) {
+            if (quantity > product.getStock()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "재고를 초과했습니다. 최대 담을 수 있는 수량은 " + (product.getStock() - cart.getQuantity()) + "개입니다.");
+                        "재고를 초과했습니다. 최대 담을 수 있는 수량은 " + product.getStock() + "개입니다.");
             }
-            cart.updateQuantity(totalQuantity);
+            cart.updateQuantity(quantity);
         } else {
             if (quantity > product.getStock()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,

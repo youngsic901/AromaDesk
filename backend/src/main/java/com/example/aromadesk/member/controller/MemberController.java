@@ -130,9 +130,10 @@ public class MemberController {
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
 
         Member member = ((MemberLoginService.CustomUserDetails) userDetails).getMember();
-        session.setAttribute("CusUser", MemberDto.fromEntity(member));
+        MemberDto loginUserDto = MemberDto.fromEntity(member);
+//        session.setAttribute("CusUser", loginUserDto);
 
-        return ResponseEntity.ok("로그인 성공");
+        return ResponseEntity.ok(loginUserDto);
     }
 
 
