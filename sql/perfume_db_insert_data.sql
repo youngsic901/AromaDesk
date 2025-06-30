@@ -56,6 +56,17 @@ VALUES
     ('user004', 'user004@example.com', '$2a$10$Mwuo/rTLcG4JEI5DFnvGzut4jDUzVAiIHKcfvTxsJx93XjeBNjEPq', '박민수', '010-4444-4444', '인천시 남동구'),
     ('user005', 'user005@example.com', '$2a$10$Mwuo/rTLcG4JEI5DFnvGzut4jDUzVAiIHKcfvTxsJx93XjeBNjEPq', '최지은', '010-5555-5555', '대구시 수성구');
 
+-- ✅ 회원별 기본 배송지 및 추가 배송지 삽입
+INSERT INTO member_address (member_id, address, is_default, alias)
+VALUES
+    (1, '서울시 강남구 삼성동 123-4', TRUE, '집'),
+    (1, '서울시 강남구 테헤란로 456', FALSE, '회사'),
+    (2, '부산시 해운대구 우동 123', TRUE, '집'),
+    (3, '대전시 유성구 봉명동 77-1', TRUE, '집'),
+    (4, '인천시 남동구 논현동 55-8', TRUE, '집'),
+    (5, '대구시 수성구 범어동 99', TRUE, '집'),
+    (5, '대구시 달서구 본동 12-34', FALSE, '회사');
+
 -- ✅ 관리자(admin) 삽입
 INSERT INTO admin (username, password, name)
 VALUES
