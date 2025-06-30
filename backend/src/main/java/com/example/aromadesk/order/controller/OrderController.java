@@ -1,6 +1,7 @@
 package com.example.aromadesk.order.controller;
 
 import com.example.aromadesk.auth.service.CustomOAuth2User;
+import com.example.aromadesk.auth.service.MemberLoginService;
 import com.example.aromadesk.cart.dto.CartRequestDto;
 import com.example.aromadesk.member.entity.Member;
 import com.example.aromadesk.order.dto.OrderRequestDto;
@@ -10,6 +11,7 @@ import com.example.aromadesk.order.repository.OrderRepository;
 import com.example.aromadesk.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +28,8 @@ import java.util.Map;
  /* DATA         AUTHOR          DESC.
  /*--------     ---------    ----------------------
  /*2025.06.25   SUSU        상품 상세보기 및 장바구니 주문 처리
- /*2025.06.26   SUSU        결제 완료 처리 
+ /*2025.06.26   SUSU        결제 완료 처리
+ /*2025.06.30   SUSU        로그인 사용자 타입 분기 처리 로직 추가
  /*************************************************************/
 
 @RestController
@@ -36,15 +39,29 @@ public class OrderController {
 
     private final OrderService orderService;
     private final OrderRepository orderRepository;
+    
+    /**
+     * 인증된 사용자로부터 Member 객체 추출(OAuth2 or 일반 로그인 모두 대응)
+     */
+    private Member extractLoginMember(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        if(principal instanceof CustomOAuth2User){
+            return ((CustomOAuth2User) principal).getMember();
+        } else if (principal instanceof MemberLoginService.CustomUserDetails) {
+            return ((MemberLoginService.CustomUserDetails) principal).getMember();
+        } else {
+            throw new IllegalStateException("로그인된 사용자를 확인할 수 없습니다.");
+        }
+    }
 
     /**
      * 단일 상품 주문 생성 (상품 상세 -> 바로 주문)
      */
     @PostMapping("/single")
     public ResponseEntity<String> createSingleOrder(@RequestBody OrderRequestDto dto) {
-        CustomOAuth2User user = (CustomOAuth2User) SecurityContextHolder
-                .getContext().getAuthentication().getPrincipal();
-        Member loginMember = user.getMember();
+        Member loginMember = extractLoginMember();
         orderService.createSingleOrder(dto, loginMember);
         return ResponseEntity.ok("단일 상품 주문이 성공하였습니다. ");
     }
@@ -54,9 +71,7 @@ public class OrderController {
      */
     @PostMapping("/from-cart")
     public ResponseEntity<String> createOrderFromCart(@RequestBody CartRequestDto dto) {
-        CustomOAuth2User user = (CustomOAuth2User) SecurityContextHolder
-                .getContext().getAuthentication().getPrincipal();
-        Member loginMember = user.getMember();
+        Member loginMember = extractLoginMember();
         orderService.createOrderFromCart(dto, loginMember);
         return ResponseEntity.ok("장바구니 상품 주문이 완료되었습니다.");
     }
@@ -66,9 +81,7 @@ public class OrderController {
      */
     @GetMapping
     public ResponseEntity<List<OrderResponseDto>> getAllOrders() {
-        CustomOAuth2User user = (CustomOAuth2User) SecurityContextHolder
-                .getContext().getAuthentication().getPrincipal();
-        Member loginMember = user.getMember();
+        Member loginMember = extractLoginMember();
         List<OrderResponseDto> orders = orderService.getOrdersByMemberID(loginMember);
         return ResponseEntity.ok(orders);
     }
