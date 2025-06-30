@@ -10,7 +10,7 @@ export const productApi = {
         brand,
         gender,
         volume,
-        name,
+        keyword,
         maxPrice,
         page = 1,
         size = 10,
@@ -21,6 +21,7 @@ export const productApi = {
       if (brand) queryParams.brand = brand;
       if (gender) queryParams.gender = gender;
       if (volume) queryParams.volume = volume;
+      if (keyword) queryParams.keyword = keyword;
       if (page) queryParams.page = page;
       if (size) queryParams.size = size;
 
@@ -66,17 +67,8 @@ export const productApi = {
       }
 
       // 프론트엔드에서 추가 필터링 처리 (클라이언트 사이드)
-      if (result.content && (name || maxPrice)) {
+      if (result.content && maxPrice) {
         let filteredContent = result.content;
-
-        // name 검색 필터링
-        if (name) {
-          filteredContent = filteredContent.filter(
-            (product) =>
-              product.name.toLowerCase().includes(name.toLowerCase()) ||
-              product.brand.toLowerCase().includes(name.toLowerCase())
-          );
-        }
 
         // 가격 필터링 (maxPrice)
         if (maxPrice) {
@@ -97,6 +89,7 @@ export const productApi = {
 
       return result;
     } catch (error) {
+      console.error("검색 API 오류:", error);
       throw handleApiError(error);
     }
   },

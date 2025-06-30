@@ -25,7 +25,7 @@ var productApi = {
         brand,
         gender,
         volume,
-        name,
+        keyword,
         maxPrice,
         _params$page,
         page,
@@ -43,20 +43,21 @@ var productApi = {
           case 0:
             params = _args.length > 0 && _args[0] !== undefined ? _args[0] : {};
             _context.prev = 1;
-            brand = params.brand, gender = params.gender, volume = params.volume, name = params.name, maxPrice = params.maxPrice, _params$page = params.page, page = _params$page === void 0 ? 1 : _params$page, _params$size = params.size, size = _params$size === void 0 ? 10 : _params$size; // 백엔드 API 엔드포인트와 파라미터 구조 맞춤
+            brand = params.brand, gender = params.gender, volume = params.volume, keyword = params.keyword, maxPrice = params.maxPrice, _params$page = params.page, page = _params$page === void 0 ? 1 : _params$page, _params$size = params.size, size = _params$size === void 0 ? 10 : _params$size; // 백엔드 API 엔드포인트와 파라미터 구조 맞춤
 
             queryParams = {};
             if (brand) queryParams.brand = brand;
             if (gender) queryParams.gender = gender;
             if (volume) queryParams.volume = volume;
+            if (keyword) queryParams.keyword = keyword;
             if (page) queryParams.page = page;
             if (size) queryParams.size = size;
-            _context.next = 11;
+            _context.next = 12;
             return regeneratorRuntime.awrap(_axiosConfig["default"].get("/api/products", {
               params: queryParams
             }));
 
-          case 11:
+          case 12:
             response = _context.sent;
             // 백엔드 응답 구조: { content: [], totalElements: number, page: number, size: number, totalPages: number }
             result = (0, _errorHandler.handleApiSuccess)(response); // 응답 구조 검증 및 기본값 설정
@@ -95,15 +96,8 @@ var productApi = {
             } // 프론트엔드에서 추가 필터링 처리 (클라이언트 사이드)
 
 
-            if (result.content && (name || maxPrice)) {
-              filteredContent = result.content; // name 검색 필터링
-
-              if (name) {
-                filteredContent = filteredContent.filter(function (product) {
-                  return product.name.toLowerCase().includes(name.toLowerCase()) || product.brand.toLowerCase().includes(name.toLowerCase());
-                });
-              } // 가격 필터링 (maxPrice)
-
+            if (result.content && maxPrice) {
+              filteredContent = result.content; // 가격 필터링 (maxPrice)
 
               if (maxPrice) {
                 filteredContent = filteredContent.filter(function (product) {
@@ -122,17 +116,18 @@ var productApi = {
 
             return _context.abrupt("return", result);
 
-          case 19:
-            _context.prev = 19;
+          case 20:
+            _context.prev = 20;
             _context.t0 = _context["catch"](1);
+            console.error("검색 API 오류:", _context.t0);
             throw (0, _errorHandler.handleApiError)(_context.t0);
 
-          case 22:
+          case 24:
           case "end":
             return _context.stop();
         }
       }
-    }, null, null, [[1, 19]]);
+    }, null, null, [[1, 20]]);
   },
   // 상품 상세 조회
   getProductById: function getProductById(productId) {

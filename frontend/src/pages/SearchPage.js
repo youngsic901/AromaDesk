@@ -18,7 +18,7 @@ const SearchPage = () => {
   useEffect(() => {
     if (query) {
       setSearchTerm(query);
-      dispatch(fetchFilteredProducts({ name: query }));
+      dispatch(fetchFilteredProducts({ keyword: query, size: 1000 }));
     }
   }, [dispatch, query]);
 
@@ -30,7 +30,7 @@ const SearchPage = () => {
   };
 
   const handlePageChange = (page) => {
-    dispatch(fetchFilteredProducts({ name: query, page }));
+    dispatch(fetchFilteredProducts({ keyword: query, page, size: 1000 }));
   };
 
   return (
@@ -73,13 +73,23 @@ const SearchPage = () => {
           <div className="spinner-border" role="status">
             <span className="visually-hidden">로딩 중...</span>
           </div>
+          <p className="mt-2">검색 중...</p>
         </div>
       ) : error ? (
-        <div className="alert alert-danger">오류: {error}</div>
+        <div className="alert alert-danger">
+          <h5>검색 오류가 발생했습니다</h5>
+          <p>오류: {error}</p>
+          <p>다시 시도해주세요.</p>
+        </div>
       ) : products.length === 0 ? (
         <div className="text-center py-5">
           <h4 className="text-muted">검색 결과가 없습니다</h4>
           <p className="text-muted">다른 키워드로 검색해보세요.</p>
+          <div className="mt-3">
+            <p className="text-muted small">
+              검색어: "{query}" | 총 상품 수: {pagination.total}
+            </p>
+          </div>
         </div>
       ) : (
         <>

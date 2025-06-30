@@ -11,13 +11,6 @@ import {
   FaRegCommentDots,
 } from "react-icons/fa";
 
-const DUMMY_THUMBNAILS = [
-  // 실제로는 상품 이미지 여러 장이 있을 때 사용
-  "/placeholder-product.jpg",
-  "/placeholder-product.jpg",
-  "/placeholder-product.jpg",
-];
-
 const ProductDetailPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
@@ -34,11 +27,19 @@ const ProductDetailPage = () => {
   if (error) return <div className="alert alert-danger">{error}</div>;
   if (!currentProduct) return null;
 
-  // 썸네일 이미지 배열 (실제 서비스라면 currentProduct.images 등 활용)
-  const thumbnails = [
-    currentProduct.imageUrl || "/placeholder-product.jpg",
-    ...DUMMY_THUMBNAILS,
-  ];
+  // 실제 이미지가 있는 경우에만 썸네일 생성
+  const thumbnails = currentProduct.imageUrl ? [currentProduct.imageUrl] : [];
+
+  // description에서 이미지 URL 추출 (jpg, png, gif 등)
+  const extractImagesFromDescription = (description) => {
+    if (!description) return [];
+
+    const imageRegex = /https?:\/\/[^\s]+\.(jpg|jpeg|png|gif|webp)/gi;
+    const matches = description.match(imageRegex);
+    return matches || [];
+  };
+
+  const detailImages = extractImagesFromDescription(currentProduct.description);
 
   // 장바구니 담기 핸들러
   const handleAddToCart = () => {
@@ -57,37 +58,61 @@ const ProductDetailPage = () => {
         {/* 좌측: 이미지/썸네일 */}
         <div className="col-md-5">
           <div className="bg-white rounded shadow-sm p-3 mb-3 text-center">
-            <img
-              src={thumbnails[selectedImg]}
-              alt={currentProduct.name}
-              className="img-fluid rounded"
-              style={{
-                maxHeight: 380,
-                objectFit: "contain",
-                background: "#f8f9fa",
-              }}
-            />
-          </div>
-          <div className="d-flex justify-content-center gap-2">
-            {thumbnails.map((img, idx) => (
+            {thumbnails.length > 0 ? (
               <img
-                key={idx}
-                src={img}
-                alt="썸네일"
-                className={`rounded border ${
-                  selectedImg === idx ? "border-primary" : "border-light"
-                }`}
+                src={thumbnails[selectedImg]}
+                alt={currentProduct.name}
+                className="img-fluid rounded"
                 style={{
-                  width: 60,
-                  height: 60,
-                  objectFit: "cover",
-                  cursor: "pointer",
+                  maxHeight: 380,
+                  objectFit: "contain",
+                  background: "#f8f9fa",
                 }}
-                onClick={() => setSelectedImg(idx)}
+                onError={(e) => {
+                  e.target.src = "/placeholder-product.jpg";
+                }}
               />
-            ))}
+            ) : (
+              <div
+                className="d-flex align-items-center justify-content-center"
+                style={{
+                  height: 380,
+                  background: "#f8f9fa",
+                  borderRadius: "0.375rem",
+                }}
+              >
+                <span className="text-muted">이미지 준비중</span>
+              </div>
+            )}
           </div>
+
+          {/* 썸네일이 있을 때만 표시 */}
+          {thumbnails.length > 1 && (
+            <div className="d-flex justify-content-center gap-2">
+              {thumbnails.map((img, idx) => (
+                <img
+                  key={idx}
+                  src={img}
+                  alt="썸네일"
+                  className={`rounded border ${
+                    selectedImg === idx ? "border-primary" : "border-light"
+                  }`}
+                  style={{
+                    width: 60,
+                    height: 60,
+                    objectFit: "cover",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => setSelectedImg(idx)}
+                  onError={(e) => {
+                    e.target.src = "/placeholder-product.jpg";
+                  }}
+                />
+              ))}
+            </div>
+          )}
         </div>
+
         {/* 우측: 상품 정보/구매 */}
         <div className="col-md-7">
           <h2 className="fw-bold mb-2">{currentProduct.name}</h2>
@@ -147,12 +172,67 @@ const ProductDetailPage = () => {
           </div>
         </div>
       </div>
-      {/* 하단: 상세 설명만 */}
+
+      {/* 하단: 상세 설명 및 이미지 */}
       <div className="mt-5">
         <div className="tab-content p-3 border bg-white rounded">
           <div>
             <h5 className="fw-bold mb-3">상품 상세정보</h5>
-            <div>{currentProduct.description || "상세 설명 준비중"}</div>
+
+            {/* 상세정보 이미지들 */}
+            {detailImages.length > 0 && (
+              <div className="mb-4">
+                {detailImages.map((imageUrl, index) => (
+                  <div key={index} className="mb-3 text-center">
+                    <img
+                      src={imageUrl}
+                      alt={`상품 상세정보 ${index + 1}`}
+                      className="img-fluid rounded"
+                      style={{ maxWidth: "100%" }}
+                      onError={(e) => {
+                        console.warn(`이미지 로드 실패: ${imageUrl}`);
+                        e.target.style.display = "none";
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 텍스트 설명 */}
+            <div className="mb-3">
+              {currentProduct.description || "상세 설명 준비중"}
+            </div>
+
+            {/* 상품 정보 테이블 */}
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <tbody>
+                  <tr>
+                    <th className="bg-light" style={{ width: "30%" }}>
+                      브랜드
+                    </th>
+                    <td>{currentProduct.brand}</td>
+                  </tr>
+                  <tr>
+                    <th className="bg-light">성별</th>
+                    <td>{currentProduct.genderCategory}</td>
+                  </tr>
+                  <tr>
+                    <th className="bg-light">용량</th>
+                    <td>{currentProduct.volumeCategory}</td>
+                  </tr>
+                  <tr>
+                    <th className="bg-light">가격</th>
+                    <td>{currentProduct.price.toLocaleString()}원</td>
+                  </tr>
+                  <tr>
+                    <th className="bg-light">재고</th>
+                    <td>{currentProduct.stock}개</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

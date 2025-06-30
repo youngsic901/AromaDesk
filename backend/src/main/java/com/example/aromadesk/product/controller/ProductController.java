@@ -63,4 +63,11 @@ public class ProductController {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
+
+    // 브랜드 목록 조회
+    @GetMapping("/brands")
+    public ResponseEntity<List<String>> getBrands() {
+        List<String> brands = productService.getAllBrands();
+        return ResponseEntity.ok(brands);
+    }
 }

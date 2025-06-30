@@ -48,7 +48,7 @@ const CategoryPage = () => {
 
   useEffect(() => {
     // 옵션에 맞는 상품 불러오기
-    const params = { gender };
+    const params = { gender, size: 1000 };
     if (volume) params.volume = volume;
     if (price) params.maxPrice = price;
 
