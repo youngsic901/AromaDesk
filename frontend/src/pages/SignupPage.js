@@ -2,8 +2,38 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSignUp } from '../api/useSignUp';
 import '../css/loginCus.css';
+import { useEffect} from 'react';
+import axios from 'axios';
 
 const SignupPage = () => {
+
+  useEffect(() => {
+  axios.get('/auth/social-info', { withCredentials: true })
+    .then(res => {
+      if (res.data.email) {
+        setFormData(prev => ({
+          ...prev,
+          email: res.data.email,
+          name: res.data.name
+        }));
+      }
+    })
+    .catch(err => {
+      console.error('세션 정보 불러오기 실패:', err);
+    });
+}, []);
+
+  const handleAddressSearch = () => {
+    new window.daum.Postcode({
+      oncomplete: function(data) {
+        setFormData(prev => ({
+          ...prev,
+          address: data.address
+        }));
+      }
+    }).open();
+  };
+
   const [formData, setFormData] = useState({
     memberId: '',
     email: '',
@@ -11,7 +41,8 @@ const SignupPage = () => {
     confirmPassword: '',
     name: '',
     phone: '',
-    address: ''
+    address: '',
+    addressDetail: ''
   });
   const [validationStatus, setValidationStatus] = useState({
     memberId: { checked: false, available: false }
@@ -127,7 +158,7 @@ const SignupPage = () => {
       password: formData.password.trim(),
       name: formData.name.trim(),
       phone: formData.phone.trim(),
-      address: formData.address.trim(),
+      address: (formData.address + ' ' + formData.addressDetail).trim(),
       role: 'USER' // 백엔드에서 고정값으로 설정
     };
 
@@ -205,7 +236,7 @@ const SignupPage = () => {
           value={formData.email}
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}
-          disabled={isLoading}
+          disabled={isLoading || !!formData.email}
         />
         
         <input
@@ -238,7 +269,7 @@ const SignupPage = () => {
           value={formData.name}
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}
-          disabled={isLoading}
+          disabled={isLoading || !!formData.name}
         />
         
         <input
@@ -251,13 +282,43 @@ const SignupPage = () => {
           onKeyPress={handleKeyPress}
           disabled={isLoading}
         />
-        
+
+        <div style={{ width: '100%', marginBottom: '12px', display: 'flex', gap: '10px' }}>
+          <input
+            className="login-input"
+            type="text"
+            name="address"
+            placeholder="주소"
+            value={formData.address}
+            readOnly
+            style={{ flex: 1, marginBottom: '0' }}
+          />
+          <button
+            type="button"
+            onClick={handleAddressSearch}
+            disabled={isLoading}
+            style={{
+              width: '80px',
+              padding: '10px 5px',
+              backgroundColor: '#FFE812',
+              color: '#333',
+              border: '1px solid #ddd',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              flexShrink: 0
+            }}
+          >
+            주소 검색
+          </button>
+        </div>
+
         <input
           className="login-input"
           type="text"
-          name="address"
-          placeholder="주소"
-          value={formData.address}
+          name="addressDetail"
+          placeholder="상세주소 (예: 101호)"
+          value={formData.addressDetail}
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}
           disabled={isLoading}

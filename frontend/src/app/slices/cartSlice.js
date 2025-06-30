@@ -123,21 +123,38 @@ const cartSlice = createSlice({
         state.loading = false;
         const newItem = action.payload;
 
+        // newItem이 유효하지 않으면 처리하지 않음
+        if (!newItem || !newItem.productId) {
+          console.warn("유효하지 않은 상품 데이터:", newItem);
+          return;
+        }
+
         // state.items가 undefined면 빈 배열로 초기화
         if (!state.items) {
           state.items = [];
         }
 
         const existingIndex = state.items.findIndex(
-          (item) => item?.productId === newItem?.productId
+          (item) => item?.productId === newItem.productId
         );
 
         if (existingIndex !== -1) {
-          state.items[existingIndex].quantity += newItem?.quantity || 0;
+          // 기존 상품이 있으면 수량 추가
+          const existingItem = state.items[existingIndex];
+          if (existingItem && typeof existingItem.quantity === "number") {
+            existingItem.quantity += newItem.quantity || 1;
+          } else {
+            existingItem.quantity = newItem.quantity || 1;
+          }
         } else {
-          state.items.push(newItem);
+          // 새 상품 추가
+          state.items.push({
+            ...newItem,
+            quantity: newItem.quantity || 1,
+          });
         }
 
+        // 총 수량과 금액 계산
         state.totalQuantity = state.items.reduce(
           (total, item) => total + (item?.quantity || 0),
           0
@@ -150,6 +167,10 @@ const cartSlice = createSlice({
       .addCase(addToCartAction.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        // 재고 부족 오류인 경우 사용자에게 알림
+        if (action.payload && action.payload.includes("재고")) {
+          alert(action.payload);
+        }
       })
 
       // updateQuantityAction
@@ -180,6 +201,10 @@ const cartSlice = createSlice({
       .addCase(updateQuantityAction.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        // 재고 부족 오류인 경우 사용자에게 알림
+        if (action.payload && action.payload.includes("재고")) {
+          alert(action.payload);
+        }
       })
 
       // removeFromCartAction

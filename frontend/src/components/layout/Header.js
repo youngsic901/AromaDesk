@@ -43,19 +43,19 @@ const Header = ({ setSidebarOpen }) => {
   const handleLogoutClick = async () => {
     try {
       // 백엔드에 로그아웃 요청
-      await apiClient.post('/api/members/logout');
+      await apiClient.post("/api/members/logout");
     } catch (error) {
       console.error('로그아웃 API 호출 실패:', error);
     }
-    
+
     // Redux 스토어에서 로그아웃 상태로 변경
     dispatch(logoutAction());
     
     // localStorage에서 사용자 정보 삭제
-    localStorage.removeItem('CusUser');
-    
+    localStorage.removeItem("CusUser");
+
     // 메인 페이지로 이동
-    navigate('/');
+    navigate("/");
   };
 
   return (
@@ -71,7 +71,11 @@ const Header = ({ setSidebarOpen }) => {
         </button>
 
         {/* 로고 */}
-        <Link className="navbar-brand fw-bold fs-4" to="/" style={{ color: "blue" }}>
+        <Link
+          className="navbar-brand fw-bold fs-4"
+          to="/"
+          style={{ color: "blue" }}
+        >
           AromaDesk
         </Link>
 

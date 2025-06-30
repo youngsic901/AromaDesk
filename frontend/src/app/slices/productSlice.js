@@ -7,7 +7,7 @@ export const fetchFilteredProducts = createAsyncThunk(
   async (params = {}, { rejectWithValue }) => {
     try {
       const response = await productApi.getFilteredProducts(params);
-      return response;
+      return { ...response, append: params.append };
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -116,20 +116,74 @@ const productSlice = createSlice({
       })
       .addCase(fetchFilteredProducts.fulfilled, (state, action) => {
         state.loading = false;
+
+        // 응답 데이터 검증 및 안전한 처리
+        if (!action.payload) {
+          console.warn("API 응답이 비어있습니다");
+          state.products = [];
+          state.pagination.total = 0;
+          state.pagination.page = 1;
+          state.pagination.size = 10;
+          return;
+        }
+
+        const { append, ...payload } = action.payload;
+
         // 백엔드 응답 구조: { content: [], totalElements: number, page: number, size: number, totalPages: number }
-        if (action.payload && action.payload.content) {
-          state.products = action.payload.content;
-          state.pagination.total = action.payload.totalElements || 0;
-          state.pagination.page = action.payload.page || 1;
-          state.pagination.size = action.payload.size || 10;
-        } else if (Array.isArray(action.payload)) {
+        if (payload.content && Array.isArray(payload.content)) {
+          if (append && state.products.length > 0) {
+            // 무한 스크롤: 기존 상품에 새로운 상품 추가
+            // 빈 배열이 반환되면 더 이상 로드할 상품이 없음을 의미
+            if (payload.content.length === 0) {
+              // 빈 배열이 반환되었지만 기존 상품이 있으면 hasMore를 false로 설정할 수 있도록
+              // pagination 정보는 업데이트하지 않음
+              return;
+            }
+            state.products = [...state.products, ...payload.content];
+          } else {
+            // 일반 로드: 기존 상품 교체
+            state.products = payload.content;
+          }
+          state.pagination.total = payload.totalElements || 0;
+          state.pagination.page = payload.page || 1;
+          state.pagination.size = payload.size || 10;
+          state.pagination.totalPages =
+            payload.totalPages ||
+            Math.ceil((payload.totalElements || 0) / (payload.size || 10));
+        } else if (Array.isArray(payload)) {
           // 배열로 직접 반환된 경우 (기존 호환성)
-          state.products = action.payload;
-          state.pagination.total = action.payload.length;
-        } else {
+          if (append && state.products.length > 0) {
+            if (payload.length === 0) {
+              // 빈 배열이 반환되면 더 이상 로드할 상품이 없음
+              return;
+            }
+            state.products = [...state.products, ...payload];
+          } else {
+            state.products = payload;
+          }
+          state.pagination.total = payload.length;
+          state.pagination.page = 1;
+          state.pagination.size = payload.length;
+          state.pagination.totalPages = 1;
+        } else if (payload && typeof payload === "object") {
           // 단일 객체인 경우
-          state.products = [action.payload];
+          if (append && state.products.length > 0) {
+            state.products = [...state.products, payload];
+          } else {
+            state.products = [payload];
+          }
           state.pagination.total = 1;
+          state.pagination.page = 1;
+          state.pagination.size = 1;
+          state.pagination.totalPages = 1;
+        } else {
+          // 예상치 못한 응답 구조
+          console.warn("예상치 못한 응답 구조:", payload);
+          state.products = [];
+          state.pagination.total = 0;
+          state.pagination.page = 1;
+          state.pagination.size = 10;
+          state.pagination.totalPages = 0;
         }
       })
       .addCase(fetchFilteredProducts.rejected, (state, action) => {

@@ -42,14 +42,35 @@ const btnStyle = {
   marginTop: 8,
   transition: "background 0.2s",
 };
+const disabledBtnStyle = {
+  background: "gray",
+  color: "#fff",
+  border: "none",
+  borderRadius: 8,
+  fontWeight: 500,
+  fontSize: 15,
+  padding: "8px 18px",
+  marginTop: 8,
+  transition: "background 0.2s",
+};
 
 const ProductCard = ({ product, memberId = 1 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [hover, setHover] = React.useState(false);
 
+  // 재고 상태 확인
+  const isOutOfStock = !product.stock || product.stock <= 0;
+
   const handleAddToCart = (e) => {
     e.stopPropagation();
+
+    // 재고가 없으면 추가하지 않음
+    if (isOutOfStock) {
+      alert("재고가 부족합니다.");
+      return;
+    }
+
     dispatch(
       addToCartAction({
         memberId,
@@ -82,19 +103,30 @@ const ProductCard = ({ product, memberId = 1 }) => {
         />
         {hover && (
           <button
-            style={{
-              ...btnStyle,
-              position: "absolute",
-              left: "50%",
-              top: "50%",
-              transform: "translate(-50%, -50%)",
-              zIndex: 2,
-              boxShadow: "0 2px 8px rgba(80,80,120,0.12)",
-            }}
+            style={isOutOfStock ? disabledBtnStyle : btnStyle}
             onClick={handleAddToCart}
+            disabled={isOutOfStock}
           >
-            장바구니 추가
+            {isOutOfStock ? "품절" : "장바구니 추가"}
           </button>
+        )}
+        {/* 재고 부족 표시 */}
+        {isOutOfStock && (
+          <div
+            style={{
+              position: "absolute",
+              top: 10,
+              right: 10,
+              background: "rgba(239, 68, 68, 0.9)",
+              color: "white",
+              padding: "4px 8px",
+              borderRadius: "4px",
+              fontSize: "12px",
+              fontWeight: "bold",
+            }}
+          >
+            품절
+          </div>
         )}
       </div>
       <div className="card-body d-flex flex-column justify-content-between p-3">
@@ -114,6 +146,12 @@ const ProductCard = ({ product, memberId = 1 }) => {
             {product.volumeCategory && (
               <span className="badge bg-light text-dark">
                 {product.volumeCategory}
+              </span>
+            )}
+            {/* 재고 상태 표시 */}
+            {!isOutOfStock && (
+              <span className="badge bg-success text-white ms-1">
+                재고: {product.stock}개
               </span>
             )}
           </div>

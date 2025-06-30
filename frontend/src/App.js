@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import { Provider, useDispatch } from "react-redux";
 import store from "./app/store";
 // Bootstrap CSS and JS
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
+
 // Layout Components
 import Header from "./components/layout/Header";
 import Sidebar from "./components/layout/SideBar";
@@ -72,9 +79,18 @@ function AppContent() {
   
   // 초기화가 완료될 때까지 로딩 표시
   if (!isInitialized) {
-    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-      로딩 중...
-    </div>;
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        로딩 중...
+      </div>
+    );
   }
   
   return (
@@ -140,7 +156,9 @@ function AppContent() {
                       path="/category/:category"
                       element={<CategoryPage />}
                     />
+                    <Route path="/brand" element={<BrandPage />} />
                     <Route path="/brand/:brand" element={<BrandPage />} />
+                    <Route path="/search" element={<SearchPage />} />
                     <Route path="/products" element={<ProductListPage />} />
                     <Route
                       path="/products/:id"
