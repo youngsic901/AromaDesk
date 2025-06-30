@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import AdminLayout from "../components/admin/layout/AdminLayout";
 import { adminProductApi } from "../api/adminProductApi";
 import { productApi } from "../api/productApi";
-import "../css/AdminMemberPage.css";
+import "../css/AdminProductPage.css";
+import Modal from "../components/common/Modal";
 
 const AdminProductPage = () => {
   const [products, setProducts] = useState([]);
@@ -20,13 +21,49 @@ const AdminProductPage = () => {
     imageUrl: "",
     description: "",
   });
+  // 필터 상태
+  const [brand, setBrand] = useState("");
+  const [gender, setGender] = useState("");
+  const [volume, setVolume] = useState("");
+  const [keyword, setKeyword] = useState("");
+  // 브랜드 목록 상태 (최초 1회만 받아옴)
+  const [brandList, setBrandList] = useState([]);
+  // 페이징 상태
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(20);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
 
-  // 상품 목록 조회
-  const fetchProducts = async () => {
+  // 브랜드 목록 최초 1회만 받아오기
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const brands = await adminProductApi.getBrands();
+        setBrandList(brands);
+      } catch (err) {
+        setBrandList([]);
+      }
+    };
+    fetchBrands();
+  }, []);
+
+  // 상품 목록 조회 (필터+페이징)
+  const fetchProducts = async (pageParam = page) => {
     try {
       setLoading(true);
-      const products = await adminProductApi.getProducts();
-      setProducts(products);
+      const params = {};
+      if (brand) params.brand = brand;
+      if (gender) params.gender = gender;
+      if (volume) params.volume = volume;
+      if (keyword) params.keyword = keyword;
+      params.page = pageParam;
+      params.size = size;
+      const response = await adminProductApi.getProducts(params);
+      setProducts(response.content || response);
+      setTotalPages(response.totalPages || 1);
+      setTotalElements(response.totalElements || 0);
       setError(null);
     } catch (err) {
       console.error("상품 목록 조회 실패:", err);
@@ -37,8 +74,15 @@ const AdminProductPage = () => {
   };
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    fetchProducts(1); // 필터 변경 시 1페이지로 이동
+    setPage(1);
+    // eslint-disable-next-line
+  }, [brand, gender, volume, size]);
+
+  useEffect(() => {
+    fetchProducts(page);
+    // eslint-disable-next-line
+  }, [page]);
 
   // 상품 생성
   const handleCreateProduct = async (e) => {
@@ -57,29 +101,26 @@ const AdminProductPage = () => {
         description: "",
       });
       fetchProducts();
-      alert("상품이 성공적으로 생성되었습니다.");
+      setModalMessage("상품이 성공적으로 생성되었습니다.");
+      setModalOpen(true);
     } catch (err) {
-      console.error("상품 생성 실패:", err);
-      alert("상품 생성에 실패했습니다.");
+      setModalMessage("상품 생성에 실패했습니다.");
+      setModalOpen(true);
     }
   };
 
   // 상품 수정
   const handleUpdateProduct = async (e) => {
     e.preventDefault();
-    console.log("수정 시작:", editingProduct);
     try {
-      const result = await adminProductApi.updateProduct(
-        editingProduct.id,
-        editingProduct
-      );
-      console.log("수정 성공:", result);
+      await adminProductApi.updateProduct(editingProduct.id, editingProduct);
       setEditingProduct(null);
       await fetchProducts();
-      alert("상품이 성공적으로 수정되었습니다.");
+      setModalMessage("상품이 성공적으로 수정되었습니다.");
+      setModalOpen(true);
     } catch (err) {
-      console.error("상품 수정 실패:", err);
-      alert("상품 수정에 실패했습니다.");
+      setModalMessage("상품 수정에 실패했습니다.");
+      setModalOpen(true);
     }
   };
 
@@ -89,10 +130,11 @@ const AdminProductPage = () => {
       try {
         await adminProductApi.deleteProduct(productId);
         fetchProducts();
-        alert("상품이 성공적으로 삭제되었습니다.");
+        setModalMessage("상품이 성공적으로 삭제되었습니다.");
+        setModalOpen(true);
       } catch (err) {
-        console.error("상품 삭제 실패:", err);
-        alert("상품 삭제에 실패했습니다.");
+        setModalMessage("상품 삭제에 실패했습니다.");
+        setModalOpen(true);
       }
     }
   };
@@ -104,6 +146,67 @@ const AdminProductPage = () => {
     <AdminLayout>
       <div className="admin-page">
         <h1>상품 관리</h1>
+        {/* 필터 바 */}
+        <div className="filter-bar">
+          <select value={brand} onChange={(e) => setBrand(e.target.value)}>
+            <option value="">브랜드 전체</option>
+            {brandList.map((b) => (
+              <option key={b} value={b}>
+                {b}
+              </option>
+            ))}
+          </select>
+          <select value={gender} onChange={(e) => setGender(e.target.value)}>
+            <option value="">성별 전체</option>
+            <option value="MALE">남성</option>
+            <option value="FEMALE">여성</option>
+            <option value="UNISEX">중성</option>
+          </select>
+          <select value={volume} onChange={(e) => setVolume(e.target.value)}>
+            <option value="">용량 전체</option>
+            <option value="UNDER_30ML">30ml</option>
+            <option value="UNDER_50ML">50ml</option>
+            <option value="LARGE">대용량</option>
+          </select>
+          <input
+            type="text"
+            placeholder="상품명/설명 검색"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            style={{ flex: 1 }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                fetchProducts(1);
+              }
+            }}
+          />
+          <button onClick={() => fetchProducts(1)}>검색</button>
+        </div>
+        {/* 페이지네이션 */}
+        <div className="pagination-bar">
+          <span>총 {totalElements}개 | </span>
+          <button onClick={() => setPage(page - 1)} disabled={page <= 1}>
+            이전
+          </button>
+          <span style={{ margin: "0 8px" }}>
+            {page} / {totalPages}
+          </span>
+          <button
+            onClick={() => setPage(page + 1)}
+            disabled={page >= totalPages}
+          >
+            다음
+          </button>
+          <select
+            value={size}
+            onChange={(e) => setSize(Number(e.target.value))}
+          >
+            <option value={10}>10개씩</option>
+            <option value={20}>20개씩</option>
+            <option value={50}>50개씩</option>
+          </select>
+        </div>
 
         {/* 상품 추가 버튼 */}
         <button className="add-button" onClick={() => setShowAddForm(true)}>
@@ -413,6 +516,10 @@ const AdminProductPage = () => {
             </div>
           </div>
         )}
+
+        <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+          {modalMessage}
+        </Modal>
       </div>
     </AdminLayout>
   );

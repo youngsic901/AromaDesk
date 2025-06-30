@@ -48,9 +48,18 @@ public class AdminProductController {
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "20") int size
     ) {
+        if (brand != null && brand.isEmpty()) brand = null;
+        if (gender != null && gender.isEmpty()) gender = null;
+        if (volume != null && volume.isEmpty()) volume = null;
+        if (keyword != null && keyword.isEmpty()) keyword = null;
         return ResponseEntity.ok(
                 productService.getFilteredSearchedPagedProducts(brand, gender, volume, keyword, page, size)
         );
+    }
+
+    @GetMapping("/brands")
+    public ResponseEntity<List<String>> getAllBrands() {
+        return ResponseEntity.ok(productService.getAllBrands());
     }
 
 }
