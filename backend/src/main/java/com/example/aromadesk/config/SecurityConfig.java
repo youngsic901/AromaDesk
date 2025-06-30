@@ -78,7 +78,13 @@ public class SecurityConfig {
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/admin/login", "/admin/login-process").permitAll()
 						.anyRequest().hasRole("ADMIN")
-				);
+				)
+				.logout(logout -> logout
+						.logoutUrl("/admin/logout")
+						.logoutSuccessUrl("/admin/login")
+						.invalidateHttpSession(true)
+						.deleteCookies("JSESSIONID")
+				);;
 		return http.build();
 	}
   // 비밀번호 암호화 방식
