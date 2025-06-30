@@ -27,10 +27,9 @@ export const updateMyPageInfo = async (userId, updateData) => {
   }
 };
 
-// 비밀번호 확인 (백엔드에 없는 기능이므로 클라이언트에서 처리)
+// 비밀번호 확인 (클라이언트에서 처리)
 export const checkPassword = async (userId, password) => {
   try {
-    // 로컬스토리지에서 사용자 정보 조회
     const userInfo = localStorage.getItem('CusUser');
     if (userInfo) {
       const user = JSON.parse(userInfo);
@@ -45,17 +44,13 @@ export const checkPassword = async (userId, password) => {
   } catch (error) {
     console.error('비밀번호 확인 오류:', error);
     const errorMessage = handleApiError(error).message;
-    return { 
-      success: false, 
-      error: errorMessage
-    };
+    return { success: false, error: errorMessage };
   }
 };
 
-// 비밀번호 변경 (백엔드에 없는 기능이므로 클라이언트에서 처리)
+// 비밀번호 변경 (클라이언트에서 처리)
 export const changePassword = async (userId, newPassword) => {
   try {
-    // 로컬스토리지에서 사용자 정보 조회 및 업데이트
     const userInfo = localStorage.getItem('CusUser');
     if (userInfo) {
       const user = JSON.parse(userInfo);
@@ -68,9 +63,17 @@ export const changePassword = async (userId, newPassword) => {
   } catch (error) {
     console.error('비밀번호 변경 오류:', error);
     const errorMessage = handleApiError(error).message;
-    return { 
-      success: false, 
-      error: errorMessage
-    };
+    return { success: false, error: errorMessage };
   }
-}; 
+};
+
+// 로그인한 사용자의 주문 목록 조회
+export const getMyOrders = async () => {
+  try {
+    const response = await apiClient.get('/api/orders');
+    return handleApiSuccess(response);
+  } catch (error) {
+    console.error('주문 내역 조회 오류:', error);
+    throw handleApiError(error);
+  }
+};
