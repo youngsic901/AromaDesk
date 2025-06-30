@@ -23,10 +23,10 @@ function IntroPage() {
   ];
 
   useEffect(() => {
-    // 5초 후에 메뉴 표시
+    // 0.5초 후에 메뉴 표시
     const timer = setTimeout(() => {
       setShowMenu(true);
-    }, 5000);
+    }, 500);
 
     // 텍스트 타이핑 효과
     const textTimer = setInterval(() => {
