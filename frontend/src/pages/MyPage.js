@@ -52,7 +52,10 @@ const MyPage = () => {
   };
 
   const handleAddressUpdateSuccess = (updatedUser) => {
-    setUserInfo(updatedUser);
+    setUserInfo(prev => ({
+      ...prev,
+      ...updatedUser
+    }));
     setShowAddressForm(false);
   };
 
@@ -96,17 +99,17 @@ const MyPage = () => {
                 <div className="text-center mb-3">
                   <div
                       className={`rounded-circle d-inline-flex align-items-center justify-content-center ${
-                          user ? "bg-primary" : "bg-light"
+                          userInfo ? "bg-primary" : "bg-light"
                       }`}
                       style={{ width: 80, height: 80 }}
                   >
-                    <FaUser className={user ? "text-white" : "text-muted"} size={40} />
+                    <FaUser className={userInfo ? "text-white" : "text-muted"} size={40} />
                   </div>
                   <h5 className="mt-2 mb-0">
-                    {user ? user.name : "마이페이지"}
+                    {userInfo ? userInfo.name : "마이페이지"}
                   </h5>
                   <small className="text-muted">
-                    {user ? user.email : "로그인하여 개인정보를 관리하세요"}
+                    {userInfo ? userInfo.email : "로그인하여 개인정보를 관리하세요"}
                   </small>
                 </div>
               </Card.Body>
@@ -160,19 +163,19 @@ const MyPage = () => {
                         onClick={handleEditClick}
                     >
                       <FaEdit className="me-1" />
-                      {user ? "수정" : "로그인하여 수정"}
+                      {userInfo ? "수정" : "로그인하여 수정"}
                     </Button>
                   </Card.Header>
                   <Card.Body>
-                    {user ? (
+                    {userInfo ? (
                         <Row>
                           <Col md={6}>
-                            <p><strong>이름:</strong> {user.name}</p>
-                            <p><strong>이메일:</strong> {user.email}</p>
-                            <p><strong>전화번호:</strong> {user.phone || "미등록"}</p>
+                            <p><strong>이름:</strong> {userInfo.name}</p>
+                            <p><strong>이메일:</strong> {userInfo.email}</p>
+                            <p><strong>전화번호:</strong> {userInfo.phone || "미등록"}</p>
                           </Col>
                           <Col md={6}>
-                            <p><strong>가입일:</strong> {user.createdAt ? new Date(user.createdAt).toLocaleDateString('ko-KR') : "미등록"}</p>
+                            <p><strong>가입일:</strong> {userInfo.createdAt ? new Date(userInfo.createdAt).toLocaleDateString('ko-KR') : "미등록"}</p>
                           </Col>
                         </Row>
                     ) : (
@@ -198,11 +201,11 @@ const MyPage = () => {
                         onClick={handleAddressEditClick}
                     >
                       <FaEdit className="me-1" />
-                      {user ? "수정" : "로그인하여 수정"}
+                      {userInfo ? "수정" : "로그인하여 수정"}
                     </Button>
                   </Card.Header>
                   <Card.Body>
-                    {user ? (
+                    {userInfo ? (
                         <div>
                           <p><strong>우편번호:</strong> {userInfo.zipCode || "미등록"}</p>
                           <p><strong>주소:</strong> {userInfo.address || "미등록"}</p>
@@ -227,7 +230,7 @@ const MyPage = () => {
                     <h5 className="mb-0">주문내역</h5>
                   </Card.Header>
                   <Card.Body>
-                    {user ? (
+                    {userInfo ? (
                         <p className="text-muted">주문내역 기능은 준비 중입니다.</p>
                     ) : (
                         <div className="text-center py-4">
@@ -248,7 +251,8 @@ const MyPage = () => {
         {showUpdateForm && (
             <MyPageUpdate
                 user={userInfo}
-                onSuccess={handleUpdateSuccess}
+                field="info"
+                onUpdate={handleUpdateSuccess}
                 onClose={() => setShowUpdateForm(false)}
             />
         )}
