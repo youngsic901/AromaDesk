@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLogin } from '../login/useLogin.js';
 import '../css/loginCus.css';
+import axios from 'axios';
 
 const LoginPage = () => {
   const [memberId, setMemberId] = useState('');
@@ -101,7 +102,28 @@ const LoginPage = () => {
           네이버로 로그인
         </a>
         
-        <a href="/signup" className="signup-link">회원가입</a>
+        <button 
+          className="signup-link"
+          style={{
+            background: "none",
+            border: "none",
+            color: "#0076ff",
+            fontSize: "1rem",
+            cursor: "pointer",
+            padding: 0,
+            marginTop: "12px",
+            textDecoration: "none"
+          }}
+          onClick={async () => {
+            try {
+              await axios.get('/auth/clear-social-session', { withCredentials: true });
+            } catch (e) {}
+            navigate('/signup');
+          }}
+        >
+          회원가입
+        </button>
+
       </div>
     </div>
   );
