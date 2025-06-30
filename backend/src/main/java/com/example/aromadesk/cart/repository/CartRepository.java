@@ -19,5 +19,9 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     Optional<Cart> findByMemberIdAndProductId(Long memberId, Long productId);
     void deleteByMemberIdAndProductId(Long memberId, Long productId);
     List<Cart> findAllByIdInAndMemberId(List<Long> ids, Long memberId);
-
+    
+    // String memberId를 사용하는 메서드들 추가
+    List<Cart> findByMemberMemberId(String memberId);
+    Optional<Cart> findByMemberMemberIdAndProductId(String memberId, Long productId);
+    void deleteByMemberMemberIdAndProductId(String memberId, Long productId);
 }
