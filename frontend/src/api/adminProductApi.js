@@ -2,9 +2,15 @@ import axios from "./axiosConfig";
 
 // 관리자 상품 API
 export const adminProductApi = {
-  // 상품 목록 조회
-  getProducts: async () => {
-    const response = await axios.get("/api/admin/products");
+  // 상품 목록 조회 (필터 파라미터, 페이징 지원)
+  getProducts: async (params = {}) => {
+    const response = await axios.get("/api/admin/products", { params });
+    return response.data;
+  },
+
+  // 브랜드 목록 조회
+  getBrands: async () => {
+    const response = await axios.get("/api/admin/products/brands");
     return response.data;
   },
 
