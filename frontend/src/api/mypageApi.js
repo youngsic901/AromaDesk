@@ -1,22 +1,33 @@
 import apiClient from "./axiosConfig";
 import { handleApiError, handleApiSuccess } from "./errorHandler";
+import { authManager } from "./authApi";
 
-// 마이페이지 정보 조회
+// 마이페이지 정보 조회 (authManager 사용)
 export const getMyPageInfo = async (userId) => {
   try {
-    const response = await apiClient.get(`/api/members/${userId}`);
-    return handleApiSuccess(response);
+    const result = await authManager.getUserInfo();
+    if (result.success) {
+      return result.data;
+    } else {
+      throw new Error(result.error);
+    }
   } catch (error) {
     console.error('마이페이지 정보 조회 오류:', error);
     throw handleApiError(error);
   }
 };
 
-// 마이페이지 정보 수정
-export const updateMyPageInfo = async (userId, updateData) => {
+// 마이페이지 정보 수정 (authManager 사용)
+export const updateMyPageInfo = async (updateData) => {
   try {
-    const response = await apiClient.put(`/api/members/${userId}`, updateData);
-    return { success: true, data: handleApiSuccess(response) };
+    console.log('수정 요청 데이터:', updateData);
+    const result = await authManager.updateUserInfo(updateData);
+    
+    if (result.success) {
+      return { success: true, data: result.data };
+    } else {
+      return { success: false, error: result.error };
+    }
   } catch (error) {
     console.error('마이페이지 정보 수정 오류:', error);
     const errorMessage = handleApiError(error).message;
@@ -41,6 +52,14 @@ export const checkPassword = async (userId, password) => {
     } else {
       return { success: false, error: '사용자 정보를 찾을 수 없습니다.' };
     }
+    
+    const userInfo = result.data;
+    
+    if (userInfo.password === password) {
+      return { success: true, data: { isValid: true } };
+    } else {
+      return { success: false, error: '현재 비밀번호가 일치하지 않습니다.' };
+    }
   } catch (error) {
     console.error('비밀번호 확인 오류:', error);
     const errorMessage = handleApiError(error).message;
@@ -58,7 +77,7 @@ export const changePassword = async (userId, newPassword) => {
       localStorage.setItem('CusUser', JSON.stringify(user));
       return { success: true, data: { message: '비밀번호가 변경되었습니다.' } };
     } else {
-      return { success: false, error: '사용자 정보를 찾을 수 없습니다.' };
+      return { success: false, error: updateResult.error };
     }
   } catch (error) {
     console.error('비밀번호 변경 오류:', error);

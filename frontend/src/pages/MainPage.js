@@ -9,6 +9,7 @@ const MainPage = () => {
   const { products, loading, error, pagination } = useSelector(
     (state) => state.product
   );
+  const { user } = useSelector((state) => state.user);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [lastResponseSize, setLastResponseSize] = useState(0);
@@ -21,8 +22,12 @@ const MainPage = () => {
         size: 20, // 한 번에 20개씩 로드
       })
     );
-    dispatch(fetchCartItems(1)); // memberId = 1 (임시)
-  }, [dispatch]);
+    
+    // 로그인한 사용자가 있을 때만 장바구니 불러오기
+    if (user && user.memberId) {
+      dispatch(fetchCartItems(user.memberId));
+    }
+  }, [dispatch, user]);
 
   // 무한 스크롤 핸들러
   const handleScroll = useCallback(() => {

@@ -31,7 +31,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         if (exists) {
             Member member = memberRepository.findByEmail(email).get();
             request.getSession().setAttribute("CusUser", MemberDto.fromEntity(member));
-            response.sendRedirect("http://localhost:3000");
+            response.sendRedirect("http://localhost:3000/main");
         } else {
 
             request.getSession().setAttribute("email", email);

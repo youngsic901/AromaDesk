@@ -26,7 +26,7 @@ function IntroPage() {
     // 5초 후에 메뉴 표시
     const timer = setTimeout(() => {
       setShowMenu(true);
-    }, 5000);
+    }, 500);
 
     // 텍스트 타이핑 효과
     const textTimer = setInterval(() => {
@@ -44,7 +44,7 @@ function IntroPage() {
   };
 
   const handleAdmin = () => {
-    navigate("/admin/login");
+    navigate("/admin");
   };
 
   return (

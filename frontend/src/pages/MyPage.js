@@ -295,6 +295,6 @@ function MyPage() {
       `}</style>
     </div>
   );
-}
+};
 
 export default MyPage;
