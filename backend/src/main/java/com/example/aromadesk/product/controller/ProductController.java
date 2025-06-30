@@ -25,7 +25,7 @@ public class ProductController {
             @RequestParam(name = "gender", required = false) String gender,
             @RequestParam(name = "volume", required = false) String volume,
             @RequestParam(name = "page", defaultValue = "1") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size
+            @RequestParam(name = "size", defaultValue = "50") int size
     ) {
         return ResponseEntity.ok(
                 productService.getFilteredPagedProducts(brand, gender, volume, page, size)

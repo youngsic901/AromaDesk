@@ -49,7 +49,7 @@ public class ProductService {
         product.setName(dto.getName());
         product.setBrand(dto.getBrand());
         product.setGenderCategory(dto.getGenderCategory());
-        product.setVolumeCategory(dto.getVoluemCategory());
+        product.setVolumeCategory(dto.getVolumeCategory());
         product.setPrice(dto.getPrice());
         product.setStock(dto.getStock());
         product.setImageUrl(dto.getImageUrl());
@@ -70,7 +70,7 @@ public class ProductService {
         product.setName(dto.getName());
         product.setBrand(dto.getBrand());
         product.setGenderCategory(dto.getGenderCategory());
-        product.setVolumeCategory(dto.getVoluemCategory());
+        product.setVolumeCategory(dto.getVolumeCategory());
         product.setPrice(dto.getPrice());
         product.setStock(dto.getStock());
         product.setImageUrl(dto.getImageUrl());
