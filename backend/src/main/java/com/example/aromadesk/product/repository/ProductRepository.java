@@ -15,4 +15,17 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         and (:volume IS NULL or p.volumeCategory = :volume)
     """)
     List<Product> findFilteredList(@Param("brand")String brand, @Param("gender")String gender, @Param("volume")String volume);
+
+    @Query("SELECT p FROM Product p " +
+            "WHERE (:brand IS NULL OR p.brand = :brand) " +
+            "AND (:gender IS NULL OR p.genderCategory = :gender) " +
+            "AND (:volume IS NULL OR p.volumeCategory = :volume) " +
+            "AND (:keyword IS NULL OR " +
+            "LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(p.brand) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')) )")
+    List<Product> searchFilteredList(@Param("brand") String brand,
+                                     @Param("gender") String gender,
+                                     @Param("volume") String volume,
+                                     @Param("keyword") String keyword);
 }
