@@ -44,12 +44,6 @@ public class AdminLoginController {
         return ResponseEntity.ok(admin);
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpSession session) {
-        session.removeAttribute("Admin");
-        return ResponseEntity.ok("로그아웃되었습니다.");
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<Admin> getAdmin(@PathVariable Long id) {
         Optional<Admin> admin = adminRepository.findById(id);
