@@ -37,4 +37,11 @@ public class AuthController {
         result.put("name", name);
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/clear-social-session")
+    public ResponseEntity<?> clearSocialSession(HttpServletRequest request) {
+        request.getSession().removeAttribute("email");
+        request.getSession().removeAttribute("name");
+        return ResponseEntity.ok("소셜 세션 정보가 삭제되었습니다.");
+    }
 }

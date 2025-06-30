@@ -1,5 +1,7 @@
 package com.example.aromadesk.auth.service;
 
+import com.example.aromadesk.member.dto.MemberDto;
+import com.example.aromadesk.member.entity.Member;
 import com.example.aromadesk.member.repository.MemberRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,8 +29,11 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         boolean exists  = memberRepository.findByEmail(email).isPresent();
 
         if (exists) {
+            Member member = memberRepository.findByEmail(email).get();
+            request.getSession().setAttribute("CusUser", MemberDto.fromEntity(member));
             response.sendRedirect("http://localhost:3000");
         } else {
+
             request.getSession().setAttribute("email", email);
             request.getSession().setAttribute("name", oAuth2User.getName());
             response.sendRedirect("http://localhost:3000/signup");

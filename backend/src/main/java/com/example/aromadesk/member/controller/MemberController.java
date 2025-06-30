@@ -53,10 +53,12 @@ public class MemberController {
 
     // 회원가입 (POST /api/members)
     @PostMapping
-    public ResponseEntity<MemberDto> createMember(@RequestBody MemberDto dto) {
+    public ResponseEntity<MemberDto> createMember(@RequestBody MemberDto dto, HttpSession session) {
         Member member = dto.toEntity();
         member.setPassword(passwordEncoder.encode(dto.getPassword())); // 비밀번호 암호화
         Member newMember = memberRepository.save(member);
+        session.removeAttribute("email");
+        session.removeAttribute("name");
         return ResponseEntity.ok(MemberDto.fromEntity(newMember));
     }
 
