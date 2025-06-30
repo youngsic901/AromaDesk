@@ -2,8 +2,26 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSignUp } from '../api/useSignUp';
 import '../css/loginCus.css';
+import { useEffect} from 'react';
+import axios from 'axios';
 
 const SignupPage = () => {
+
+  useEffect(() => {
+  axios.get('/auth/social-info', { withCredentials: true })
+    .then(res => {
+      if (res.data.email) {
+        setFormData(prev => ({
+          ...prev,
+          email: res.data.email,
+          name: res.data.name
+        }));
+      }
+    })
+    .catch(err => {
+      console.error('세션 정보 불러오기 실패:', err);
+    });
+}, []);
 
   const handleAddressSearch = () => {
     new window.daum.Postcode({
@@ -218,7 +236,7 @@ const SignupPage = () => {
           value={formData.email}
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}
-          disabled={isLoading}
+          disabled={isLoading || !!formData.email}
         />
         
         <input
@@ -251,7 +269,7 @@ const SignupPage = () => {
           value={formData.name}
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}
-          disabled={isLoading}
+          disabled={isLoading || !!formData.name}
         />
         
         <input
@@ -264,27 +282,15 @@ const SignupPage = () => {
           onKeyPress={handleKeyPress}
           disabled={isLoading}
         />
-        
-        <input
-          className="login-input"
-          type="text"
-          name="address"
-          placeholder="주소"
-          value={formData.address}
-          readOnly
-          style={{ marginBottom: '8px' }}
-        />
 
         <div style={{ width: '100%', marginBottom: '12px', display: 'flex', gap: '10px' }}>
           <input
             className="login-input"
             type="text"
-            name="addressDetail"
-            placeholder="상세주소 (예: 101호)"
-            value={formData.addressDetail}
-            onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
-            disabled={isLoading}
+            name="address"
+            placeholder="주소"
+            value={formData.address}
+            readOnly
             style={{ flex: 1, marginBottom: '0' }}
           />
           <button
@@ -306,6 +312,17 @@ const SignupPage = () => {
             주소 검색
           </button>
         </div>
+
+        <input
+          className="login-input"
+          type="text"
+          name="addressDetail"
+          placeholder="상세주소 (예: 101호)"
+          value={formData.addressDetail}
+          onChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+          disabled={isLoading}
+        />
         
         <button 
           className="login-btn" 

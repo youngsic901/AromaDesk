@@ -48,9 +48,6 @@ public class CustomOAuth2User implements OAuth2User {
 
     @Override
     public String getName() {
-        if (member != null) {
-            return member.getMemberId();
-        }
-        return email;
+        return name;
     }
 }
