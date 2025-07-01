@@ -25,7 +25,13 @@ const MyOrders = () => {
       try {
         setLoading(true);
         const result = await getMyOrders();
-        setOrders(result);
+        console.log("📦 전체 주문:", result);
+
+        // ✅ 최신순 정렬
+        const sorted = result.sort(
+          (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
+        );
+        setOrders(sorted);
       } catch (err) {
         setError("주문 내역을 불러오는 데 실패했습니다.");
       } finally {
@@ -37,9 +43,8 @@ const MyOrders = () => {
   }, []);
 
   useEffect(() => {
-    const filtered = orders.filter(
-      (order) => order.orderStatus === selectedStatus
-    );
+    const filtered = orders.filter((order) => order.status === selectedStatus);
+    console.log("🔍 필터링된 주문:", filtered);
     setFilteredOrders(filtered);
   }, [orders, selectedStatus]);
 
@@ -87,7 +92,7 @@ const MyOrders = () => {
                     총 결제 금액: {order.totalPrice.toLocaleString()}원
                   </p>
                   <p className="mb-0 text-primary">
-                    상태: {STATUS_LABELS[order.orderStatus] || order.orderStatus}
+                    상태: {STATUS_LABELS[order.status] || order.status}
                   </p>
                 </div>
                 <Button

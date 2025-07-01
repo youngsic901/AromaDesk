@@ -151,9 +151,13 @@ const OrderCompletePage = () => {
       </div>
 
       <div className="order-complete-actions">
-        <button className="order-complete-button order-complete-button-primary" onClick={() => navigate("/mypage/orders")}>
+        <button
+          className="order-complete-button order-complete-button-primary"
+          onClick={() => navigate("/mypage", { state: { activeTab: "orders" } })}
+        >
           주문 내역 보러가기
         </button>
+
         <button className="order-complete-button order-complete-button-secondary" onClick={() => navigate("/")}>
           홈으로 가기
         </button>
