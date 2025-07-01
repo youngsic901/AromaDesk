@@ -62,8 +62,27 @@ function MyPageUpdate({ user, field, onClose, onUpdate }) {
           <input name="address" value={form.address} onChange={handleChange} />
         </div>
       )}
-      <button className="mypage-btn" onClick={handleSave} disabled={loading}>저장</button>
-      <button className="mypage-btn" onClick={onClose} disabled={loading}>취소</button>
+      <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+        <button className="mypage-btn" onClick={handleSave} disabled={loading} style={{
+          backgroundColor: '#007bff',
+          color: 'white',
+          border: 'none',
+          padding: '10px 20px',
+          borderRadius: '5px',
+          cursor: 'pointer',
+          opacity: 1
+        }}>저장</button>
+
+        <button className="mypage-btn" onClick={onClose} disabled={loading} style={{
+          backgroundColor: '#6c757d',
+          color: 'white',
+          border: 'none',
+          padding: '10px 20px',
+          borderRadius: '5px',
+          cursor: 'pointer',
+          opacity: 1
+        }}>취소</button>
+      </div>
       {error && <div style={{color:'red'}}>{error}</div>}
     </div>
   );

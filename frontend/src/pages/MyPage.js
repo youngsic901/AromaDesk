@@ -8,7 +8,6 @@ import AddressUpdate from "../components/AddressUpdate";
 import { authManager } from "../api/authApi";
 import MyOrders from "./MyOrders";
 import { useLocation } from "react-router-dom";
-
 const MyPage = () => {
   const { user } = useSelector((state) => state.user);
   const location = useLocation();
@@ -18,22 +17,17 @@ const MyPage = () => {
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
   const navigate = useNavigate();
-
   // ProtectedRoute에서 인증 확인을 하므로 여기서는 단순히 사용자 정보만 가져옴
   useEffect(() => {
     const fetchUserInfo = async () => {
       if (!user) {
         return;
       }
-
       try {
         setLoading(true);
         setError(null);
-
         const result = await authManager.getUserInfo();
-
         if (result.success) {
           setUserInfo(result.data);
         } else {
@@ -46,15 +40,12 @@ const MyPage = () => {
         setLoading(false);
       }
     };
-
     fetchUserInfo();
   }, [user]);
-
   const handleUpdateSuccess = (updatedUser) => {
     setUserInfo(updatedUser);
     setShowUpdateForm(false);
   };
-
   const handleAddressUpdateSuccess = (updatedUser) => {
     setUserInfo(prev => ({
       ...prev,
@@ -62,15 +53,12 @@ const MyPage = () => {
     }));
     setShowAddressForm(false);
   };
-
   const handleEditClick = () => {
     setShowUpdateForm(true);
   };
-
   const handleAddressEditClick = () => {
     setShowAddressForm(true);
   };
-
   // 로딩 상태
   if (loading) {
     return (
@@ -83,7 +71,6 @@ const MyPage = () => {
         </Container>
     );
   }
-
   // 에러 상태
   if (error) {
     return (
@@ -92,7 +79,6 @@ const MyPage = () => {
         </Container>
     );
   }
-
   return (
       <Container className="py-5">
         <Row>
@@ -118,7 +104,6 @@ const MyPage = () => {
                 </div>
               </Card.Body>
             </Card>
-
             {/* 네비게이션 메뉴 */}
             <Card>
               <Card.Body className="p-0">
@@ -154,7 +139,6 @@ const MyPage = () => {
               </Card.Body>
             </Card>
           </Col>
-
           <Col lg={9}>
             {/* 메인 콘텐츠 */}
             {activeTab === "info" && (
@@ -194,7 +178,6 @@ const MyPage = () => {
                   </Card.Body>
                 </Card>
             )}
-
             {activeTab === "address" && (
                 <Card>
                   <Card.Header className="d-flex justify-content-between align-items-center">
@@ -211,9 +194,7 @@ const MyPage = () => {
                   <Card.Body>
                     {userInfo ? (
                         <div>
-                          <p><strong>우편번호:</strong> {userInfo.zipCode || "미등록"}</p>
                           <p><strong>주소:</strong> {userInfo.address || "미등록"}</p>
-                          <p><strong>상세주소:</strong> {userInfo.addressDetail || "미등록"}</p>
                         </div>
                     ) : (
                         <div className="text-center py-4">
@@ -227,34 +208,31 @@ const MyPage = () => {
                   </Card.Body>
                 </Card>
             )}
-
             {activeTab === "orders" && (
-              <Card>
-                <Card.Header>
-                  <h5 className="mb-0">주문내역</h5>
-                </Card.Header>
-                <Card.Body>
-                  {userInfo ? (
-                    <MyOrders/>
-                  ) : (
-                    <div className="text-center py-4">
-                      <p className="text-muted mb-3">로그인하여 주문내역을 확인하세요.</p>
-                      <Button
-                        variant="primary"
-                        onClick={() => navigate("/login", { state: { from: "/mypage" } })}
-                      >
-                        <FaSignInAlt className="me-2" />
-                        로그인하기
-                      </Button>
-                    </div>
-                  )}
-                </Card.Body>
-              </Card>
+                <Card>
+                  <Card.Header>
+                    <h5 className="mb-0">주문내역</h5>
+                  </Card.Header>
+                  <Card.Body>
+                    {userInfo ? (
+                        <MyOrders/>
+                    ) : (
+                        <div className="text-center py-4">
+                          <p className="text-muted mb-3">로그인하여 주문내역을 확인하세요.</p>
+                          <Button
+                              variant="primary"
+                              onClick={() => navigate("/login", { state: { from: "/mypage" } })}
+                          >
+                            <FaSignInAlt className="me-2" />
+                            로그인하기
+                          </Button>
+                        </div>
+                    )}
+                  </Card.Body>
+                </Card>
             )}
-
           </Col>
         </Row>
-
         {/* 개인정보 수정 모달 */}
         {showUpdateForm && (
             <MyPageUpdate
@@ -264,7 +242,6 @@ const MyPage = () => {
                 onClose={() => setShowUpdateForm(false)}
             />
         )}
-
         {/* 배송지 수정 모달 */}
         {showAddressForm && (
             <AddressUpdate
@@ -276,5 +253,4 @@ const MyPage = () => {
       </Container>
   );
 };
-
 export default MyPage;
