@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const navItems = [
-  { label: "대시보드", path: "/admin/dashboard" },
+  //{ label: "대시보드", path: "/admin/dashboard" },
   { label: "상품관리", path: "/admin/products" },
   { label: "주문관리", path: "/admin/orders" },
   { label: "회원관리", path: "/admin/members" },
