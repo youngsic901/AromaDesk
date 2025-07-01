@@ -6,7 +6,6 @@ import {
   clearCart,
 } from "../app/slices/cartSlice";
 import { useNavigate } from "react-router-dom";
-import orderApi from "../api/orderApi";
 import { FaTrash, FaMinus, FaPlus } from "react-icons/fa";
 
 const CartPage = () => {
@@ -23,14 +22,13 @@ const CartPage = () => {
   // 수량 변경
   const handleQuantity = (productId, quantity) => {
     if (!productId || quantity < 1) return;
-    
-    // 로그인 확인
-    if (!user || !user.memberId) {
+
+    if (!user || !user.id) {
       alert("로그인이 필요합니다.");
       navigate("/login");
       return;
     }
-    
+
     dispatch(
       updateQuantityAction({ memberId: user.id, productId, quantity })
     );
@@ -39,14 +37,13 @@ const CartPage = () => {
   // 상품 삭제
   const handleRemove = (productId) => {
     if (!productId) return;
-    
-    // 로그인 확인
-    if (!user || !user.memberId) {
+
+    if (!user || !user.id) {
       alert("로그인이 필요합니다.");
       navigate("/login");
       return;
     }
-    
+
     dispatch(removeFromCartAction({ memberId: user.id, productId }));
   };
 
@@ -71,15 +68,19 @@ const CartPage = () => {
       0
     );
 
-    navigate("/order/payment", {
-      state: {
-        cartItemIds,
-        totalAmount,
-      },
-    });
+    // 주문 정보 localStorage 저장
+    const orderPayload = {
+      type: "cart",
+      cartItemIds,
+      totalAmount,
+      items,
+      deliveryId: 1,
+      paymentMethod: "MOCK",
+    };
+    localStorage.setItem("pendingOrder", JSON.stringify(orderPayload));
+
+    navigate("/order/payment");
   };
-
-
 
   return (
     <main className="container py-5">
@@ -161,7 +162,7 @@ const CartPage = () => {
             </div>
           </div>
 
-          {/* 결제 요약/주문 */}
+          {/* 결제 요약/주문 */} 
           <div className="col-lg-4">
             <div className="card shadow-sm p-4 sticky-top" style={{ top: 100 }}>
               <h5 className="fw-bold mb-3">결제 예상금액</h5>

@@ -59,25 +59,29 @@ const ProductDetailPage = () => {
   };
 
   const handleBuyNow = () => {
-    if (!user || !user.memberId) {
-      alert("로그인이 필요합니다.");
-      return;
-    }
+  if (!user || !user.memberId) {
+    alert("로그인이 필요합니다.");
+    return;
+  }
 
-    navigate("/order/payment", {
-      state: {
-        items: [
-          {
-            productId: currentProduct.id,
-            quantity,
-          },
-        ],
-        deliveryId: 1,
-        paymentMethod: "MOCK",
-        product: currentProduct,
+  const orderData = {
+    type: "single",
+    items: [
+      {
+        ...currentProduct,
+        productId: currentProduct.id,
+        quantity,
       },
-    });
+    ],
+    deliveryId: 1,
+    paymentMethod: "MOCK",
+    product: currentProduct,
   };
+
+  localStorage.setItem("pendingOrder", JSON.stringify(orderData)); // ✅ 추가
+  navigate("/order/payment");
+};
+
 
   return (
     <main className="container py-5">
