@@ -21,7 +21,7 @@ const cardHoverStyle = {
 const imgStyle = {
   width: "100%",
   height: 180,
-  objectFit: "cover",
+  objectFit: "contain",
   borderTopLeftRadius: "18px",
   borderTopRightRadius: "18px",
   background: "#f4f4f4",

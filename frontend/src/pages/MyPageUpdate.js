@@ -45,10 +45,10 @@ function MyPageUpdate({ user, field, onClose, onUpdate }) {
       {field === 'info' && (
         <>
           <div className="mypage-info-row">
-            <label>닉네임</label>
+            <label>이름</label>
             <input name="name" value={form.name} onChange={handleChange} />
             <label>이메일</label>
-            <input name="email" value={form.email} onChange={handleChange} />
+            <input name="email" value={form.email} readOnly={true} />
           </div>
           <div className="mypage-info-row">
             <label>휴대폰 번호</label>
