@@ -6,15 +6,19 @@ import { useNavigate } from "react-router-dom";
 import MyPageUpdate from "./MyPageUpdate";
 import AddressUpdate from "../components/AddressUpdate";
 import { authManager } from "../api/authApi";
+import MyOrders from "./MyOrders";
+import { useLocation } from "react-router-dom";
 
 const MyPage = () => {
   const { user } = useSelector((state) => state.user);
-  const [activeTab, setActiveTab] = useState("info");
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(location.state?.activeTab || "info");
   const [showUpdateForm, setShowUpdateForm] = useState(false);
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
   const navigate = useNavigate();
 
   // ProtectedRoute에서 인증 확인을 하므로 여기서는 단순히 사용자 정보만 가져옴
@@ -225,25 +229,29 @@ const MyPage = () => {
             )}
 
             {activeTab === "orders" && (
-                <Card>
-                  <Card.Header>
-                    <h5 className="mb-0">주문내역</h5>
-                  </Card.Header>
-                  <Card.Body>
-                    {userInfo ? (
-                        <p className="text-muted">주문내역 기능은 준비 중입니다.</p>
-                    ) : (
-                        <div className="text-center py-4">
-                          <p className="text-muted mb-3">로그인하여 주문내역을 확인하세요.</p>
-                          <Button variant="primary" onClick={() => navigate('/login', { state: { from: '/mypage' } })}>
-                            <FaSignInAlt className="me-2" />
-                            로그인하기
-                          </Button>
-                        </div>
-                    )}
-                  </Card.Body>
-                </Card>
+              <Card>
+                <Card.Header>
+                  <h5 className="mb-0">주문내역</h5>
+                </Card.Header>
+                <Card.Body>
+                  {userInfo ? (
+                    <MyOrders/>
+                  ) : (
+                    <div className="text-center py-4">
+                      <p className="text-muted mb-3">로그인하여 주문내역을 확인하세요.</p>
+                      <Button
+                        variant="primary"
+                        onClick={() => navigate("/login", { state: { from: "/mypage" } })}
+                      >
+                        <FaSignInAlt className="me-2" />
+                        로그인하기
+                      </Button>
+                    </div>
+                  )}
+                </Card.Body>
+              </Card>
             )}
+
           </Col>
         </Row>
 

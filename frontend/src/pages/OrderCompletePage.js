@@ -3,6 +3,17 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import orderApi from "../api/orderApi";
 import apiClient from "../api/axiosConfig";
 
+const statusMap = {
+  PAID: "결제 완료",
+  UNPAID: "결제 대기",
+  CANCELLED: "주문 취소",
+  REFUNDED: "환불 완료",
+  MOCK: "모의 결제",
+  PREPARING: "배송 준비 중",
+  SHIPPED: "배송 중",
+  DELIVERED: "배송 완료",
+};
+
 const OrderCompletePage = () => {
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get("orderId");
@@ -28,7 +39,6 @@ const OrderCompletePage = () => {
           return;
         }
 
-        // 배송 상태 (없을 수도 있음)
         try {
           const deliveryRes = await apiClient.get(`/api/orders/${orderId}/delivery`);
           setDelivery(deliveryRes.data);
@@ -66,10 +76,18 @@ const OrderCompletePage = () => {
   return (
     <div style={styles.container}>
       <h2>주문이 완료되었습니다 🎉</h2>
-      <p>주문번호: <strong>{order.orderId}</strong></p>
-      <p>결제 상태: <strong>{order.status}</strong></p>
-      <p>결제 수단: <strong>{order.paymentMethod}</strong></p>
-      <p>총 결제 금액: <strong>{order.totalPrice.toLocaleString()}원</strong></p>
+      <p>
+        주문번호: <strong>{order.orderId}</strong>
+      </p>
+      <p>
+        결제 상태: <strong>{statusMap[order.status] || order.status}</strong>
+      </p>
+      <p>
+        결제 수단: <strong>{statusMap[order.paymentMethod] || order.paymentMethod}</strong>
+      </p>
+      <p>
+        총 결제 금액: <strong>{order.totalPrice.toLocaleString()}원</strong>
+      </p>
 
       <h4 style={{ marginTop: "2rem" }}>주문 상품</h4>
       <ul>
@@ -81,9 +99,14 @@ const OrderCompletePage = () => {
       <h4 style={{ marginTop: "2rem" }}>배송 상태</h4>
       {delivery ? (
         <div>
-          <p><strong>상태:</strong> {delivery.status}</p>
+          <p>
+            <strong>상태:</strong>{" "}
+            {statusMap[delivery.status] || delivery.status}
+          </p>
           {delivery.trackingNumber && (
-            <p><strong>송장번호:</strong> {delivery.trackingNumber}</p>
+            <p>
+              <strong>송장번호:</strong> {delivery.trackingNumber}
+            </p>
           )}
         </div>
       ) : (
