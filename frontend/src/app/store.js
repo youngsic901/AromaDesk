@@ -4,22 +4,36 @@ import cartReducer from "./slices/cartSlice";
 import deliveryReducer from "./slices/deliverySlice";
 import userReducer from "./slices/userSlice";
 import adminReducer from "./slices/adminSlice";
+// redux-persist 관련 import
+import { persistStore, persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage";
+import { combineReducers } from "redux";
+
+// persist config: cart만 localStorage에 저장
+const persistConfig = {
+  key: "root",
+  storage,
+  whitelist: ["cart"],
+};
+
+const rootReducer = combineReducers({
+  product: productReducer,
+  cart: cartReducer,
+  delivery: deliveryReducer,
+  user: userReducer,
+  admin: adminReducer,
+});
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
-  reducer: {
-    product: productReducer,
-    cart: cartReducer,
-    delivery: deliveryReducer,
-    user: userReducer,
-    admin: adminReducer,
-  },
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: {
-        // 비동기 액션의 pending 상태를 직렬화 체크에서 제외
-        ignoredActions: ["persist/PERSIST"],
-      },
+      serializableCheck: false,
     }),
 });
+
+export const persistor = persistStore(store);
 
 export default store;
