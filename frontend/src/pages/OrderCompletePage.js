@@ -140,7 +140,7 @@ const OrderCompletePage = () => {
           >
             주문 내역 보러가기
           </button>
-          <button className="order-complete-button order-complete-button-secondary" onClick={() => navigate("/")}>
+          <button className="order-complete-button order-complete-button-secondary" onClick={() => navigate("/main")}>
             홈으로 가기
           </button>
         </div>
