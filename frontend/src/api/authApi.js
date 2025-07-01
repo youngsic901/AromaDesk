@@ -87,7 +87,8 @@ export const authManager = {
   updateUserInfo: async (updateData) => {
     try {
       console.log('사용자 정보 업데이트:', updateData);
-      const response = await apiClient.put('/api/members/update', updateData);
+      const user = authManager.getLocalUser();
+      const response = await apiClient.patch(`/api/members/${user.id}/address`, updateData);
       const updatedUser = handleApiSuccess(response);
       
       // 캐시 및 localStorage 업데이트

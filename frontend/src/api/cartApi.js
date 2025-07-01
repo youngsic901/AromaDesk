@@ -39,6 +39,7 @@ export const cartApi = {
 
       // 필수 필드 검증 및 기본값 설정
       return {
+        cartItemId: cartItem.cartItemId || null,
         productId: cartItem.productId || productId,
         name: cartItem.name || "상품명 없음",
         imageUrl: cartItem.imageUrl || "",

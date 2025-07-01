@@ -30,7 +30,7 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     if (!memberId.trim() || !password.trim()) {
-      alert('아이디와 비밀번호를 입력해주세요.');
+      alert("아이디와 비밀번호를 입력해주세요.");
       return;
     }
 
@@ -41,27 +41,26 @@ const LoginPage = () => {
         // 로그인 성공 상태 설정 (페이지 이동은 useEffect에서 처리)
         setLoginSuccess(true);
       } else {
-        console.log('로그인 실패:', result.error);
-        alert('로그인 실패: ' + result.error);
+        console.log("로그인 실패:", result.error);
+        alert("로그인 실패: " + result.error);
       }
     } catch (error) {
-      console.error('로그인 처리 중 오류:', error);
-      alert('로그인 처리 중 오류가 발생했습니다.');
+      console.error("로그인 처리 중 오류:", error);
+      alert("로그인 처리 중 오류가 발생했습니다.");
     }
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleLogin();
     }
   };
 
   return (
     <div className="login-page">
-      
       <div className="login-container">
         <h2 className="login-title">로그인</h2>
-        
+
         <input
           className="login-input"
           type="text"
@@ -71,7 +70,7 @@ const LoginPage = () => {
           onKeyPress={handleKeyPress}
           disabled={isLoading}
         />
-        
+
         <input
           className="login-input"
           type="password"
@@ -81,40 +80,57 @@ const LoginPage = () => {
           onKeyPress={handleKeyPress}
           disabled={isLoading}
         />
-        
-        <button 
-          className="login-btn" 
+
+        <button
+          className="login-btn"
           onClick={handleLogin}
           disabled={isLoading}
         >
-          {isLoading ? '로그인 중...' : '로그인'}
+          {isLoading ? "로그인 중..." : "로그인"}
         </button>
 
         {error && (
-          <div className="error-message" style={{ color: 'red', marginTop: '10px' }}>
+          <div
+            className="error-message"
+            style={{ color: "red", marginTop: "10px" }}
+          >
             {error}
           </div>
         )}
 
         {/* 소셜 로그인 버튼들 */}
-        <a 
-          className="google-btn" 
+        <a
+          className="google-btn"
           href="http://localhost/oauth2/authorization/google"
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: 8,
+          }}
         >
           구글로 로그인
         </a>
-        <a 
+        <a
           className="kakao-btn"
           href="http://localhost/oauth2/authorization/kakao"
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: 8,
+          }}
         >
           카카오로 로그인
         </a>
-        <a 
+        <a
           className="naver-btn"
           href="http://localhost/oauth2/authorization/naver"
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
           네이버로 로그인
         </a>

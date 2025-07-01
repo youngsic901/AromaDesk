@@ -7,7 +7,7 @@ export const getMyPageInfo = async (userId) => {
     const response = await apiClient.get(`/api/members/${userId}`);
     return handleApiSuccess(response);
   } catch (error) {
-    console.error('마이페이지 정보 조회 오류:', error);
+    console.error("마이페이지 정보 조회 오류:", error);
     throw handleApiError(error);
   }
 };
@@ -18,7 +18,7 @@ export const updateMyPageInfo = async (userId, updateData) => {
     const response = await apiClient.put(`/api/members/${userId}`, updateData);
     return { success: true, data: handleApiSuccess(response) };
   } catch (error) {
-    console.error('마이페이지 정보 수정 오류:', error);
+    console.error("마이페이지 정보 수정 오류:", error);
     const errorMessage = handleApiError(error).message;
     return { 
       success: false, 
@@ -36,13 +36,13 @@ export const checkPassword = async (userId, password) => {
       if (user.password === password) {
         return { success: true, data: { isValid: true } };
       } else {
-        return { success: false, error: '현재 비밀번호가 일치하지 않습니다.' };
+        return { success: false, error: "현재 비밀번호가 일치하지 않습니다." };
       }
     } else {
-      return { success: false, error: '사용자 정보를 찾을 수 없습니다.' };
+      return { success: false, error: "사용자 정보를 찾을 수 없습니다." };
     }
   } catch (error) {
-    console.error('비밀번호 확인 오류:', error);
+    console.error("비밀번호 확인 오류:", error);
     const errorMessage = handleApiError(error).message;
     return { success: false, error: errorMessage };
   }
@@ -55,13 +55,13 @@ export const changePassword = async (userId, newPassword) => {
     if (userInfo) {
       const user = JSON.parse(userInfo);
       user.password = newPassword;
-      localStorage.setItem('CusUser', JSON.stringify(user));
-      return { success: true, data: { message: '비밀번호가 변경되었습니다.' } };
+      localStorage.setItem("CusUser", JSON.stringify(user));
+      return { success: true, data: { message: "비밀번호가 변경되었습니다." } };
     } else {
       return { success: false, error: '사용자 정보를 찾을 수 없습니다.' };
     }
   } catch (error) {
-    console.error('비밀번호 변경 오류:', error);
+    console.error("비밀번호 변경 오류:", error);
     const errorMessage = handleApiError(error).message;
     return { success: false, error: errorMessage };
   }
