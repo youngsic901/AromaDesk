@@ -30,7 +30,7 @@ const SideBar = ({ sidebarOpen = true, setSidebarOpen }) => {
 
   // 카테고리 메뉴 + 브랜드향수 메뉴 추가
   const menu = [
-    { label: "홈", to: "/" },
+    { label: "홈", to: "/main" },
     { label: "남자향수", to: "/category/male" },
     { label: "여자향수", to: "/category/female" },
     { label: "남여공용", to: "/category/unisex" },

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import orderApi from "../api/orderApi";
 import apiClient from "../api/axiosConfig";
+import "../css/OrderCompletePage.css";
 
 const statusMap = {
   PAID: "결제 완료",
@@ -55,91 +56,112 @@ const OrderCompletePage = () => {
 
   if (error) {
     return (
-      <div style={styles.container}>
-        <h2>주문 실패</h2>
-        <p style={styles.error}>{error}</p>
-        <button style={styles.button} onClick={() => navigate("/")}>
-          홈으로 가기
-        </button>
+      <div className="order-complete-container">
+        <div className="order-complete-error">
+          <h2>주문 실패</h2>
+          <p>{error}</p>
+          <div className="order-complete-actions">
+            <button className="order-complete-button order-complete-button-secondary" onClick={() => navigate("/main")}>
+              홈으로 가기
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!order) {
     return (
-      <div style={styles.container}>
-        <h2>주문 정보를 확인 중입니다...</h2>
+      <div className="order-complete-container">
+        <div className="order-complete-loading">
+          <h2>주문 정보를 확인 중입니다...</h2>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={styles.container}>
-      <h2>주문이 완료되었습니다 🎉</h2>
-      <p>
-        주문번호: <strong>{order.orderId}</strong>
-      </p>
-      <p>
-        결제 상태: <strong>{statusMap[order.status] || order.status}</strong>
-      </p>
-      <p>
-        결제 수단: <strong>{statusMap[order.paymentMethod] || order.paymentMethod}</strong>
-      </p>
-      <p>
-        총 결제 금액: <strong>{order.totalPrice.toLocaleString()}원</strong>
-      </p>
-
-      <h4 style={{ marginTop: "2rem" }}>주문 상품</h4>
-      <ul>
-        {order.productNames?.map((name, index) => (
-          <li key={index}>{name}</li>
-        ))}
-      </ul>
-
-      <h4 style={{ marginTop: "2rem" }}>배송 상태</h4>
-      {delivery ? (
-        <div>
-          <p>
-            <strong>상태:</strong>{" "}
-            {statusMap[delivery.status] || delivery.status}
-          </p>
-          {delivery.trackingNumber && (
-            <p>
-              <strong>송장번호:</strong> {delivery.trackingNumber}
-            </p>
-          )}
+    <div className="order-complete-container">
+      <div className="order-complete-success">
+        <div className="order-complete-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+          </svg>
         </div>
-      ) : (
-        <p style={{ color: "#999" }}>배송 정보가 아직 준비되지 않았습니다.</p>
-      )}
+        <h1 className="order-complete-title">주문이 완료되었습니다! 🎉</h1>
+        <p className="order-complete-subtitle">주문이 성공적으로 처리되었습니다.</p>
+      </div>
 
-      <button style={styles.button} onClick={() => navigate("/mypage/orders")}>
-        주문 내역 보러가기
-      </button>
+      <div className="order-complete-info">
+        <div className="order-complete-info-header">
+          <h3>주문 상세 정보</h3>
+        </div>
+        <div className="order-complete-info-body">
+          <div className="order-complete-row">
+            <div className="order-complete-label">주문번호</div>
+            <div className="order-complete-value highlight">{order.orderId}</div>
+          </div>
+          
+          <div className="order-complete-row">
+            <div className="order-complete-label">결제 상태</div>
+            <div className="order-complete-value success">{statusMap[order.status] || order.status}</div>
+          </div>
+          
+          <div className="order-complete-row">
+            <div className="order-complete-label">결제 수단</div>
+            <div className="order-complete-value">{statusMap[order.paymentMethod] || order.paymentMethod}</div>
+          </div>
+          
+          <div className="order-complete-row">
+            <div className="order-complete-label">총 결제 금액</div>
+            <div className="order-complete-value highlight">{order.totalPrice.toLocaleString()}원</div>
+          </div>
+
+          {order.productNames && order.productNames.length > 0 && (
+            <div className="order-complete-products">
+              <h4>주문 상품</h4>
+              <ul className="order-complete-product-list">
+                {order.productNames.map((name, index) => (
+                  <li key={index} className="order-complete-product-item">{name}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div className="order-complete-delivery">
+            <h4>배송 상태</h4>
+            {delivery ? (
+              <div className="order-complete-delivery-info">
+                <div className="order-complete-delivery-row">
+                  <div className="order-complete-delivery-label">상태</div>
+                  <div className="order-complete-delivery-value">{statusMap[delivery.status] || delivery.status}</div>
+                </div>
+                {delivery.trackingNumber && (
+                  <div className="order-complete-delivery-row">
+                    <div className="order-complete-delivery-label">송장번호</div>
+                    <div className="order-complete-delivery-value">{delivery.trackingNumber}</div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p style={{ color: "#999" }}>배송 정보가 아직 준비되지 않았습니다.</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="order-complete-actions">
+        <button className="order-complete-button order-complete-button-primary" onClick={() => navigate("/mypage/orders")}>
+          주문 내역 보러가기
+        </button>
+        <button className="order-complete-button order-complete-button-secondary" onClick={() => navigate("/")}>
+          홈으로 가기
+        </button>
+      </div>
     </div>
   );
 };
 
-const styles = {
-  container: {
-    maxWidth: "700px",
-    margin: "0 auto",
-    padding: "2rem",
-    fontFamily: "sans-serif",
-  },
-  button: {
-    marginTop: "2rem",
-    padding: "0.8rem 1.5rem",
-    backgroundColor: "#4CAF50",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    fontSize: "1rem",
-    cursor: "pointer",
-  },
-  error: {
-    color: "red",
-  },
-};
+
 
 export default OrderCompletePage;

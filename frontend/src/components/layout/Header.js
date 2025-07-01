@@ -127,9 +127,9 @@ const Header = ({ setSidebarOpen }) => {
                 <Dropdown.Item as={Link} to="/mypage">
                   마이페이지
                 </Dropdown.Item>
-                <Dropdown.Item as={Link} to="/delivery">
+                {/* <Dropdown.Item as={Link} to="/delivery">
                   배송조회
-                </Dropdown.Item>
+                </Dropdown.Item> */}
                 <Dropdown.Divider />
                 <Dropdown.Item onClick={handleLogout}>로그아웃</Dropdown.Item>
               </Dropdown.Menu>
