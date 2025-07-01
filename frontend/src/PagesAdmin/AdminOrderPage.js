@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import AdminLayout from "../components/admin/layout/AdminLayout";
 import apiClient from "../api/axiosConfig";
+import "../css/AdminOrderPage.css";
 
 function AdminOrderPage() {
   const [orders, setOrders] = useState([]);
@@ -17,10 +18,13 @@ function AdminOrderPage() {
     <AdminLayout>
       <div className="admin-order-page">
         <h2>주문 관리</h2>
+        <div className="admin-order-desc">
+          주문 내역의 상태를 확인하는 페이지 입니다
+        </div>
         {isLoading ? (
-          <div>불러오는 중...</div>
+          <div className="admin-order-loading">불러오는 중...</div>
         ) : orders.length === 0 ? (
-          <div>주문이 없습니다.</div>
+          <div className="admin-order-empty">주문이 없습니다.</div>
         ) : (
           <table className="admin-order-table">
             <thead>

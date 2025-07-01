@@ -4,6 +4,7 @@ import { adminProductApi } from "../api/adminProductApi";
 import { productApi } from "../api/productApi";
 import "../css/AdminProductPage.css";
 import Modal from "../components/common/Modal";
+import { AdminProductEditModal, AdminSuccessModal } from "../components/admin/UnifiedAdminModal";
 
 const AdminProductPage = () => {
   const [products, setProducts] = useState([]);
@@ -35,6 +36,9 @@ const AdminProductPage = () => {
   const [totalElements, setTotalElements] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [successModalMessage, setSuccessModalMessage] = useState("");
+  const [isError, setIsError] = useState(false);
 
   // 브랜드 목록 최초 1회만 받아오기
   useEffect(() => {
@@ -116,11 +120,13 @@ const AdminProductPage = () => {
       await adminProductApi.updateProduct(editingProduct.id, editingProduct);
       setEditingProduct(null);
       await fetchProducts();
-      setModalMessage("상품이 성공적으로 수정되었습니다.");
-      setModalOpen(true);
+      setSuccessModalMessage("상품이 성공적으로 수정되었습니다.");
+      setIsError(false);
+      setSuccessModalOpen(true);
     } catch (err) {
-      setModalMessage("상품 수정에 실패했습니다.");
-      setModalOpen(true);
+      setSuccessModalMessage("상품 수정에 실패했습니다.");
+      setIsError(true);
+      setSuccessModalOpen(true);
     }
   };
 
@@ -380,146 +386,24 @@ const AdminProductPage = () => {
 
         {/* 상품 수정 모달 */}
         {editingProduct && (
-          <div
-            className="modal-overlay"
-            onClick={() => setEditingProduct(null)}
-          >
-            <div className="modal" onClick={(e) => e.stopPropagation()}>
-              <h2>상품 수정</h2>
-              <form onSubmit={handleUpdateProduct}>
-                <div className="form-group">
-                  <label>상품명:</label>
-                  <input
-                    type="text"
-                    value={editingProduct.name || ""}
-                    onChange={(e) =>
-                      setEditingProduct({
-                        ...editingProduct,
-                        name: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>브랜드:</label>
-                  <input
-                    type="text"
-                    value={editingProduct.brand || ""}
-                    onChange={(e) =>
-                      setEditingProduct({
-                        ...editingProduct,
-                        brand: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>성별 카테고리:</label>
-                  <select
-                    value={editingProduct.genderCategory || ""}
-                    onChange={(e) =>
-                      setEditingProduct({
-                        ...editingProduct,
-                        genderCategory: e.target.value,
-                      })
-                    }
-                    required
-                  >
-                    <option value="">선택하세요</option>
-                    <option value="MALE">남성</option>
-                    <option value="FEMALE">여성</option>
-                    <option value="UNISEX">중성</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>용량 카테고리:</label>
-                  <select
-                    value={editingProduct.volumeCategory || ""}
-                    onChange={(e) =>
-                      setEditingProduct({
-                        ...editingProduct,
-                        volumeCategory: e.target.value,
-                      })
-                    }
-                    required
-                  >
-                    <option value="">선택하세요</option>
-                    <option value="UNDER_30ML">30ml</option>
-                    <option value="UNDER_50ML">50ml</option>
-                    <option value="LARGE">대용량</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>가격:</label>
-                  <input
-                    type="number"
-                    value={editingProduct.price || ""}
-                    onChange={(e) =>
-                      setEditingProduct({
-                        ...editingProduct,
-                        price: parseInt(e.target.value) || 0,
-                      })
-                    }
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>재고:</label>
-                  <input
-                    type="number"
-                    value={editingProduct.stock || ""}
-                    onChange={(e) =>
-                      setEditingProduct({
-                        ...editingProduct,
-                        stock: parseInt(e.target.value) || 0,
-                      })
-                    }
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>이미지 URL:</label>
-                  <input
-                    type="text"
-                    value={editingProduct.imageUrl || ""}
-                    onChange={(e) =>
-                      setEditingProduct({
-                        ...editingProduct,
-                        imageUrl: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>설명:</label>
-                  <textarea
-                    value={editingProduct.description || ""}
-                    onChange={(e) =>
-                      setEditingProduct({
-                        ...editingProduct,
-                        description: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-                <div className="button-group">
-                  <button type="submit">수정</button>
-                  <button type="button" onClick={() => setEditingProduct(null)}>
-                    취소
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
+          <AdminProductEditModal
+            product={editingProduct}
+            onClose={() => setEditingProduct(null)}
+            onSubmit={handleUpdateProduct}
+            onChange={setEditingProduct}
+          />
         )}
 
         <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
           {modalMessage}
         </Modal>
+        
+        <AdminSuccessModal 
+          open={successModalOpen} 
+          onClose={() => setSuccessModalOpen(false)}
+          message={successModalMessage}
+          isError={isError}
+        />
       </div>
     </AdminLayout>
   );

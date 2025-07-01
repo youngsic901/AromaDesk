@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { clearCart } from "../app/slices/cartSlice";
 import { useDispatch } from "react-redux";
+import "../css/OrderPaymentPage.css";
 
 const OrderPaymentPage = () => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ const OrderPaymentPage = () => {
   }, []);
 
   if (!orderData || !orderData.paymentMethod || !orderData.deliveryId) {
-    return <div className="text-center py-5">잘못된 접근입니다.</div>;
+    return <div className="order-payment-error">잘못된 접근입니다.</div>;
   }
 
   const {
@@ -70,58 +71,74 @@ const OrderPaymentPage = () => {
   };
 
   return (
-    <main className="container py-5">
-      <div className="card shadow-sm p-4">
-        <h3 className="fw-bold mb-4">주문 정보 확인</h3>
+    <main className="order-payment-container">
+      <div className="order-payment-header">
+        <h1 className="order-payment-title">주문 정보 확인</h1>
+        <p className="order-payment-subtitle">주문하실 상품과 결제 정보를 확인해주세요</p>
+      </div>
+      
+      <div className="order-info-card">
+        <div className="order-info-header">
+          <h3>주문 상세 정보</h3>
+        </div>
+        <div className="order-info-body">
 
         {isSingleOrder && (
           <>
-            <div className="row mb-3">
-              <div className="col-md-3 fw-semibold">상품명</div>
-              <div className="col-md-9">{product.name}</div>
+            <div className="order-info-row">
+              <div className="order-info-label">상품명</div>
+              <div className="order-info-value">{product.name}</div>
             </div>
-            <div className="row mb-3">
-              <div className="col-md-3 fw-semibold">수량</div>
-              <div className="col-md-9">{quantity}</div>
+            <div className="order-info-row">
+              <div className="order-info-label">수량</div>
+              <div className="order-info-value">{quantity}개</div>
             </div>
           </>
         )}
 
         {isCartOrder && Array.isArray(items) && (
-          <div className="row mb-3">
-            <div className="col-md-3 fw-semibold">주문 상품</div>
-            <div className="col-md-9">
-              <ul className="list-unstyled mb-0">
-                {items.map((item, index) => (
-                  <li key={index}>
-                    {item.name} ({item.quantity}개) -{" "}
-                    {(item.price * item.quantity).toLocaleString()}원
-                  </li>
-                ))}
-              </ul>
-            </div>
+          <div className="order-items-section">
+            <h4 className="order-items-title">주문 상품</h4>
+            {items.map((item, index) => (
+              <div key={index} className="order-item">
+                <img
+                  src={item.imageUrl || "/placeholder-product.jpg"}
+                  alt={item.name}
+                  className="order-item-image"
+                />
+                <div className="order-item-details">
+                  <div className="order-item-name">{item.name}</div>
+                  <div className="order-item-brand">{item.brand}</div>
+                  <div className="order-item-quantity">수량: {item.quantity}개</div>
+                </div>
+                <div className="order-item-price">
+                  {(item.price * item.quantity).toLocaleString()}원
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
-        <div className="row mb-3">
-          <div className="col-md-3 fw-semibold">총 결제금액</div>
-          <div className="col-md-9 text-danger fw-bold">
+        <div className="order-info-row">
+          <div className="order-info-label">총 결제금액</div>
+          <div className="order-info-value danger">
             {totalPrice.toLocaleString()}원
           </div>
         </div>
 
-        <div className="row mb-3">
-          <div className="col-md-3 fw-semibold">결제 수단</div>
-          <div className="col-md-9">{paymentMethod}</div>
+        <div className="order-info-row">
+          <div className="order-info-label">결제 수단</div>
+          <div className="order-info-value">{paymentMethod}</div>
         </div>
 
-        <div className="row mb-4">
-          <div className="col-md-3 fw-semibold">배송지 ID</div>
-          <div className="col-md-9">{deliveryId}</div>
+        <div className="order-info-row">
+          <div className="order-info-label">배송지 ID</div>
+          <div className="order-info-value">{deliveryId}</div>
         </div>
-
-        <div className="text-end">
-          <button className="btn btn-success px-4" onClick={handleConfirm}>
+        </div>
+        
+        <div className="order-payment-actions">
+          <button className="order-payment-button order-payment-button-primary" onClick={handleConfirm}>
             결제하기
           </button>
         </div>
