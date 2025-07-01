@@ -38,6 +38,8 @@ import BrandPage from "./pages/BrandPage";
 import SearchPage from "./pages/SearchPage";
 import OrderCompletePage from "./pages/OrderCompletePage";
 import OrderPaymentPage from "./pages/OrderPaymentPage"
+import MyOrders from "./pages/MyOrders"
+
 // API
 import { loginAPI } from "./api/loginApi";
 import {
@@ -231,8 +233,9 @@ function AppContent() {
                       <Route path="/order/payment" element={<OrderPaymentPage />} />
                       <Route
                         path="/order/complete"
-                        element={<OrderCompletePage />}
+                        element={<OrderCompletePage />} 
                       />
+                      <Route path="/mypage/orders" element={<MyOrders />} />
                     </Routes>
                   </main>
                 </div>

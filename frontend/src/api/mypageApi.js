@@ -71,9 +71,11 @@ export const changePassword = async (userId, newPassword) => {
 export const getMyOrders = async () => {
   try {
     const response = await apiClient.get('/api/orders');
-    return handleApiSuccess(response);
+    console.log("✅ 주문 API 응답:", response.data);  // 유지
+    return response.data;  // ✅ 수정: .data.data → .data
   } catch (error) {
     console.error('주문 내역 조회 오류:', error);
     throw handleApiError(error);
   }
 };
+
