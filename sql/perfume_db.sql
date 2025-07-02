@@ -39,7 +39,9 @@ CREATE TABLE product (
     stock BIGINT DEFAULT 0,
     image_url VARCHAR(500),
     description TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(20) DEFAULT 'ACTIVE',       -- ✅ 상태 컬럼 추가
+    CHECK (status IN ('ACTIVE', 'SOLD_OUT', 'DISCONTINUED', 'INACTIVE')) -- 상태 제약
 );
 
 -- 장바구니 테이블
