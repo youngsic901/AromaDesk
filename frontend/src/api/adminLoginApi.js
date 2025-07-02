@@ -35,14 +35,12 @@ export const adminLoginAPI = {
   // 관리자 로그아웃
   logout: async () => {
     try {
-      const response = await apiClient.post('/admin/logout');
       
       // 관리자 세션키 삭제 (localStorage)
       localStorage.removeItem('AdminSessionId');
       localStorage.removeItem('AdminUser');
       console.log('관리자 세션키 삭제됨 (localStorage)');
       
-      return { success: true, data: handleApiSuccess(response) };
     } catch (error) {
       const errorMessage = handleApiError(error).message;
       return { 
