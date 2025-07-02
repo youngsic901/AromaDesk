@@ -66,7 +66,7 @@ public class MemberController {
     }
 
     // 회원 정보 수정 (PUT /api/members/{id})
-    @PutMapping("/{id}")
+    @PostMapping("/{id}")
     public ResponseEntity<MemberDto> updateMember(@PathVariable Long id, @RequestBody MemberDto updateRequest) {
         return memberRepository.findById(id)
                 .map(member -> {
@@ -84,6 +84,32 @@ public class MemberController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @PostMapping("/{id}/changePassword")
+    public ResponseEntity<?> changePassword(@PathVariable Long id, @RequestBody Map<String, String> passwordMap) {
+        String currentPassword = passwordMap.get("currentPassword");
+        String newPassword = passwordMap.get("newPassword");
+        String confirmPassword = passwordMap.get("confirmPassword");
+
+        // 새 비밀번호와 확인값 일치 여부 체크
+        if (!newPassword.equals(confirmPassword)) {
+            return ResponseEntity.badRequest().body("새 비밀번호와 확인 값이 일치하지 않습니다.");
+        }
+
+        return memberRepository.findById(id)
+                .map(member -> {
+                    // 현재 비밀번호 검증
+                    if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
+                        return ResponseEntity.badRequest().body("현재 비밀번호가 일치하지 않습니다.");
+                    }
+                    // 비밀번호 변경
+                    member.setPassword(passwordEncoder.encode(newPassword));
+                    memberRepository.save(member);
+                    return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
 
     @PatchMapping("/{id}/address")
     public ResponseEntity<?> updateAddress(@PathVariable Long id, @RequestBody UpdateAddressDto request) {
