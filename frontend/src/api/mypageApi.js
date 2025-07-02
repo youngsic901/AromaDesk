@@ -15,7 +15,7 @@ export const getMyPageInfo = async (userId) => {
 // 마이페이지 정보 수정
 export const updateMyPageInfo = async (userId, updateData) => {
   try {
-    const response = await apiClient.put(`/api/members/${userId}`, updateData);
+    const response = await apiClient.post(`/api/members/${userId}`, updateData);
     return { success: true, data: handleApiSuccess(response) };
   } catch (error) {
     console.error("마이페이지 정보 수정 오류:", error);
