@@ -71,7 +71,12 @@ const AdminProductPage = () => {
       setError(null);
     } catch (err) {
       console.error("상품 목록 조회 실패:", err);
-      setError("상품 목록을 불러오는데 실패했습니다.");
+      if(err.response?.status === 401 || err.response?.status === 403) {
+        window.location.href = "/adminLogin";
+      } else {
+        setError("상품 목록을 불러오는데 실패했습니다.");
+      }
+
     } finally {
       setLoading(false);
     }
