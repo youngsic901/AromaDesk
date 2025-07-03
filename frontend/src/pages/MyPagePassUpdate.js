@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Container, Row, Col, Card, Button, Alert, Form } from "react-bootstrap";
 import { FaUser, FaMapMarkerAlt, FaShoppingBag, FaSave, FaArrowLeft, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
 import { authManager } from "../api/authApi";
 import { toast } from "react-toastify";
+import { logout } from "../app/slices/userSlice";
 
-const MyPageEdit = () => {
+const MyPagePassUpdate = () => {
   const { user } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(location.state?.activeTab || "info");
@@ -127,15 +129,24 @@ const MyPageEdit = () => {
       const result = await authManager.changePassword(passwordFormData);
       
       if (result.success) {
-        toast.success("비밀번호가 성공적으로 변경되었습니다!", {
+        toast.success("비밀번호가 성공적으로 변경되었습니다! 보안을 위해 로그아웃됩니다.", {
           position: "top-center",
-          autoClose: 2000
+          autoClose: 3000
         });
         
-        // 잠시 후 마이페이지로 돌아가기
+        // 캐시 무효화
+        authManager.invalidateCache();
+        
+        // 잠시 후 로그아웃 처리
         setTimeout(() => {
-          navigate('/mypage', { state: { activeTab } });
-        }, 1500);
+          dispatch(logout());
+          localStorage.removeItem("CusUser");
+          navigate('/login', { 
+            state: { 
+              message: "비밀번호가 변경되어 로그아웃되었습니다. 새 비밀번호로 다시 로그인해주세요." 
+            } 
+          });
+        }, 2000);
       } else {
         setError(result.error || "비밀번호 변경에 실패했습니다.");
       }
@@ -262,20 +273,26 @@ const MyPageEdit = () => {
               </div>
             </Card.Header>
             <Card.Body>
-              <Form>
-                <Row>
-                  <Col md={8}>
-                    <Form.Group className="mb-3">
-                      <Form.Label><strong>현재 비밀번호</strong></Form.Label>
-                      <div className="d-flex">
-                        <Form.Control
-                          type={showPasswords.current ? "text" : "password"}
-                          name="currentPassword"
-                          value={passwordFormData.currentPassword}
-                          onChange={handlePasswordInputChange}
-                          placeholder="현재 비밀번호를 입력하세요"
-                          className="me-2"
-                        />
+              <Row>
+                <Col md={8}>
+                  <Form.Group className="mb-3">
+                    <Form.Label><strong>현재 비밀번호</strong></Form.Label>
+                    <div className="d-flex">
+                      <Form.Control
+                        type={showPasswords.current ? "text" : "password"}
+                        name="currentPassword"
+                        value={passwordFormData.currentPassword}
+                        onChange={handlePasswordInputChange}
+                        placeholder="현재 비밀번호를 입력하세요"
+                        className="me-2"
+                        autoComplete="current-password"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleVerifyCurrentPassword();
+                          }
+                        }}
+                      />
                         <Button
                           variant="outline-secondary"
                           onClick={() => togglePasswordVisibility('current')}
@@ -288,6 +305,7 @@ const MyPageEdit = () => {
                           onClick={handleVerifyCurrentPassword}
                           className="ms-2"
                           disabled={!passwordFormData.currentPassword}
+                          type="button"
                         >
                           확인
                         </Button>
@@ -311,6 +329,7 @@ const MyPageEdit = () => {
                               onChange={handlePasswordInputChange}
                               placeholder="새 비밀번호를 입력하세요"
                               className="me-2"
+                              autoComplete="new-password"
                             />
                             <Button
                               variant="outline-secondary"
@@ -335,6 +354,7 @@ const MyPageEdit = () => {
                               onChange={handlePasswordInputChange}
                               placeholder="새 비밀번호를 다시 입력하세요"
                               className="me-2"
+                              autoComplete="new-password"
                             />
                             <Button
                               variant="outline-secondary"
@@ -354,7 +374,6 @@ const MyPageEdit = () => {
                     )}
                   </Col>
                 </Row>
-              </Form>
             </Card.Body>
           </Card>
         </Col>
@@ -363,4 +382,4 @@ const MyPageEdit = () => {
   );
 };
 
-export default MyPageEdit; 
+export default MyPagePassUpdate; 
