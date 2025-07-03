@@ -13,4 +13,6 @@ public class OrderRequestDto {
     private Long deliveryId;
     private PaymentMethod paymentMethod;
 
+    private String address;
+    private List<Long> cartItemIds;
 }
