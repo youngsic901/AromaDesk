@@ -8,10 +8,12 @@ import {
 } from "react-router-dom";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import store from "./app/store";
+import { ToastContainer } from "react-toastify";
 
 // Bootstrap CSS and JS
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import "react-toastify/dist/ReactToastify.css";
 
 // Layout Components
 import Header from "./components/layout/Header";
@@ -25,6 +27,8 @@ import ProductListPage from "./pages/ProductListPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import CartPage from "./pages/CartPage";
 import MyPage from "./pages/MyPage";
+import MyPageUpdate from "./pages/MyPageUpdate";
+import MyPagePassUpdate from "./pages/MyPagePassUpdate";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import AdminLoginPage from "./PagesAdmin/AdminLoginPage";
@@ -226,6 +230,8 @@ function AppContent() {
                       />
                       <Route path="/cart" element={<CartPage />} />
                       <Route path="/mypage" element={<MyPage />} />
+                      <Route path="/mypage/edit" element={<MyPageUpdate />} />
+                      <Route path="/mypage/password" element={<MyPagePassUpdate />} />
                       <Route path="/login" element={<LoginPage />} />
                       <Route path="/signup" element={<SignupPage />} />
                       <Route path="/order/payment" element={<OrderPaymentPage />} />
@@ -241,6 +247,7 @@ function AppContent() {
             }
           />
         </Routes>
+        <ToastContainer />
       </LoginStatusChecker>
     </Router>
   );

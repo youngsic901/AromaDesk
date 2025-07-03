@@ -3,8 +3,6 @@ import { useSelector } from "react-redux";
 import { Container, Row, Col, Card, Button, Alert } from "react-bootstrap";
 import { FaUser, FaMapMarkerAlt, FaShoppingBag, FaEdit, FaSignInAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import MyPageUpdate from "./MyPageUpdate";
-import AddressUpdate from "../components/AddressUpdate";
 import { authManager } from "../api/authApi";
 import MyOrders from "./MyOrders";
 import { useLocation } from "react-router-dom";
@@ -12,8 +10,6 @@ const MyPage = () => {
   const { user } = useSelector((state) => state.user);
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(location.state?.activeTab || "info");
-  const [showUpdateForm, setShowUpdateForm] = useState(false);
-  const [showAddressForm, setShowAddressForm] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -42,22 +38,11 @@ const MyPage = () => {
     };
     fetchUserInfo();
   }, [user]);
-  const handleUpdateSuccess = (updatedUser) => {
-    setUserInfo(updatedUser);
-    setShowUpdateForm(false);
-  };
-  const handleAddressUpdateSuccess = (updatedUser) => {
-    setUserInfo(prev => ({
-      ...prev,
-      ...updatedUser
-    }));
-    setShowAddressForm(false);
-  };
   const handleEditClick = () => {
-    setShowUpdateForm(true);
+    navigate('/mypage/edit', { state: { activeTab } });
   };
   const handleAddressEditClick = () => {
-    setShowAddressForm(true);
+    navigate('/mypage/edit', { state: { activeTab: 'address' } });
   };
   // 로딩 상태
   if (loading) {
@@ -145,14 +130,24 @@ const MyPage = () => {
                 <Card>
                   <Card.Header className="d-flex justify-content-between align-items-center">
                     <h5 className="mb-0">개인정보</h5>
-                    <Button
-                        variant="outline-primary"
-                        size="sm"
-                        onClick={handleEditClick}
-                    >
-                      <FaEdit className="me-1" />
-                      {userInfo ? "수정" : "로그인하여 수정"}
-                    </Button>
+                    <div>
+                      <Button
+                          variant="outline-warning"
+                          size="sm"
+                          onClick={() => navigate('/mypage/password', { state: { activeTab } })}
+                          className="me-2"
+                      >
+                        비밀번호 수정
+                      </Button>
+                      <Button
+                          variant="outline-primary"
+                          size="sm"
+                          onClick={handleEditClick}
+                      >
+                        <FaEdit className="me-1" />
+                        {userInfo ? "수정" : "로그인하여 수정"}
+                      </Button>
+                    </div>
                   </Card.Header>
                   <Card.Body>
                     {userInfo ? (
@@ -233,23 +228,6 @@ const MyPage = () => {
             )}
           </Col>
         </Row>
-        {/* 개인정보 수정 모달 */}
-        {showUpdateForm && (
-            <MyPageUpdate
-                user={userInfo}
-                field="info"
-                onUpdate={handleUpdateSuccess}
-                onClose={() => setShowUpdateForm(false)}
-            />
-        )}
-        {/* 배송지 수정 모달 */}
-        {showAddressForm && (
-            <AddressUpdate
-                user={userInfo}
-                onUpdate={handleAddressUpdateSuccess}
-                onClose={() => setShowAddressForm(false)}
-            />
-        )}
       </Container>
   );
 };

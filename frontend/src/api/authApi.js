@@ -88,7 +88,7 @@ export const authManager = {
     try {
       console.log('사용자 정보 업데이트:', updateData);
       const user = authManager.getLocalUser();
-      const response = await apiClient.patch(`/api/members/${user.id}/address`, updateData);
+      const response = await apiClient.post(`/api/members/${user.id}`, updateData);
       const updatedUser = handleApiSuccess(response);
       
       // 캐시 및 localStorage 업데이트
@@ -99,6 +99,52 @@ export const authManager = {
       return { success: true, data: updatedUser };
     } catch (error) {
       console.error('사용자 정보 업데이트 실패:', error);
+      return { 
+        success: false, 
+        error: handleApiError(error).message 
+      };
+    }
+  },
+
+  // 현재 비밀번호 확인
+  verifyCurrentPassword: async (currentPassword) => {
+    try {
+      console.log('현재 비밀번호 확인:', currentPassword);
+      const user = authManager.getLocalUser();
+      const response = await apiClient.post(`/api/members/${user.id}/changePassword`, {
+        currentPassword: currentPassword,
+        newPassword: currentPassword, // 임시로 같은 값 전송
+        confirmPassword: currentPassword
+      });
+      
+      // 성공하면 현재 비밀번호가 맞는 것
+      return { success: true };
+    } catch (error) {
+      console.error('현재 비밀번호 확인 실패:', error);
+      if (error.response && error.response.status === 400) {
+        return { 
+          success: false, 
+          error: "현재 비밀번호가 일치하지 않습니다." 
+        };
+      }
+      return { 
+        success: false, 
+        error: handleApiError(error).message 
+      };
+    }
+  },
+
+  // 비밀번호 변경
+  changePassword: async (passwordData) => {
+    try {
+      console.log('비밀번호 변경:', passwordData);
+      const user = authManager.getLocalUser();
+      const response = await apiClient.post(`/api/members/${user.id}/changePassword`, passwordData);
+      const result = handleApiSuccess(response);
+      
+      return { success: true, data: result };
+    } catch (error) {
+      console.error('비밀번호 변경 실패:', error);
       return { 
         success: false, 
         error: handleApiError(error).message 
