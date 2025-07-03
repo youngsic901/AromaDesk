@@ -1,6 +1,7 @@
 package com.example.aromadesk.product.dto;
 
 import com.example.aromadesk.product.entity.Product;
+import com.example.aromadesk.product.entity.ProductStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,6 +18,7 @@ public class ProductResponseDTO {
     private String imageUrl;
     private String description;      // 🔹 상세 설명
     private String createdAt;        // 🔹 등록일 (형식화해서 String으로 반환)
+    private ProductStatus status;
 
     public ProductResponseDTO(Product product) {
         this.id = product.getId();
@@ -31,5 +33,6 @@ public class ProductResponseDTO {
         this.createdAt = product.getCreatedAt() != null
                 ? product.getCreatedAt().toString().substring(0, 10)  // "YYYY-MM-DD"
                 : null;
+        this.status = product.getStatus();
     }
 }

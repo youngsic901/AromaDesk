@@ -41,7 +41,7 @@ public class CartController {
      * 장바구니에 상품 추가(상품이 있다면 수량 변경)
      *
      * @param memberId 상품을 추가할 장바구니의 소유한 고객의 id
-     * @param request 장바구니에 추가될 상품 { "productId": 5, "quantity": 2 }
+     * @param request 장바구니에 추가될 상품 { "productId": 5, "quantity": 2 , "price": 18000 }
      * @return 실패 or (성공 메세지 + 추가된 상품 정보)
      */
     @PostMapping("/members/{memberId}/cart")
