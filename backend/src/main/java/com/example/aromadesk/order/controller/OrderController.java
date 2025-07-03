@@ -12,6 +12,7 @@ import com.example.aromadesk.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,8 +62,9 @@ public class OrderController {
      * 단일 상품 주문 생성
      */
     @PostMapping("/single")
-    public ResponseEntity<OrderResponseDto> createSingleOrder(@RequestBody OrderRequestDto dto) {
-        Member loginMember = extractLoginMember();
+    public ResponseEntity<OrderResponseDto> createSingleOrder(@RequestBody OrderRequestDto dto,
+                                                              @AuthenticationPrincipal MemberLoginService.CustomUserDetails userDetails) {
+        Member loginMember = userDetails.getMember();
         OrderResponseDto response = orderService.createSingleOrder(dto, loginMember);
         return ResponseEntity.ok(response);
     }
@@ -71,8 +73,9 @@ public class OrderController {
      * 장바구니 기반 주문 생성 → OrderResponseDto 반환으로 변경
      */
     @PostMapping("/from-cart")
-    public ResponseEntity<OrderResponseDto> createOrderFromCart(@RequestBody CartRequestDto dto) {
-        Member loginMember = extractLoginMember();
+    public ResponseEntity<OrderResponseDto> createOrderFromCart(@RequestBody OrderRequestDto dto,
+                                                                @AuthenticationPrincipal MemberLoginService.CustomUserDetails userDetails) {
+        Member loginMember = userDetails.getMember();
         OrderResponseDto response = orderService.createOrderFromCart(dto, loginMember);
         return ResponseEntity.ok(response);
     }

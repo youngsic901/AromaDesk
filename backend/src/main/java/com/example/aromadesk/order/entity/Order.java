@@ -41,8 +41,7 @@ public class Order {
     private OrderStatus orderStatus;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "delivery_id")
+    @OneToOne(mappedBy = "order", cascade = CascadeType.PERSIST)
     private Delivery delivery;
 
     @Column(name = "total_price", nullable = false)
