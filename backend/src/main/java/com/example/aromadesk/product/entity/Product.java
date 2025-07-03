@@ -30,5 +30,7 @@ public class Product {
 
     private LocalDateTime createdAt;
 
-
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ProductStatus status = ProductStatus.ACTIVE;
 }

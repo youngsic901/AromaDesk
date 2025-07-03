@@ -1,5 +1,6 @@
 package com.example.aromadesk.product.dto;
 
+import com.example.aromadesk.product.entity.ProductStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,4 +15,5 @@ public class ProductRequestDTO {
     private int stock;
     private String imageUrl;
     private String description;
+    private ProductStatus status;
 }

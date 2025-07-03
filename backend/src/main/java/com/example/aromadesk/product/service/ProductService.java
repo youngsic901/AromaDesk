@@ -3,6 +3,7 @@ package com.example.aromadesk.product.service;
 import com.example.aromadesk.product.dto.ProductRequestDTO;
 import com.example.aromadesk.product.dto.ProductResponseDTO;
 import com.example.aromadesk.product.entity.Product;
+import com.example.aromadesk.product.entity.ProductStatus;
 import com.example.aromadesk.product.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class ProductService {
+public class    ProductService {
     private final ProductRepository productRepository;
 
     public ProductService(ProductRepository productRepository) {
@@ -76,6 +77,8 @@ public class ProductService {
         product.setDescription(dto.getDescription());
         product.setCreatedAt(LocalDateTime.now());
 
+        product.setStatus(resolveStatus(dto));
+
         return new ProductResponseDTO(productRepository.save(product));
     }
 
@@ -96,14 +99,16 @@ public class ProductService {
         product.setImageUrl(dto.getImageUrl());
         product.setDescription(dto.getDescription());
 
+        product.setStatus(resolveStatus(dto));
+
         return new ProductResponseDTO(productRepository.save(product));
     }
 
     public void deleteProduct(Long id) {
-        if(!productRepository.existsById(id)) {
-            throw new RuntimeException("상품이 존재하지 않습니다.");
-        }
-        productRepository.deleteById(id);
+        Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("상품이 존재하지 않습니다."));
+
+        product.setStatus(ProductStatus.DELETED);
+        productRepository.save(product);
     }
 
     // 브랜드 목록 조회
@@ -113,5 +118,30 @@ public class ProductService {
                 .distinct()
                 .sorted()
                 .collect(Collectors.toList());
+    }
+
+    // product 테이블의 status만 중점적으로 수정하는 메서드
+    public void updateProductStatus(Long productId, ProductStatus newStatus) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
+
+        // 유효성 검증: 재고가 0인데 ACTIVE로 설정하면 안 됨
+        if (product.getStock() == 0 && newStatus == ProductStatus.ACTIVE) {
+            throw new IllegalArgumentException("재고가 0이면 상품 상태를 ACTIVE로 설정할 수 없습니다.");
+        }
+
+        product.setStatus(newStatus);
+        productRepository.save(product);
+    }
+
+    private ProductStatus resolveStatus(ProductRequestDTO dto) {
+        if(dto.getStatus() != null) {
+            if(dto.getStock() == 0 && dto.getStatus() == ProductStatus.ACTIVE) {
+                throw new IllegalArgumentException("재고가 0이면 상품 상태가 ACTIVE일 수 없습니다.");
+            }
+            return dto.getStatus();
+        } else {
+            return dto.getStock() == 0 ? ProductStatus.SOLD_OUT : ProductStatus.ACTIVE;
+        }
     }
 }
