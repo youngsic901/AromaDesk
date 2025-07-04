@@ -19,8 +19,10 @@ public class OrderResponseDto {
     private String paymentMethod;
     private int totalPrice;
     private Long deliveryId;
+    private String deliveryStatus;
     private List<String> productNames;
     private String memberName;
+    private String address;
 
     public static OrderResponseDto from(Order order) {
         return OrderResponseDto.builder()
@@ -30,10 +32,12 @@ public class OrderResponseDto {
                 .paymentMethod(order.getPaymentMethod().name())
                 .totalPrice(order.getTotalPrice())
                 .deliveryId(order.getDelivery() != null ? order.getDelivery().getId() : null)
+                .deliveryStatus(order.getDelivery() != null ? order.getDelivery().getStatus().name() : null)
                 .productNames(order.getOrderItems().stream()
                         .map(item -> item.getProduct().getName())
                         .collect(Collectors.toList()))
                 .memberName(order.getMember().getName())
+                .address(order.getDelivery() != null ? order.getDelivery().getAddress() : null)
                 .build();
     }
 

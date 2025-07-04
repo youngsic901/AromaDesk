@@ -142,6 +142,10 @@ const OrderCompletePage = () => {
                   <div className="order-complete-delivery-value">{delivery.trackingNumber}</div>
                 </div>
               )}
+              <div className="order-complete-delivery-row">
+                <div className="order-complete-delivery-label">배송지</div>
+                <div className="order-complete-delivery-value">{order.address || "배송지 정보 없음"}</div>
+              </div>
             </div>
           </div>
         </div>
