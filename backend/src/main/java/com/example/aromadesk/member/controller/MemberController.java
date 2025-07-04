@@ -36,7 +36,7 @@ public class MemberController {
     private final PasswordEncoder passwordEncoder;
     private final MemberLoginService memberLoginService;
 
-    // 회원 전체 목록 조회 (GET /api/members)
+    // 회원 전체 목록 조회 (GET /api/members)            삭제 후 테스트 필요
     @GetMapping
     public ResponseEntity<?> getAllMembers() {
         List<MemberDto> dtos = memberRepository.findAll()
@@ -54,7 +54,7 @@ public class MemberController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // 회원가입 (POST /api/members)
+    // 회원가입 (POST /api/members)     삭제 후 테스트 필요
     @PostMapping
     public ResponseEntity<MemberDto> createMember(@RequestBody MemberDto dto, HttpSession session) {
         Member member = dto.toEntity();
