@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Button, Spinner, Alert, Nav } from "react-bootstrap";
-import { getMyOrders, getDeliveryStatus } from "../api/mypageApi";
+import { getMyOrders } from "../api/mypageApi";
 
-const DELIVERY_LABELS = {
+const STATUS_LABELS = {
+  ALL: "전체",
   PREPARING: "배송 준비중",
-  SHIPPING: "배송중",
+  SHIPPED: "배송중",
   DELIVERED: "배송 완료",
 };
-
-const STATUS_TABS = ["ALL", "PREPARING", "SHIPPING", "DELIVERED"];
+const STATUS_TABS = ["ALL", "PREPARING", "SHIPPED", "DELIVERED"];
 
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -23,18 +23,11 @@ const MyOrders = () => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const orderList = await getMyOrders();
-        const ordersWithDelivery = await Promise.all(
-          orderList.map(async (order) => {
-            try {
-              const deliveryRes = await getDeliveryStatus(order.orderId);
-              return { ...order, deliveryStatus: deliveryRes.status };
-            } catch {
-              return { ...order, deliveryStatus: "UNKNOWN" };
-            }
-          })
+        const result = await getMyOrders();
+        const sorted = result.sort(
+          (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
         );
-        setOrders(ordersWithDelivery);
+        setOrders(sorted);
       } catch (err) {
         setError("주문 내역을 불러오는 데 실패했습니다.");
       } finally {
@@ -45,11 +38,14 @@ const MyOrders = () => {
   }, []);
 
   useEffect(() => {
-    const filtered =
-      selectedStatus === "ALL"
-        ? orders
-        : orders.filter((order) => order.deliveryStatus === selectedStatus);
-    setFilteredOrders(filtered);
+    if (selectedStatus === "ALL") {
+      setFilteredOrders(orders);
+    } else {
+      const filtered = orders.filter(
+        (order) => order.deliveryStatus === selectedStatus
+      );
+      setFilteredOrders(filtered);
+    }
   }, [orders, selectedStatus]);
 
   if (loading) {
@@ -74,8 +70,11 @@ const MyOrders = () => {
       <Nav variant="tabs" activeKey={selectedStatus} className="mb-4">
         {STATUS_TABS.map((status) => (
           <Nav.Item key={status}>
-            <Nav.Link eventKey={status} onClick={() => setSelectedStatus(status)}>
-              {status === "ALL" ? "전체 보기" : DELIVERY_LABELS[status]}
+            <Nav.Link
+              eventKey={status}
+              onClick={() => setSelectedStatus(status)}
+            >
+              {STATUS_LABELS[status]}
             </Nav.Link>
           </Nav.Item>
         ))}
@@ -95,13 +94,18 @@ const MyOrders = () => {
                     총 결제 금액: {order.totalPrice.toLocaleString()}원
                   </p>
                   <p className="mb-0 text-primary">
-                    배송 상태: {DELIVERY_LABELS[order.deliveryStatus] || order.deliveryStatus}
+                    배송 상태:{" "}
+                    {STATUS_LABELS[order.deliveryStatus] ||
+                      order.deliveryStatus ||
+                      "정보 없음"}
                   </p>
                 </div>
                 <Button
                   variant="outline-secondary"
                   size="sm"
-                  onClick={() => navigate(`/order/complete?orderId=${order.orderId}`)}
+                  onClick={() =>
+                    navigate(`/order/complete?orderId=${order.orderId}`)
+                  }
                 >
                   상세 보기
                 </Button>
