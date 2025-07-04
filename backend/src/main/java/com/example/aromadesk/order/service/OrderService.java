@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
  /*2025.06.26   susu        member 객체로 변경
  /*2025.06.26   KANG        기간별 총메출 메소드 추가
  /*2025.06.30   SUSU        장바구니 주문시 OrderResponseDto 반환 추가
+ /*2025.07.03   SUSU        배송지 직접 입력 방식으로 수정 (Delivery 생성)
  /*************************************************************/
 
 @Service
@@ -55,9 +56,6 @@ public class OrderService {
         if (dto.getItems() == null || dto.getItems().isEmpty()) {
             throw new IllegalArgumentException("주문 항목이 비어 있습니다.");
         }
-
-        Delivery delivery = deliveryRepository.findById(dto.getDeliveryId())
-                .orElseThrow(() -> new IllegalArgumentException("배송지가 없습니다. id=" + dto.getDeliveryId()));
 
         List<OrderItem> orderItems = dto.getItems().stream().map(itemDto -> {
             Product product = productRepository.findById(itemDto.getProductId())
@@ -82,7 +80,6 @@ public class OrderService {
 
         Order order = Order.builder()
                 .member(member)
-                .delivery(delivery)
                 .orderStatus(dto.getPaymentMethod().name().equals("MOCK") ? OrderStatus.PAID : OrderStatus.ORDERED)
                 .paymentMethod(dto.getPaymentMethod())
                 .totalPrice(totalPrice)
@@ -91,7 +88,16 @@ public class OrderService {
         orderItems.forEach(item -> item.setOrder(order));
         order.setOrderItems(orderItems);
 
+        Delivery delivery = Delivery.builder()
+                .address(dto.getAddress())
+                .status(com.example.aromadesk.delivery.entity.DeliveryStatus.PREPARING)
+                .order(order)
+                .build();
+
+        order.setDelivery(delivery);
+
         orderRepository.save(order);
+
         return OrderResponseDto.from(order);
     }
 
@@ -99,10 +105,7 @@ public class OrderService {
      * 장바구니 기반 주문 처리(cartItemIds 사용) + OrderResponseDto 반환
      */
     @Transactional
-    public OrderResponseDto createOrderFromCart(CartRequestDto dto, Member member) {
-        Delivery delivery = deliveryRepository.findById(dto.getDeliveryId())
-                .orElseThrow(() -> new IllegalArgumentException("배송지가 없습니다. id = " + dto.getDeliveryId()));
-
+    public OrderResponseDto createOrderFromCart(OrderRequestDto dto, Member member) {
         List<Cart> cartItems = cartRepository.findAllByIdInAndMemberId(dto.getCartItemIds(), member.getId());
 
         if (cartItems.isEmpty()) {
@@ -134,8 +137,7 @@ public class OrderService {
 
         Order order = Order.builder()
                 .member(member)
-                .delivery(delivery)
-                .orderStatus(OrderStatus.ORDERED)
+                .orderStatus(dto.getPaymentMethod().name().equals("MOCK") ? OrderStatus.PAID : OrderStatus.ORDERED)
                 .paymentMethod(dto.getPaymentMethod())
                 .totalPrice(totalPrice)
                 .build();
@@ -143,9 +145,13 @@ public class OrderService {
         orderItems.forEach(item -> item.setOrder(order));
         order.setOrderItems(orderItems);
 
-        if (dto.getPaymentMethod().name().equals("MOCK")) {
-            order.setOrderStatus(OrderStatus.PAID);
-        }
+        Delivery delivery = Delivery.builder()
+                .address(dto.getAddress())
+                .status(com.example.aromadesk.delivery.entity.DeliveryStatus.PREPARING)
+                .order(order)
+                .build();
+
+        order.setDelivery(delivery);
 
         Order savedOrder = orderRepository.save(order);
         cartRepository.deleteAll(cartItems);
@@ -190,4 +196,32 @@ public class OrderService {
         }
         return countMap;
     }
+
+    @Transactional(readOnly = true)
+    public Delivery getDeliveryByOrderId(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다. orderId=" + orderId));
+
+        Delivery delivery = order.getDelivery();
+        if (delivery == null) {
+            throw new IllegalStateException("배송 정보가 없습니다. orderId=" + orderId);
+        }
+
+        return delivery;
+    }
+
+    @Transactional(readOnly = true)
+    public String getDeliveryStatus(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다. orderId=" + orderId));
+
+        Delivery delivery = order.getDelivery();
+        if (delivery == null) {
+            return "배송 정보 없음";
+        }
+
+        return delivery.getStatus().name();  // DeliveryStatus Enum 값을 문자열로 반환
+    }
+
+
 }
