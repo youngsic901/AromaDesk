@@ -77,3 +77,14 @@ export const getMyOrders = async () => {
     throw handleApiError(error);
   }
 };
+
+// 특정 주문의 배송 상태 조회
+export const getDeliveryStatus = async (orderId) => {
+  try {
+    const response = await apiClient.get(`/api/orders/${orderId}/delivery`);
+    return handleApiSuccess(response);
+  } catch (error) {
+    console.error('배송 상태 조회 오류:', error);
+    throw handleApiError(error);
+  }
+};
