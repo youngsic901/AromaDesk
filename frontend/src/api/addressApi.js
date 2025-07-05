@@ -58,3 +58,22 @@ export const updateAddress = async (memberId, addressData) => {
     };
   }
 };
+
+// 로그인한 사용자 DB 최신 정보 조회
+export const getCurrentUser = async () => {
+  try {
+    console.log('=== 현재 사용자 정보 조회 ===');
+    const response = await axios.get("/auth/me");   
+
+    return {
+      success: true,
+      data: response.data
+    };
+  } catch (error) {
+    console.error('사용자 정보 조회 오류:', error);
+    return {
+      success: false,
+      error: handleApiError(error).message
+    };
+  }
+};
