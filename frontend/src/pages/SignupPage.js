@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useSignUp } from '../api/useSignUp';
 import '../css/loginCus.css';
 import { useEffect} from 'react';
@@ -7,7 +7,14 @@ import axios from 'axios';
 
 const SignupPage = () => {
 
+  const location = useLocation();
+
   useEffect(() => {
+  const params = new URLSearchParams(location.search);
+  const fromSocial = params.get("fromSocial") === "true";
+
+  if(!fromSocial) return;
+
   axios.get('/auth/social-info', { withCredentials: true })
     .then(res => {
       if (res.data.email) {
