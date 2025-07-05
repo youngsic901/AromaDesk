@@ -36,7 +36,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
             request.getSession().setAttribute("email", email);
             request.getSession().setAttribute("name", oAuth2User.getName());
-            response.sendRedirect("http://localhost:3000/signup");
+            response.sendRedirect("http://localhost:3000/signup?fromSocial=true");
         }
     }
 }
