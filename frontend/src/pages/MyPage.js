@@ -3,8 +3,7 @@ import { useSelector } from "react-redux";
 import { Container, Row, Col, Card, Button, Alert, Form } from "react-bootstrap";
 import { FaUser, FaMapMarkerAlt, FaShoppingBag, FaEdit, FaSignInAlt, FaSearch, FaSave, FaTimes } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
-import { authManager } from "../api/authApi";
-import { getCurrentAddress, updateAddress } from "../api/addressApi";
+import { getCurrentUser, updateAddress } from "../api/addressApi";
 import MyOrders from "./MyOrders";
 
 const MyPage = () => {
@@ -26,7 +25,7 @@ const MyPage = () => {
       try {
         setLoading(true);
         setError(null);
-        const result = await authManager.getUserInfo();
+        const result = await getCurrentUser();
         if (result.success) {
           setUserInfo(result.data);
         } else {
@@ -43,16 +42,14 @@ const MyPage = () => {
   }, [user]);
 
   useEffect(() => {
-    if (activeTab === "address" && showAddressForm) {
-      const fetchAddress = async () => {
-        const result = await getCurrentAddress();
-        if (result.success) {
-          setAddressForm(result.data);
-        }
-      };
-      fetchAddress();
+    if (activeTab === "address" && showAddressForm && userInfo) {
+      setAddressForm({
+        address: userInfo.address || "",
+        zipCode: userInfo.zipCode || "",
+        addressDetail: userInfo.addressDetail || ""
+      });
     }
-  }, [activeTab, showAddressForm]);
+  }, [activeTab, showAddressForm, userInfo]);
 
   const handleAddressChange = (e) => {
     const { name, value } = e.target;
@@ -83,7 +80,7 @@ const MyPage = () => {
     if (result.success) {
       alert("배송지 수정 완료");
       setShowAddressForm(false);
-      const updatedUser = await authManager.getUserInfo(true);
+      const updatedUser = await getCurrentUser();
       if (updatedUser.success) {
         setUserInfo(updatedUser.data);
       }
@@ -173,9 +170,9 @@ const MyPage = () => {
                   </Form>
                 ) : (
                   <div>
-                    <p><strong>우편번호:</strong> {addressForm.zipCode || "미등록"}</p>
+                    <p><strong>우편번호:</strong> {userInfo?.zipCode || "미등록"}</p>
                     <p><strong>주소:</strong> {userInfo?.address || "미등록"}</p>
-                    <p><strong>상세주소:</strong> {addressForm.addressDetail || "미등록"}</p>
+                    <p><strong>상세주소:</strong> {userInfo?.addressDetail || "미등록"}</p>
                   </div>
                 )}
               </Card.Body>
