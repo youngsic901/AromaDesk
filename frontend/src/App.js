@@ -21,7 +21,7 @@ import Sidebar from "./components/layout/SideBar";
 import Footer from "./components/layout/Footer";
 
 // Page Components
-import IntroPage from "./pages/IntroPage";
+// import IntroPage from "./pages/IntroPage";
 import MainPage from "./pages/MainPage";
 import ProductListPage from "./pages/ProductListPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
@@ -157,9 +157,6 @@ function AppContent() {
     <Router>
       <LoginStatusChecker>
         <Routes>
-          {/* 소개 페이지 (루트 경로) */}
-          <Route path="/" element={<IntroPage />} />
-
           {/* 관리자 페이지 라우팅: 별도 레이아웃 */}
           <Route path="/adminLogin" element={<AdminLoginPage />} />
           <Route
@@ -215,6 +212,7 @@ function AppContent() {
                   />
                   <main className="flex-grow-1 p-4">
                     <Routes>
+                      <Route path="/" element={<MainPage />} />
                       <Route path="/main" element={<MainPage />} />
                       <Route
                         path="/category/:category"

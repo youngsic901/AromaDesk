@@ -60,8 +60,8 @@ function AdminMemberPage() {
   return (
     <AdminLayout>
       <div className="admin-member-container">
-        <h2 style={{fontWeight:800, fontSize:24, marginBottom:8}}>회원 관리</h2>
-        <div style={{color:'#888', marginBottom:24}}>회원 정보 조회 및 관리를 할 수 있습니다</div>
+        <h1 style={{fontSize: '28px', fontWeight: '700', marginBottom: '8px'}}>회원 관리</h1>
+        <h2 style={{fontSize: '16px', color: '#888', marginBottom: '24px'}}>회원 정보 조회 및 관리를 할 수 있습니다</h2>
         <form className="admin-member-search-box" onSubmit={handleSearch}>
           <input
             className="admin-member-search-input"
