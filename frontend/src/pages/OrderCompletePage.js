@@ -21,6 +21,7 @@ const OrderCompletePage = () => {
   const [order, setOrder] = useState(null);
   const [delivery, setDelivery] = useState(null);
   const [error, setError] = useState("");
+  const [cancelError, setCancelError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -52,6 +53,22 @@ const OrderCompletePage = () => {
 
     fetchData();
   }, [orderId]);
+
+  const handleCancelOrder = async () => {
+    if (!window.confirm("정말 주문을 취소하시겠습니까?")) return;
+
+    try {
+      const res = await orderApi.cancelOrder(orderId);
+      if (res.success) {
+        alert("주문이 취소되었습니다.");
+        navigate("/mypage", { state: { activeTab: "orders" } });
+      } else {
+        setCancelError(res.error || "주문 취소에 실패했습니다.");
+      }
+    } catch (error) {
+      setCancelError("주문 취소 중 오류가 발생했습니다.");
+    }
+  };
 
   if (error) {
     return (
@@ -90,7 +107,7 @@ const OrderCompletePage = () => {
             <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
           </svg>
         </div>
-        <h1 className="order-complete-title">주문이 완료되었습니다! :짠:</h1>
+        <h1 className="order-complete-title">주문이 완료되었습니다!</h1>
         <p className="order-complete-subtitle">주문이 성공적으로 처리되었습니다.</p>
       </div>
 
@@ -147,6 +164,8 @@ const OrderCompletePage = () => {
         </div>
       </div>
 
+      {cancelError && <div className="order-complete-error-message">{cancelError}</div>}
+
       <div className="order-complete-actions">
         <button
           className="order-complete-button order-complete-button-primary"
@@ -159,6 +178,12 @@ const OrderCompletePage = () => {
           onClick={() => navigate("/main")}
         >
           홈으로 가기
+        </button>
+        <button
+          className="order-complete-button order-complete-button-danger"
+          onClick={handleCancelOrder}
+        >
+          주문 취소하기
         </button>
       </div>
     </div>

@@ -65,6 +65,19 @@ export const orderApi = {
       return { success: false, error: handleApiError(error).message };
     }
   },
+
+ /**
+   * 주문 취소
+   * @param {number} orderId
+   */
+  cancelOrder: async (orderId) => {
+    try {
+      const response = await apiClient.post(`/api/orders/${orderId}/cancel`);
+      return { success: true, data: handleApiSuccess(response) };
+    } catch (error) {
+      return { success: false, error: handleApiError(error).message };
+    }
+  },
 };
 
 export default orderApi;

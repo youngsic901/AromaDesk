@@ -37,7 +37,8 @@ import java.util.stream.Collectors;
  /*2025.06.26   KANG        기간별 총메출 메소드 추가
  /*2025.06.30   SUSU        장바구니 주문시 OrderResponseDto 반환 추가
  /*2025.07.03   SUSU        배송지 직접 입력 방식으로 수정 (Delivery 생성)
- /*2025.07.05   SUSU        주문 상세 조히 추가
+ /*2025.07.05   SUSU        주문 상세 조회 추가
+ /*2025.07.07   SUSU        주문 취소 기능 추가
  /*************************************************************/
 
 @Service
@@ -311,6 +312,24 @@ public class OrderService {
         order.setOrderStatus(OrderStatus.valueOf(orderStatus));
     }
 
+    @Transactional
+    public void cancelOrder(Long orderId, Long memberId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("주문을 찾을 수 없습니다"));
 
+        //본인 주문인지 확인
+        if(!order.getMember().getId().equals(memberId)) {
+            throw new RuntimeException("본인의 주문만 취소 할 수 있습니다.");
+        }
+
+        //이미 취소된 주문인지 확인
+        if(order.getOrderStatus() == OrderStatus.CANCELLED) {
+            throw new RuntimeException("이미 취소된 주문입니다.");
+        }
+
+        //주문 상태 변경
+        order.setOrderStatus(OrderStatus.CANCELLED);
+
+    }
 
 }
