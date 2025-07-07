@@ -142,4 +142,11 @@ public class OrderController {
         Map<String, Long> result = orderService.countOrdersByStatusBetween(startDateTime, endDateTime);
         return ResponseEntity.ok(result);
     }
+
+    @PostMapping("/{orderId}/cancel")
+    public ResponseEntity<String> cancelOrder(@PathVariable("orderId") Long orderId) {
+        Member loginMember = extractLoginMember();
+        orderService.cancelOrder(orderId, loginMember.getId());
+        return ResponseEntity.ok("주문이 취소되었습니다.");
+    }
 }

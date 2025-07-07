@@ -24,7 +24,12 @@ const MyOrders = () => {
       try {
         setLoading(true);
         const result = await getMyOrders();
-        const sorted = result.sort(
+
+        const notCancelled = result.filter(
+          (order) => order.orderStatus !== "CANCELLED"
+        );
+
+        const sorted = notCancelled.sort(
           (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
         );
         setOrders(sorted);

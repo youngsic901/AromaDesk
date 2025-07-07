@@ -371,3 +371,14 @@
     height: 30px;
   }
 } 
+
+.order-complete-button-danger {
+  background-color: #f44336;
+  color: white;
+  border: none;
+}
+
+.order-complete-error-message {
+  color: red;
+  margin-top: 12px;
+}
