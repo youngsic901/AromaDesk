@@ -156,7 +156,8 @@ const AdminProductPage = () => {
   return (
     <AdminLayout>
       <div className="admin-page">
-        <h1>상품 관리</h1>
+        <h1 style={{fontSize: '28px', fontWeight: '700', marginBottom: '8px'}}>상품 관리</h1>
+        <h2 style={{fontSize: '16px', color: '#888', marginBottom: '24px'}}>상품 정보 조회 및 관리를 할 수 있습니다</h2>
         {/* 필터 바 */}
         <div className="filter-bar">
           <select value={brand} onChange={(e) => setBrand(e.target.value)}>
