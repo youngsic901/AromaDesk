@@ -155,27 +155,39 @@ public class MemberController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+        // 0. 기존 세션 무효화
+        HttpSession oldSession = request.getSession(false);
+        if (oldSession != null) {
+            oldSession.invalidate();
+        }
+
+        // 1. 새로운 세션 생성
+        HttpSession session = request.getSession(true);
+
+        // 2. UserDetails 생성
         UserDetails userDetails = memberLoginService.loadUserByUsername(loginRequest.getMemberId());
 
+        // 3. 비밀번호 검증
         if (!passwordEncoder.matches(loginRequest.getPassword(), userDetails.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 틀렸습니다");
         }
 
+        // 4. 인증 토큰 생성 및 SecurityContext에 저장
         UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authToken);
         SecurityContextHolder.setContext(context);
 
-        HttpSession session = request.getSession(true);
+        // 5. 세션에 SPRING_SECURITY_CONTEXT 저장
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
 
+        // 6. 사용자 정보 세션에 저장
         Member member = ((MemberLoginService.CustomUserDetails) userDetails).getMember();
         MemberDto memberDto = MemberDto.fromEntity(member);
         session.setAttribute("CusUser", memberDto);
 
-        // 로그인 성공 시 사용자 식별에 필요한 최소한의 정보만 반환
+        // 7. 로그인 성공 시 사용자 식별에 필요한 최소한의 정보만 반환
         Map<String, Object> response = new HashMap<>();
         response.put("memberId", memberDto.getMemberId());
         response.put("name", memberDto.getName());

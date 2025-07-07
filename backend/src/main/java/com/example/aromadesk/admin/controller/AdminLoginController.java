@@ -49,24 +49,32 @@ public class AdminLoginController {
             return ResponseEntity.status(401).body("비밀번호가 일치하지 않습니다.");
         }
 
-        // 1. UserDetails 만들기 (AdminLoginService에서 loadUserByUsername 활용)
+        // 0. 기존 세션 무효화
+        HttpSession oldSession = request.getSession(false);
+        if(oldSession != null) {
+            oldSession.invalidate();
+        }
+
+        // 1. 새로운 세션 생성
+        HttpSession session = request.getSession(true);
+
+        // 2. UserDetails 만들기 (AdminLoginService에서 loadUserByUsername 활용)
         UserDetails userDetails = adminLoginService.loadUserByUsername(dto.getUsername());
 
-        // 2. 인증 토큰 생성 및 SecurityContext에 저장
+        // 3. 인증 토큰 생성 및 SecurityContext에 저장
         UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authToken);
         SecurityContextHolder.setContext(context);
 
-        // 3. 세션에 SPRING_SECURITY_CONTEXT_KEY로 저장
-        HttpSession session = request.getSession(true);
+        // 4. 세션에 SPRING_SECURITY_CONTEXT_KEY로 저장
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
 
-        // 4. 관리자 정보 세션에도 저장(선택)
+        // 5. 관리자 정보 세션에도 저장(선택)
         session.setAttribute("Admin", AdminDto.fromEntity(admin));
 
-        // 5. 응답 구성
+        // 6. 응답 구성
         Map<String, Object> response = new HashMap<>();
         response.put("admin", AdminDto.fromEntity(admin));
         response.put("AdminUser", session.getId());
