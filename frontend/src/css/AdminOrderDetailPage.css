@@ -1,0 +1,103 @@
+.order-detail-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 40px 0;
+}
+
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.top-bar {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+}
+
+.back-button {
+    background-color: #34d399;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.back-button:hover {
+    background-color: #10b981;
+}
+
+.order-detail-card {
+    background-color: #f9fafb;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 400px;
+}
+
+.order-detail-control {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.order-detail-control label {
+    font-weight: 600;
+}
+
+.save-button {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.save-button:hover {
+    background-color: #2563eb;
+}
+
+.loading {
+    text-align: center;
+    font-size: 18px;
+    padding: 40px;
+}
+
+/* 상태 변경 텍스트 강조 */
+.confirm-highlight {
+    font-weight: 700;
+    color: #dc2626;
+}
+
+.order-detail-control select {
+    padding: 6px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: #fff;
+    font-size: 14px;
+    color: #374151;
+    appearance: none;  /* 기본 화살표 제거 */
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20fill%3D%22%236b7280%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205-5z%22/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 18px;
+}
+
+.order-detail-control select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}

@@ -1,5 +1,6 @@
 package com.example.aromadesk.delivery.service;
 
+import com.example.aromadesk.delivery.dto.DeliveryStatusResponseDto;
 import com.example.aromadesk.delivery.entity.Delivery;
 import com.example.aromadesk.delivery.entity.DeliveryStatus;
 
@@ -39,12 +40,16 @@ public class DeliveryService {
      * 배송 상태 변경
      */
     @Transactional
-    public void updateDeliveryStatus(Long deliveryId, DeliveryStatus newStatus) {
+    public DeliveryStatusResponseDto updateDeliveryStatus(Long deliveryId, DeliveryStatus newStatus) {
         Delivery delivery = deliveryRepository.findById(deliveryId)
                 .orElseThrow(() -> new IllegalArgumentException("배송 정보가 없습니다."));
 
         delivery.setStatus(newStatus);
+
+        // 변경 결과 반환
+        return DeliveryStatusResponseDto.from(delivery);
     }
+
 
     /**
      * 전체 배송 조회

@@ -42,6 +42,7 @@ import BrandPage from "./pages/BrandPage";
 import SearchPage from "./pages/SearchPage";
 import OrderCompletePage from "./pages/OrderCompletePage";
 import OrderPaymentPage from "./pages/OrderPaymentPage"
+import AdminOrderDetailPage from "./PagesAdmin/AdminOrderDetailPage"
 // API
 import { loginAPI } from "./api/loginApi";
 import {
@@ -199,6 +200,14 @@ function AppContent() {
               </AdminRoute>
             }
           />
+          <Route path="/admin/orders/:orderId" 
+          element={
+            <AdminRoute>
+              <AdminOrderDetailPage />
+            </AdminRoute>
+            }
+          />
+
           {/* 일반 사용자 페이지 라우팅: 기존 레이아웃 */}
           <Route
             path="/*"
