@@ -41,10 +41,10 @@ function AdminOrderPage() {
     return (
         <AdminLayout>
             <div className="admin-order-page">
-                <h2>주문 관리</h2>
-                <div className="admin-order-desc">
+                <h1 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '8px' }}>주문 관리</h1>
+                <h2 style={{ fontSize: '16px', color: '#888', marginBottom: '24px' }}>
                     주문 내역의 상태를 확인하는 페이지 입니다
-                </div>
+                </h2>
                 {isLoading ? (
                     <div className="admin-order-loading">불러오는 중...</div>
                 ) : orders.length === 0 ? (

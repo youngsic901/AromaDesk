@@ -42,8 +42,6 @@ const AdminLoginPage = () => {
           sessionId: result.data.AdminUser
         }));
         
-        alert('관리자 로그인 성공!');
-        
         // Redux 상태 업데이트 후 페이지 이동
         navigate('/admin');
       } else {

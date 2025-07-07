@@ -36,7 +36,8 @@
     font-size: 1.3rem;
     font-weight: bold;
     margin-bottom: 20px;
-    align-self: flex-start;
+    text-align: center;
+    width: 100%;
   }
   
   .login-input {
