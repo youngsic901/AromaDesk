@@ -7,6 +7,7 @@ import com.example.aromadesk.delivery.entity.Delivery;
 import com.example.aromadesk.delivery.repostiory.DeliveryRepository;
 import com.example.aromadesk.member.entity.Member;
 import com.example.aromadesk.member.repository.MemberRepository;
+import com.example.aromadesk.order.dto.OrderDetailResponseDto;
 import com.example.aromadesk.order.dto.OrderRequestDto;
 import com.example.aromadesk.order.dto.OrderResponseDto;
 import com.example.aromadesk.order.entity.Order;
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
  /*2025.06.26   KANG        기간별 총메출 메소드 추가
  /*2025.06.30   SUSU        장바구니 주문시 OrderResponseDto 반환 추가
  /*2025.07.03   SUSU        배송지 직접 입력 방식으로 수정 (Delivery 생성)
+ /*2025.07.05   SUSU        주문 상세 조히 추가
  /*************************************************************/
 
 @Service
@@ -49,7 +51,7 @@ public class OrderService {
     private final CartRepository cartRepository;
 
     /**
-     * 단일 상품 주문 처리 (상품 상세 페이지에서 바로 구매)
+     * 단일 상품 주문 처리
      */
     @Transactional
     public OrderResponseDto createSingleOrder(OrderRequestDto dto, Member member) {
@@ -88,21 +90,25 @@ public class OrderService {
         orderItems.forEach(item -> item.setOrder(order));
         order.setOrderItems(orderItems);
 
+        Order savedOrder = orderRepository.save(order);
+
+        // 배송 정보 생성 후 저장
         Delivery delivery = Delivery.builder()
                 .address(dto.getAddress())
                 .status(com.example.aromadesk.delivery.entity.DeliveryStatus.PREPARING)
-                .order(order)
+                .order(savedOrder)
                 .build();
 
-        order.setDelivery(delivery);
+        deliveryRepository.save(delivery);
 
-        orderRepository.save(order);
+        // 배송 정보 연결 후 주문 업데이트
+        savedOrder.setDelivery(delivery);
 
-        return OrderResponseDto.from(order);
+        return OrderResponseDto.from(savedOrder);
     }
 
     /**
-     * 장바구니 기반 주문 처리(cartItemIds 사용) + OrderResponseDto 반환
+     * 장바구니 기반 주문 처리
      */
     @Transactional
     public OrderResponseDto createOrderFromCart(OrderRequestDto dto, Member member) {
@@ -145,20 +151,32 @@ public class OrderService {
         orderItems.forEach(item -> item.setOrder(order));
         order.setOrderItems(orderItems);
 
+        Order savedOrder = orderRepository.save(order);
+
+        // 배송 정보 생성 후 저장
         Delivery delivery = Delivery.builder()
                 .address(dto.getAddress())
                 .status(com.example.aromadesk.delivery.entity.DeliveryStatus.PREPARING)
-                .order(order)
+                .order(savedOrder)
                 .build();
 
-        order.setDelivery(delivery);
+        deliveryRepository.save(delivery);
 
-        Order savedOrder = orderRepository.save(order);
+        // 배송 정보 연결 후 주문 업데이트
+        savedOrder.setDelivery(delivery);
         cartRepository.deleteAll(cartItems);
 
         return OrderResponseDto.from(savedOrder);
     }
 
+
+    /**
+     * 회원의 전체 주문 목록 조회
+     * 
+     * @param  member 조회할 회원
+     * @return 회원의 주문 목록 DTO 리스트
+     */
+    
     @Transactional(readOnly = true)
     public List<OrderResponseDto> getOrdersByMemberID(Member member) {
         List<Order> orders = orderRepository.findByMemberId(member.getId());
@@ -167,6 +185,12 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 주문 결제 완료 처리 
+     * @param orderId 결제할 주문 ID
+     * @throws IllegalArgumentException 주문이 존재하지 않거나 이미 결제된 경우 예외 발생
+     */
+    
     @Transactional
     public void completePayment(Long orderId) {
         Order order = orderRepository.findById(orderId)
@@ -179,11 +203,27 @@ public class OrderService {
         order.setOrderStatus(OrderStatus.PAID);
     }
 
+    /**
+     * 특정 기간 동안의 총 매출 조회
+     *
+     * @param start 시작일
+     * @param end 종료일
+     * @return 기간 내 총 매출액
+     */
+
     @Transactional(readOnly = true)
     public Long getTotalSalesBetween(LocalDateTime start, LocalDateTime end) {
         Long total = orderRepository.getTotalSalesBetween(start, end);
         return total != null ? total : 0L;
     }
+
+    /**
+     * 특정 기간 동안의 주문 상태별 건수 조회
+     *
+     * @param start 시작일
+     * @param end 종료일
+     * @return 상태별 주문 건수 맵
+     */
 
     @Transactional(readOnly = true)
     public Map<String, Long> countOrdersByStatusBetween(LocalDateTime start, LocalDateTime end) {
@@ -197,6 +237,14 @@ public class OrderService {
         return countMap;
     }
 
+    /**
+     * 주문 ID로 배송 정보 조회
+     *
+     * @param orderId 주문 ID
+     * @return 배송 정보 엔티티
+     * @throws IllegalArgumentException 주문이 존재하지 않는 경우 예외 발생
+     * @throws IllegalStateException 배송 정보가 없는 경우 예외 발생
+     */
     @Transactional(readOnly = true)
     public Delivery getDeliveryByOrderId(Long orderId) {
         Order order = orderRepository.findById(orderId)
@@ -210,6 +258,13 @@ public class OrderService {
         return delivery;
     }
 
+    /**
+     * 주문 ID로 배송 상태만 조회
+     *
+     * @param orderId 주문 ID
+     * @return 배송 상태 문자열 (배송 정보 없음 시 "배송 정보 없음")
+     * @throws IllegalArgumentException 주문이 존재하지 않는 경우 예외 발생
+     */
     @Transactional(readOnly = true)
     public String getDeliveryStatus(Long orderId) {
         Order order = orderRepository.findById(orderId)
@@ -222,6 +277,40 @@ public class OrderService {
 
         return delivery.getStatus().name();  // DeliveryStatus Enum 값을 문자열로 반환
     }
+
+    /**
+     * 주문 상세 조회(배송 정보 포함)
+     * @param orderId 주문 ID
+     * @return 주문 상세 정보 DTO
+     */
+
+    @Transactional(readOnly = true)
+    public OrderDetailResponseDto getOrderDetail(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다." + orderId));
+        return OrderDetailResponseDto.from(order);
+    }
+
+    /**
+     * 관리자용 전체 주문 목록 조회
+     * - 모든 주문 상태 및 배송 상태 포함
+     */
+    @Transactional(readOnly = true)
+    public List<OrderResponseDto> getAllOrdersForAdmin() {
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream()
+                .map(OrderResponseDto::from)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void updateOrderStatus(Long orderId, String orderStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다. orderId=" + orderId));
+
+        order.setOrderStatus(OrderStatus.valueOf(orderStatus));
+    }
+
 
 
 }

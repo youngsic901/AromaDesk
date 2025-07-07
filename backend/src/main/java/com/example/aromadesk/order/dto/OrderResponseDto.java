@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class OrderResponseDto {
     private Long orderId;
     private LocalDateTime orderDate;
-    private String status;
+    private String orderStatus;
     private String paymentMethod;
     private int totalPrice;
     private Long deliveryId;
@@ -27,7 +27,7 @@ public class OrderResponseDto {
         return OrderResponseDto.builder()
                 .orderId(order.getId())
                 .orderDate(order.getCreatedAt())
-                .status(order.getOrderStatus().name())
+                .orderStatus(order.getOrderStatus().name())
                 .paymentMethod(order.getPaymentMethod().name())
                 .totalPrice(order.getTotalPrice())
                 .deliveryId(order.getDelivery() != null ? order.getDelivery().getId() : null)

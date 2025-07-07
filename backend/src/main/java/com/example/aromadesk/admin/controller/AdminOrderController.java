@@ -1,15 +1,16 @@
 package com.example.aromadesk.admin.controller;
 
+import com.example.aromadesk.order.dto.OrderDetailResponseDto;
 import com.example.aromadesk.order.dto.OrderResponseDto;
 import com.example.aromadesk.order.entity.Order;
 import com.example.aromadesk.order.repository.OrderRepository;
+import com.example.aromadesk.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 public class AdminOrderController {
 
     private final OrderRepository orderRepository;
+    private final OrderService orderService;
 
     @GetMapping
     public ResponseEntity<List<OrderResponseDto>> getAllOrdersForAdmin() {
@@ -27,4 +29,28 @@ public class AdminOrderController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(result);
     }
+
+    /**
+     * 주문 상세 조회 (배송 정보 포함)
+     *
+     * @param orderId 주문 ID
+     * @return 주문 상세 정보 응답 DTO
+     */
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderDetailResponseDto> getOrderDetail(@PathVariable Long orderId) {
+        OrderDetailResponseDto response = orderService.getOrderDetail(orderId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{orderId}/order-status")
+    public ResponseEntity<Void> updateOrderStatus(
+            @PathVariable Long orderId,
+            @RequestBody Map<String, String> body) {
+
+        String orderStatus = body.get("orderStatus");
+        orderService.updateOrderStatus(orderId, orderStatus);
+        return ResponseEntity.ok().build();
+    }
+
+
 }

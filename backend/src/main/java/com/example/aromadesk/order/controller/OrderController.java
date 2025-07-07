@@ -117,7 +117,8 @@ public class OrderController {
     @GetMapping("/{orderId}/delivery")
     public ResponseEntity<DeliveryStatusResponseDto> getDeliveryStatus(@PathVariable("orderId") Long orderId) {
         Delivery delivery = orderService.getDeliveryByOrderId(orderId);
-        return ResponseEntity.ok(new DeliveryStatusResponseDto(delivery.getStatus().name()));
+
+        return ResponseEntity.ok(DeliveryStatusResponseDto.from(delivery));
     }
 
     /**

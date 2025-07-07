@@ -25,8 +25,15 @@ public class DeliveryController {
     @GetMapping("/orders/{orderId}/status")
     public ResponseEntity<DeliveryStatusResponseDto> getDeliveryStatus(@PathVariable Long orderId) {
         DeliveryStatus status = deliveryService.getDeliveryStatus(orderId);
-        return ResponseEntity.ok(new DeliveryStatusResponseDto(status.name()));
+
+        DeliveryStatusResponseDto response = DeliveryStatusResponseDto.builder()
+                .deliveryId(orderId)
+                .status(status.name())
+                .build();
+
+        return ResponseEntity.ok(response);
     }
+
 
     /**
      * 배송 상태 변경
