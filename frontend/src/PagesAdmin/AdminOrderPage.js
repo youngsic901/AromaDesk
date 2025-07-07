@@ -37,7 +37,7 @@ function AdminOrderPage() {
             .catch(() => setOrders([]))
             .finally(() => setIsLoading(false));
     }, []);
-
+  
     return (
         <AdminLayout>
             <div className="admin-order-page">
