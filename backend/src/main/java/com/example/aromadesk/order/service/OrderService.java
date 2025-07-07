@@ -4,6 +4,7 @@ import com.example.aromadesk.cart.dto.CartRequestDto;
 import com.example.aromadesk.cart.entity.Cart;
 import com.example.aromadesk.cart.repository.CartRepository;
 import com.example.aromadesk.delivery.entity.Delivery;
+import com.example.aromadesk.delivery.entity.DeliveryStatus;
 import com.example.aromadesk.delivery.repostiory.DeliveryRepository;
 import com.example.aromadesk.member.entity.Member;
 import com.example.aromadesk.member.repository.MemberRepository;
@@ -325,6 +326,11 @@ public class OrderService {
         //이미 취소된 주문인지 확인
         if(order.getOrderStatus() == OrderStatus.CANCELLED) {
             throw new RuntimeException("이미 취소된 주문입니다.");
+        }
+
+        //배송 상태가 배송 완료면 취소 불가
+        if(order.getDelivery() != null && order.getDelivery().getStatus() == DeliveryStatus.DELIVERED) {
+            throw new RuntimeException("배송이 완료된 주문은 취소할 수 없습니다.");
         }
 
         //주문 상태 변경
