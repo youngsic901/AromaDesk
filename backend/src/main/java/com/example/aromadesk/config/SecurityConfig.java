@@ -77,7 +77,7 @@ public class SecurityConfig {
 				.cors(cors -> cors.configurationSource(corsConfigurationSource))
 				.csrf(csrf -> csrf.disable())
 				.userDetailsService(adminLoginService)
-				.securityMatcher("/admin/**", "api/admin/**")
+				.securityMatcher("/admin/**", "/api/admin/**")
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/admin/login", "/admin/login-process").permitAll()
 						.anyRequest().hasRole("ADMIN")

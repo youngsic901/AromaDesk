@@ -54,7 +54,7 @@ function AdminOrderDetailPage() {
     const updateDeliveryStatus = async () => {
         const deliveryId = order.deliveryId;
         if (!deliveryId) return;
-        await apiClient.post(`/api/admin/delivery/${deliveryId}/status`, { status: deliveryStatus });
+        await apiClient.put(`/api/deliveries/${deliveryId}/status/${deliveryStatus}`);
         setConfirmOpen(false);
     };
 
@@ -99,7 +99,7 @@ function AdminOrderDetailPage() {
                                 </div>
                                 <div className="info-item">
                                     <label>주문일자</label>
-                                    <span>{order.orderDate?.slice(0, 10)}</span>
+                                    <span>{order.orderDate ? new Date(order.orderDate).toLocaleDateString('ko-KR') : '-'}</span>
                                 </div>
                                 <div className="info-item">
                                     <label>배송지</label>
