@@ -13,6 +13,8 @@ CREATE TABLE member (
     name VARCHAR(50) NOT NULL,
     phone VARCHAR(20),
     address VARCHAR(255),
+    zip_code VARCHAR(20),         -- ★ 우편번호(신규 추가)
+    address_detail VARCHAR(255),  -- ★ 상세주소(신규 추가)
     role VARCHAR(20) DEFAULT 'USER', -- 기본적으로는 USER 추후에 등급이 추가 될 수도 있을거 같아서 존속하는걸로 결정
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

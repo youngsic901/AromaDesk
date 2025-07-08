@@ -76,7 +76,11 @@ const MyPage = () => {
       return;
     }
 
-    const result = await updateAddress(userInfo.id, { address: addressForm.address });
+    const result = await updateAddress(userInfo.id, {
+      address: addressForm.address,
+      zipCode: addressForm.zipCode,
+      addressDetail: addressForm.addressDetail,
+    });
     if (result.success) {
       alert("배송지 수정 완료");
       setShowAddressForm(false);

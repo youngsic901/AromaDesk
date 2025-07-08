@@ -16,8 +16,10 @@ public class MemberDto {
     private String phone;
     private String password;
     private String address;
+    private String zipCode;
+    private String addressDetail;
     private String role;
-    private LocalDateTime createdAt;//
+    private LocalDateTime createdAt;
 
     // 엔티티 → DTO
     public static MemberDto fromEntity(Member member) {
@@ -29,6 +31,8 @@ public class MemberDto {
                 .email(member.getEmail())
                 .phone(member.getPhone())
                 .address(member.getAddress())
+                .zipCode(member.getZipCode())
+                .addressDetail(member.getAddressDetail())
                 .role(member.getRole())
                 .createdAt(member.getCreatedAt())
                 // password는 응답에서 보통 제외, 필요시 주석 해제
@@ -45,6 +49,8 @@ public class MemberDto {
                 .email(this.email)
                 .phone(this.phone)
                 .address(this.address)
+                .zipCode(this.zipCode)
+                .addressDetail(this.addressDetail)
                 .role(this.role)
                 .createdAt(this.createdAt != null ? this.createdAt : LocalDateTime.now())
                 .password(this.password)

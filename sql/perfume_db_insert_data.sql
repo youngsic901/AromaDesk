@@ -48,13 +48,13 @@ INSERT INTO common_code (code, group_name, label, parent_code, sort_order) VALUE
 
 
 -- ✅ 회원(member) 삽입
-INSERT INTO member (member_id, email, password, name, phone, address)
+INSERT INTO member (member_id, email, password, name, phone, address, zip_code, address_detail)
 VALUES
-    ('user001', 'user001@example.com', '$2a$10$Mwuo/rTLcG4JEI5DFnvGzut4jDUzVAiIHKcfvTxsJx93XjeBNjEPq', '홍길동', '010-1111-1111', '서울시 강남구'),
-    ('user002', 'user002@example.com', '$2a$10$Mwuo/rTLcG4JEI5DFnvGzut4jDUzVAiIHKcfvTxsJx93XjeBNjEPq', '김영희', '010-2222-2222', '부산시 해운대구'),
-    ('user003', 'user003@example.com', '$2a$10$Mwuo/rTLcG4JEI5DFnvGzut4jDUzVAiIHKcfvTxsJx93XjeBNjEPq', '이철수', '010-3333-3333', '대전시 유성구'),
-    ('user004', 'user004@example.com', '$2a$10$Mwuo/rTLcG4JEI5DFnvGzut4jDUzVAiIHKcfvTxsJx93XjeBNjEPq', '박민수', '010-4444-4444', '인천시 남동구'),
-    ('user005', 'user005@example.com', '$2a$10$Mwuo/rTLcG4JEI5DFnvGzut4jDUzVAiIHKcfvTxsJx93XjeBNjEPq', '최지은', '010-5555-5555', '대구시 수성구');
+    ('user001', 'user001@example.com', '$2a$10$Mwuo/rTLcG4JEI5DFnvGzut4jDUzVAiIHKcfvTxsJx93XjeBNjEPq', '홍길동', '010-1111-1111', '서울시 강남구', '06234', '101동 1101호'),
+    ('user002', 'user002@example.com', '$2a$10$Mwuo/rTLcG4JEI5DFnvGzut4jDUzVAiIHKcfvTxsJx93XjeBNjEPq', '김영희', '010-2222-2222', '부산시 해운대구', '48094', '201동 203호'),
+    ('user003', 'user003@example.com', '$2a$10$Mwuo/rTLcG4JEI5DFnvGzut4jDUzVAiIHKcfvTxsJx93XjeBNjEPq', '이철수', '010-3333-3333', '대전시 유성구', '34139', '305동 1802호'),
+    ('user004', 'user004@example.com', '$2a$10$Mwuo/rTLcG4JEI5DFnvGzut4jDUzVAiIHKcfvTxsJx93XjeBNjEPq', '박민수', '010-4444-4444', '인천시 남동구', '21558', '아파트 303호'),
+    ('user005', 'user005@example.com', '$2a$10$Mwuo/rTLcG4JEI5DFnvGzut4jDUzVAiIHKcfvTxsJx93XjeBNjEPq', '최지은', '010-5555-5555', '대구시 수성구', '42079', '빌라 402호');
 
 -- ✅ 회원별 기본 배송지 및 추가 배송지 삽입
 INSERT INTO member_address (member_id, address, is_default, alias)
