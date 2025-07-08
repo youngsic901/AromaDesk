@@ -35,7 +35,7 @@ const CategoryPage = () => {
     const categoryMap = {
       MALE: "남자향수",
       FEMALE: "여자향수",
-      UNISEX: "남여공용",
+      UNISEX: "남녀공용",
     };
     return categoryMap[code] || code;
   };

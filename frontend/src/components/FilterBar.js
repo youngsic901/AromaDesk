@@ -18,7 +18,7 @@ const GENDER_OPTIONS = [
   { value: "", label: "성별 전체" },
   { value: "MALE", label: "남자향수" },
   { value: "FEMALE", label: "여자향수" },
-  { value: "UNISEX", label: "남여공용" },
+  { value: "UNISEX", label: "남녀공용" },
 ];
 const PRICE_OPTIONS = [
   { value: "", label: "가격 전체" },

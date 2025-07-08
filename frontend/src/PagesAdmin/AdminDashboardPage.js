@@ -323,7 +323,7 @@ const generateDummyData = {
     const genderCategories = [
       { category: '남성향수', count: Math.floor(Math.random() * 300) + 150 },
       { category: '여성향수', count: Math.floor(Math.random() * 400) + 200 },
-      { category: '중성향수', count: Math.floor(Math.random() * 200) + 100 }
+      { category: '남녀공용향수', count: Math.floor(Math.random() * 200) + 100 }
     ];
     
     // 용량 카테고리

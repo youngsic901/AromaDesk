@@ -112,7 +112,7 @@ const AdminProductEditModal = ({
                 <option value="">선택하세요</option>
                 <option value="MALE">남성</option>
                 <option value="FEMALE">여성</option>
-                <option value="UNISEX">중성</option>
+                <option value="UNISEX">남녀공용</option>
               </select>
             </div>
 
@@ -139,6 +139,7 @@ const AdminProductEditModal = ({
                 required
                 placeholder="가격을 입력하세요"
                 min="0"
+                onWheel={(e) => e.target.blur()}
               />
             </div>
 
@@ -151,7 +152,23 @@ const AdminProductEditModal = ({
                 required
                 placeholder="재고 수량을 입력하세요"
                 min="0"
+                onWheel={(e) => e.target.blur()}
               />
+            </div>
+
+            <div className="admin-product-edit-form-group">
+              <label>상태</label>
+              <select
+                  value={product.status || ""}
+                  onChange={(e) => handleInputChange("status", e.target.value)}
+                  required
+              >
+                <option value="ACTIVE">판매중</option>
+                <option value="SOLD_OUT">일시품절</option>
+                <option value="DISCONTINUED">단종</option>
+                <option value="INACTIVE">임시 판매중단</option>
+                <option value="HOT">인기 상품</option>
+              </select>
             </div>
 
             <div className="admin-product-edit-form-group">
@@ -261,7 +278,7 @@ const AdminProductAddModal = ({
                 <option value="">선택하세요</option>
                 <option value="남성">남성</option>
                 <option value="여성">여성</option>
-                <option value="중성">중성</option>
+                <option value="남녀공용">남녀공용</option>
               </select>
             </div>
 
@@ -288,6 +305,7 @@ const AdminProductAddModal = ({
                 required
                 placeholder="가격을 입력하세요"
                 min="0"
+                onWheel={(e) => e.target.blur()}
               />
             </div>
 
@@ -300,6 +318,7 @@ const AdminProductAddModal = ({
                 required
                 placeholder="재고 수량을 입력하세요"
                 min="0"
+                onWheel={(e) => e.target.blur()}
               />
             </div>
 
