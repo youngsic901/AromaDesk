@@ -35,7 +35,7 @@ function AdminOrderDetailPage() {
         apiClient.get(`/api/admin/orders/${orderId}`)
             .then(res => {
                 setOrder(res.data);
-                setOrderStatus(res.data.orderStatus);
+                setOrderStatus(res.data.status);           // 주문 상태 필드명 수정
                 setDeliveryStatus(res.data.deliveryStatus);
             })
             .catch(() => setOrder(null));
@@ -82,8 +82,8 @@ function AdminOrderDetailPage() {
     return (
         <AdminLayout>
             <div className="admin-page">
-                <h1 style={{fontSize: '28px', fontWeight: '700', marginBottom: '8px'}}>주문 상세 정보</h1>
-                <h2 style={{fontSize: '16px', color: '#888', marginBottom: '24px'}}>주문번호: {order.orderId}</h2>
+                <h1 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '8px' }}>주문 상세 정보</h1>
+                <h2 style={{ fontSize: '16px', color: '#888', marginBottom: '24px' }}>주문번호: {order.orderId}</h2>
 
                 <div className="top-bar">
                     <button className="back-button" onClick={() => navigate("/admin/orders")}>← 목록으로 돌아가기</button>
@@ -112,7 +112,7 @@ function AdminOrderDetailPage() {
                                 </div>
                                 <div className="info-item">
                                     <label>배송지</label>
-                                    <span>{order.address}</span>
+                                    <span>{order.deliveryAddress || '-'}</span> {/* 수정된 부분 */}
                                 </div>
                             </div>
                         </div>
@@ -122,11 +122,15 @@ function AdminOrderDetailPage() {
                             <div className="status-grid">
                                 <div className="status-item">
                                     <label>주문 상태</label>
-                                    <span className={`status-badge ${orderStatus.toLowerCase()}`}>{orderStatusMap[orderStatus]}</span>
+                                    <span className={`status-badge ${orderStatus?.toLowerCase() || ''}`}>
+                                        {orderStatusMap[orderStatus] || orderStatus || '-'}
+                                    </span>
                                 </div>
                                 <div className="status-item">
                                     <label>배송 상태</label>
-                                    <span className={`status-badge ${deliveryStatus.toLowerCase()}`}>{deliveryStatusMap[deliveryStatus]}</span>
+                                    <span className={`status-badge ${deliveryStatus?.toLowerCase() || ''}`}>
+                                        {deliveryStatusMap[deliveryStatus] || deliveryStatus || '-'}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -143,10 +147,7 @@ function AdminOrderDetailPage() {
                                     <option value="PAID">결제 완료</option>
                                     <option value="CANCELLED">주문 취소</option>
                                 </select>
-                                <button
-                                    className="save-button"
-                                    onClick={updateOrderStatus}
-                                >저장</button>
+                                <button className="save-button" onClick={updateOrderStatus}>저장</button>
                             </div>
 
                             <div className="order-detail-control">
@@ -160,10 +161,7 @@ function AdminOrderDetailPage() {
                                     <option value="DELIVERED">배송 완료</option>
                                     <option value="CANCELLED">배송 취소</option>
                                 </select>
-                                <button
-                                    className="save-button"
-                                    onClick={updateDeliveryStatus}
-                                >저장</button>
+                                <button className="save-button" onClick={updateDeliveryStatus}>저장</button>
                             </div>
                         </div>
                     </div>
