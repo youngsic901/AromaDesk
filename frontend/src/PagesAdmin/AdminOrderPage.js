@@ -14,11 +14,6 @@ import "../css/AdminOrderPage.css";
 function AdminOrderPage() {
     const [orders, setOrders] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [page, setPage] = useState(1);
-    const [size, setSize] = useState(10);
-    const [totalPages, setTotalPages] = useState(1);
-    const [totalElements, setTotalElements] = useState(0);
-
     const navigate = useNavigate();
 
     // 주문 상태 한글 매핑
@@ -36,32 +31,12 @@ function AdminOrderPage() {
         CANCELLED: "배송 취소",
     };
 
-    // 주문 목록 조회
-    const fetchOrders = async (pageParam = page) => {
-        try {
-            setIsLoading(true);
-            const res = await apiClient.get("/api/admin/orders", {
-                params: {
-                    page: pageParam - 1, // 백엔드는 0부터 시작
-                    size,
-                },
-            });
-            setOrders(res.data.content || []);
-            setTotalPages(res.data.totalPages || 1);
-            setTotalElements(res.data.totalElements || 0);
-        } catch (error) {
-            console.error("주문 목록 조회 실패", error);
-            setOrders([]);
-            setTotalPages(1);
-            setTotalElements(0);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     useEffect(() => {
-        fetchOrders();
-    }, [page, size]);
+        apiClient.get("/api/admin/orders")
+            .then(res => setOrders(res.data))
+            .catch(() => setOrders([]))
+            .finally(() => setIsLoading(false));
+    }, []);
 
     return (
         <AdminLayout>
@@ -70,7 +45,6 @@ function AdminOrderPage() {
                 <h2 style={{ fontSize: '16px', color: '#888', marginBottom: '24px' }}>
                     주문 내역의 상태를 확인하는 페이지 입니다
                 </h2>
-
                 {isLoading ? (
                     <div className="admin-order-loading">불러오는 중...</div>
                 ) : orders.length === 0 ? (
@@ -78,56 +52,37 @@ function AdminOrderPage() {
                 ) : (
                     <table className="admin-order-table">
                         <thead>
-                            <tr>
-                                <th>주문번호</th>
-                                <th>회원</th>
-                                <th>주문 상태</th>
-                                <th>배송 상태</th>
-                                <th>총금액</th>
-                                <th>날짜</th>
-                                <th></th>
-                            </tr>
+                        <tr>
+                            <th>주문번호</th>
+                            <th>회원</th>
+                            <th>주문 상태</th>
+                            <th>배송 상태</th>
+                            <th>총금액</th>
+                            <th>날짜</th>
+                            <th></th>
+                        </tr>
                         </thead>
                         <tbody>
-                            {orders.map(order => (
-                                <tr key={order.orderId}>
-                                    <td>{order.orderId}</td>
-                                    <td>{order.memberName}</td>
-                                    <td>{orderStatusMap[order.orderStatus] || order.orderStatus}</td>
-                                    <td>{deliveryStatusMap[order.deliveryStatus] || order.deliveryStatus}</td>
-                                    <td>{order.totalPrice?.toLocaleString()}원</td>
-                                    <td>{order.orderDate?.slice(0, 10)}</td>
-                                    <td>
-                                        <button 
-                                            className="detail-button"
-                                            onClick={() => navigate(`/admin/orders/${order.orderId}`)}
-                                        >
-                                            상태 변경
-                                        </button>
-                                    </td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {orders.map(order => (
-                                    <tr key={order.orderId}>
-                                        <td>{order.orderId}</td>
-                                        <td>
-                                            <span
-                                                onClick={() => navigate(`/admin/orders/${order.orderId}`)}
-                                                style={{ cursor: "pointer", textDecoration: "underline", color: "#1b5e20" }}
-                                            >
-                                                {order.memberName}
-                                            </span>
-                                        </td>
-                                        <td>{orderStatusMap[order.orderStatus] || order.orderStatus}</td>
-                                        <td>{deliveryStatusMap[order.deliveryStatus] || order.deliveryStatus}</td>
-                                        <td>{order.totalPrice?.toLocaleString()}원</td>
-                                        <td>{order.orderDate?.slice(0, 10)}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </>
+                        {orders.map(order => (
+                            <tr key={order.orderId}>
+                                <td>{order.orderId}</td>
+                                <td>{order.memberName}</td>
+                                <td>{orderStatusMap[order.orderStatus] || order.orderStatus}</td>
+                                <td>{deliveryStatusMap[order.deliveryStatus] || order.deliveryStatus}</td>
+                                <td>{order.totalPrice?.toLocaleString()}원</td>
+                                <td>{order.orderDate?.slice(0, 10)}</td>
+                                <td>
+                                    <button
+                                        className="detail-button"
+                                        onClick={() => navigate(`/admin/orders/${order.orderId}`)}
+                                    >
+                                        상태 변경
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
                 )}
             </div>
         </AdminLayout>
