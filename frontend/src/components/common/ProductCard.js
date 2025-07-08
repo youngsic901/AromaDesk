@@ -109,15 +109,7 @@ const ProductCard = ({ product }) => {
             e.target.src = "/placeholder-product.jpg";
           }}
         />
-        {hover && (
-          <button
-            style={isOutOfStock ? disabledBtnStyle : btnStyle}
-            onClick={handleAddToCart}
-            disabled={isOutOfStock}
-          >
-            {isOutOfStock ? "품절" : "장바구니 추가"}
-          </button>
-        )}
+        {/* 장바구니 버튼 완전 제거 */}
         {/* 재고 부족 표시 */}
         {isOutOfStock && (
           <div

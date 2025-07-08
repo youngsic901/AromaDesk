@@ -50,6 +50,7 @@ const MainPage = () => {
           size: 20,
           append: true, // 기존 상품에 추가
           statuses: ['HOT'],
+          status: 'HOT',
         })
       );
     }
