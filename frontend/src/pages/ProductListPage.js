@@ -74,7 +74,7 @@ const ProductListPage = () => {
             <option value="">성별 전체</option>
             <option value="남성">남성</option>
             <option value="여성">여성</option>
-            <option value="중성">중성</option>
+            <option value="남녀공용">남녀공용</option>
           </select>
 
           <select

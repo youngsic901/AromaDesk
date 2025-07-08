@@ -134,7 +134,7 @@ const MainPage = () => {
       <div className="container-fluid py-4">
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2 className="fw-bold mb-0">
-            전체 상품 ({pagination?.total || products.length}개)
+            인기 상품 ({pagination?.total || products.length}개)
           </h2>
           {hasMore && (
             <small className="text-muted">
@@ -178,11 +178,11 @@ const MainPage = () => {
         )}
 
         {/* 더 이상 로드할 상품이 없을 때 */}
-        {!hasMore && products.length > 0 && (
-          <div className="text-center py-4">
-            <p className="text-muted">모든 상품을 불러왔습니다.</p>
-          </div>
-        )}
+        {/*{!hasMore && products.length > 0 && (*/}
+        {/*  <div className="text-center py-4">*/}
+        {/*    <p className="text-muted">모든 상품을 불러왔습니다.</p>*/}
+        {/*  </div>*/}
+        {/*)}*/}
       </div>
     </main>
   );

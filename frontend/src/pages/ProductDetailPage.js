@@ -151,6 +151,7 @@ const ProductDetailPage = () => {
               value={quantity}
               onChange={(e) => setQuantity(parseInt(e.target.value, 10))}
               style={{ width: 80 }}
+              onWheel={(e) => e.target.blur()}
             />
           </div>
           <div className="d-flex gap-2 mb-3">

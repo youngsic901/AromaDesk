@@ -33,7 +33,7 @@ const SideBar = ({ sidebarOpen = true, setSidebarOpen }) => {
     { label: "홈", to: "/main" },
     { label: "남자향수", to: "/category/male" },
     { label: "여자향수", to: "/category/female" },
-    { label: "남여공용", to: "/category/unisex" },
+    { label: "남녀공용", to: "/category/unisex" },
     { label: "브랜드향수", to: "/brand" }, // 브랜드별 대신 브랜드향수로
   ];
 
