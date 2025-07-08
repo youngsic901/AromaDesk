@@ -120,7 +120,6 @@ const ProductDetailPage = () => {
         <div className="col-md-7">
           <h2 className="fw-bold mb-2">{currentProduct.name}</h2>
           <div className="mb-2 text-muted">{currentProduct.brand}</div>
-          <div className="mb-3">{currentProduct.description}</div>
           <div className="mb-3">
             <span className="fs-2 fw-bold text-primary">
               {currentProduct.price.toLocaleString()}원
@@ -174,7 +173,6 @@ const ProductDetailPage = () => {
       <div className="mt-5">
         <div className="tab-content p-3 border bg-white rounded">
           <div>
-            <h5 className="fw-bold mb-3">상품 상세정보</h5>
             {detailImages.length > 0 && (
               <div className="mb-4">
                 {detailImages.map((imageUrl, index) => (
@@ -193,9 +191,6 @@ const ProductDetailPage = () => {
                 ))}
               </div>
             )}
-            <div className="mb-3">
-              {currentProduct.description || "상세 설명 준비중"}
-            </div>
             <div className="table-responsive">
               <table className="table table-bordered">
                 <tbody>

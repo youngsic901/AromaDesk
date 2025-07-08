@@ -15,4 +15,6 @@ import lombok.Setter;
 @Setter
 public class UpdateAddressDto {
     private String address;
+    private String zipCode;
+    private String addressDetail;
 }

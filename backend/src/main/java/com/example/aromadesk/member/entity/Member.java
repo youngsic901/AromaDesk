@@ -35,6 +35,12 @@ public class Member {
     @Column(length = 255)
     private String address;
 
+    @Column(name = "zip_code", length = 20)
+    private String zipCode;
+
+    @Column(name = "address_detail", length = 255)
+    private String addressDetail;
+
     @Column(length = 20)
     private String role;
 

@@ -116,6 +116,8 @@ public class MemberController {
         return memberRepository.findById(id)
                 .map(member -> {
                     member.setAddress(request.getAddress());
+                    member.setZipCode(request.getZipCode());
+                    member.setAddressDetail(request.getAddressDetail());
                     Member updated = memberRepository.save(member);
                     return ResponseEntity.ok(MemberDto.fromEntity(updated));
                 })
