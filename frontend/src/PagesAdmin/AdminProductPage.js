@@ -3,8 +3,7 @@ import AdminLayout from "../components/admin/layout/AdminLayout";
 import { adminProductApi } from "../api/adminProductApi";
 import { productApi } from "../api/productApi";
 import "../css/AdminProductPage.css";
-import Modal from "../components/common/Modal";
-import { AdminProductEditModal, AdminSuccessModal } from "../components/admin/UnifiedAdminModal";
+import { AdminProductEditModal, AdminSuccessModal, AdminProductAddModal, AdminDeleteConfirmModal } from "../components/admin/UnifiedAdminModal";
 
 const AdminProductPage = () => {
   const [products, setProducts] = useState([]);
@@ -34,11 +33,25 @@ const AdminProductPage = () => {
   const [size, setSize] = useState(20);
   const [totalPages, setTotalPages] = useState(1);
   const [totalElements, setTotalElements] = useState(0);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [successModalMessage, setSuccessModalMessage] = useState("");
   const [isError, setIsError] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
+
+  // 성별 카테고리 매핑
+  const genderCategoryMap = {
+    MALE: "남자",
+    FEMALE: "여자",
+    UNISEX: "중성"
+  };
+
+  // 용량 카테고리 매핑
+  const volumeCategoryMap = {
+    UNDER_30ML: "30ML",
+    UNDER_50ML: "50ML",
+    LARGE: "LARGE"
+  };
 
   // 브랜드 목록 최초 1회만 받아오기
   useEffect(() => {
@@ -110,11 +123,13 @@ const AdminProductPage = () => {
         description: "",
       });
       fetchProducts();
-      setModalMessage("상품이 성공적으로 생성되었습니다.");
-      setModalOpen(true);
+      setSuccessModalMessage("상품이 성공적으로 생성되었습니다.");
+      setIsError(false);
+      setSuccessModalOpen(true);
     } catch (err) {
-      setModalMessage("상품 생성에 실패했습니다.");
-      setModalOpen(true);
+      setSuccessModalMessage("상품 생성에 실패했습니다.");
+      setIsError(true);
+      setSuccessModalOpen(true);
     }
   };
 
@@ -137,16 +152,21 @@ const AdminProductPage = () => {
 
   // 상품 삭제
   const handleDeleteProduct = async (productId) => {
-    if (window.confirm("정말로 이 상품을 삭제하시겠습니까?")) {
-      try {
-        await adminProductApi.deleteProduct(productId);
-        fetchProducts();
-        setModalMessage("상품이 성공적으로 삭제되었습니다.");
-        setModalOpen(true);
-      } catch (err) {
-        setModalMessage("상품 삭제에 실패했습니다.");
-        setModalOpen(true);
-      }
+    setProductToDelete(productId);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await adminProductApi.deleteProduct(productToDelete);
+      fetchProducts();
+      setSuccessModalMessage("상품이 성공적으로 '삭제'되었습니다.");
+      setIsError(false);
+      setSuccessModalOpen(true);
+    } catch (err) {
+      setSuccessModalMessage("상품 '삭제'에 실패했습니다.");
+      setIsError(true);
+      setSuccessModalOpen(true);
     }
   };
 
@@ -170,15 +190,15 @@ const AdminProductPage = () => {
           </select>
           <select value={gender} onChange={(e) => setGender(e.target.value)}>
             <option value="">성별 전체</option>
-            <option value="MALE">남성</option>
-            <option value="FEMALE">여성</option>
+            <option value="MALE">남자</option>
+            <option value="FEMALE">여자</option>
             <option value="UNISEX">중성</option>
           </select>
           <select value={volume} onChange={(e) => setVolume(e.target.value)}>
             <option value="">용량 전체</option>
-            <option value="UNDER_30ML">30ml</option>
-            <option value="UNDER_50ML">50ml</option>
-            <option value="LARGE">대용량</option>
+            <option value="UNDER_30ML">30ML</option>
+            <option value="UNDER_50ML">50ML</option>
+            <option value="LARGE">LARGE</option>
           </select>
           <input
             type="text"
@@ -225,127 +245,6 @@ const AdminProductPage = () => {
           상품 추가
         </button>
 
-        {/* 상품 추가 폼 */}
-        {showAddForm && (
-          <div className="modal-overlay">
-            <div className="modal">
-              <h2>새 상품 추가</h2>
-              <form onSubmit={handleCreateProduct}>
-                <div className="form-group">
-                  <label>상품명:</label>
-                  <input
-                    type="text"
-                    value={newProduct.name}
-                    onChange={(e) =>
-                      setNewProduct({ ...newProduct, name: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>브랜드:</label>
-                  <input
-                    type="text"
-                    value={newProduct.brand}
-                    onChange={(e) =>
-                      setNewProduct({ ...newProduct, brand: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>성별 카테고리:</label>
-                  <select
-                    value={newProduct.genderCategory}
-                    onChange={(e) =>
-                      setNewProduct({
-                        ...newProduct,
-                        genderCategory: e.target.value,
-                      })
-                    }
-                    required
-                  >
-                    <option value="">선택하세요</option>
-                    <option value="남성">남성</option>
-                    <option value="여성">여성</option>
-                    <option value="중성">중성</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>용량 카테고리:</label>
-                  <select
-                    value={newProduct.volumeCategory}
-                    onChange={(e) =>
-                      setNewProduct({
-                        ...newProduct,
-                        volumeCategory: e.target.value,
-                      })
-                    }
-                    required
-                  >
-                    <option value="">선택하세요</option>
-                    <option value="30ml">30ml</option>
-                    <option value="50ml">50ml</option>
-                    <option value="100ml">100ml</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>가격:</label>
-                  <input
-                    type="number"
-                    value={newProduct.price}
-                    onChange={(e) =>
-                      setNewProduct({ ...newProduct, price: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>재고:</label>
-                  <input
-                    type="number"
-                    value={newProduct.stock}
-                    onChange={(e) =>
-                      setNewProduct({ ...newProduct, stock: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>이미지 URL:</label>
-                  <input
-                    type="text"
-                    value={newProduct.imageUrl}
-                    onChange={(e) =>
-                      setNewProduct({ ...newProduct, imageUrl: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>설명:</label>
-                  <textarea
-                    value={newProduct.description}
-                    onChange={(e) =>
-                      setNewProduct({
-                        ...newProduct,
-                        description: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-                <div className="button-group">
-                  <button type="submit">추가</button>
-                  <button type="button" onClick={() => setShowAddForm(false)}>
-                    취소
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
         {/* 상품 목록 */}
         <div className="table-container">
           <table>
@@ -358,7 +257,7 @@ const AdminProductPage = () => {
                 <th>용량</th>
                 <th>가격</th>
                 <th>재고</th>
-                <th>작업</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -367,8 +266,8 @@ const AdminProductPage = () => {
                   <td>{product.id}</td>
                   <td>{product.name}</td>
                   <td>{product.brand}</td>
-                  <td>{product.genderCategory}</td>
-                  <td>{product.volumeCategory}</td>
+                  <td>{genderCategoryMap[product.genderCategory] || product.genderCategory}</td>
+                  <td>{volumeCategoryMap[product.volumeCategory] || product.volumeCategory}</td>
                   <td>{product.price?.toLocaleString()}원</td>
                   <td>{product.stock}</td>
                   <td>
@@ -390,6 +289,15 @@ const AdminProductPage = () => {
           </table>
         </div>
 
+        {/* 상품 추가 모달 */}
+        <AdminProductAddModal
+          open={showAddForm}
+          onClose={() => setShowAddForm(false)}
+          onSubmit={handleCreateProduct}
+          product={newProduct}
+          onChange={setNewProduct}
+        />
+
         {/* 상품 수정 모달 */}
         {editingProduct && (
           <AdminProductEditModal
@@ -400,9 +308,12 @@ const AdminProductPage = () => {
           />
         )}
 
-        <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-          {modalMessage}
-        </Modal>
+        {/* 삭제 확인 모달 */}
+        <AdminDeleteConfirmModal
+          open={deleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          onConfirm={confirmDelete}
+        />
         
         <AdminSuccessModal 
           open={successModalOpen} 

@@ -198,6 +198,212 @@ const AdminProductEditModal = ({
   );
 };
 
+// 상품 추가 모달
+const AdminProductAddModal = ({ 
+  open, 
+  onClose, 
+  onSubmit, 
+  product, 
+  onChange 
+}) => {
+  if (!open) return null;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit(e);
+  };
+
+  const handleInputChange = (field, value) => {
+    onChange({
+      ...product,
+      [field]: value
+    });
+  };
+
+  return (
+    <div className="admin-modal-overlay" onClick={onClose}>
+      <div className="admin-product-edit-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="admin-product-edit-modal-header">
+          <h2>새 상품 추가</h2>
+        </div>
+        
+        <div className="admin-product-edit-modal-body">
+          <form className="admin-product-edit-form" onSubmit={handleSubmit}>
+            <div className="admin-product-edit-form-group">
+              <label>상품명</label>
+              <input
+                type="text"
+                value={product.name || ""}
+                onChange={(e) => handleInputChange("name", e.target.value)}
+                required
+                placeholder="상품명을 입력하세요"
+              />
+            </div>
+
+            <div className="admin-product-edit-form-group">
+              <label>브랜드</label>
+              <input
+                type="text"
+                value={product.brand || ""}
+                onChange={(e) => handleInputChange("brand", e.target.value)}
+                required
+                placeholder="브랜드를 입력하세요"
+              />
+            </div>
+
+            <div className="admin-product-edit-form-group">
+              <label>성별 카테고리</label>
+              <select
+                value={product.genderCategory || ""}
+                onChange={(e) => handleInputChange("genderCategory", e.target.value)}
+                required
+              >
+                <option value="">선택하세요</option>
+                <option value="남성">남성</option>
+                <option value="여성">여성</option>
+                <option value="중성">중성</option>
+              </select>
+            </div>
+
+            <div className="admin-product-edit-form-group">
+              <label>용량 카테고리</label>
+              <select
+                value={product.volumeCategory || ""}
+                onChange={(e) => handleInputChange("volumeCategory", e.target.value)}
+                required
+              >
+                <option value="">선택하세요</option>
+                <option value="30ml">30ml</option>
+                <option value="50ml">50ml</option>
+                <option value="100ml">100ml</option>
+              </select>
+            </div>
+
+            <div className="admin-product-edit-form-group">
+              <label>가격</label>
+              <input
+                type="number"
+                value={product.price || ""}
+                onChange={(e) => handleInputChange("price", e.target.value)}
+                required
+                placeholder="가격을 입력하세요"
+                min="0"
+              />
+            </div>
+
+            <div className="admin-product-edit-form-group">
+              <label>재고</label>
+              <input
+                type="number"
+                value={product.stock || ""}
+                onChange={(e) => handleInputChange("stock", e.target.value)}
+                required
+                placeholder="재고 수량을 입력하세요"
+                min="0"
+              />
+            </div>
+
+            <div className="admin-product-edit-form-group">
+              <label>이미지 URL</label>
+              <input
+                type="text"
+                value={product.imageUrl || ""}
+                onChange={(e) => handleInputChange("imageUrl", e.target.value)}
+                required
+                placeholder="이미지 URL을 입력하세요"
+              />
+            </div>
+
+            <div className="admin-product-edit-form-group">
+              <label>설명</label>
+              <textarea
+                value={product.description || ""}
+                onChange={(e) => handleInputChange("description", e.target.value)}
+                required
+                placeholder="상품 설명을 입력하세요"
+              />
+            </div>
+          </form>
+        </div>
+
+        <div className="admin-product-edit-modal-footer">
+          <button
+            type="button"
+            className="admin-product-edit-button admin-product-edit-button-secondary"
+            onClick={onClose}
+          >
+            취소
+          </button>
+          <button
+            type="submit"
+            className="admin-product-edit-button admin-product-edit-button-primary"
+            onClick={handleSubmit}
+          >
+            추가
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// 삭제 확인 모달
+const AdminDeleteConfirmModal = ({ 
+  open, 
+  onClose, 
+  onConfirm, 
+  message = "정말로 이 상품을 삭제하시겠습니까?" 
+}) => {
+  if (!open) return null;
+
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  const handleConfirm = () => {
+    onConfirm();
+    onClose();
+  };
+
+  return (
+    <div className="admin-modal-overlay" onClick={handleOverlayClick}>
+      <div className="admin-delete-confirm-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="admin-delete-confirm-modal-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+        </div>
+        
+        <h2 className="admin-delete-confirm-modal-title">
+          삭제 확인
+        </h2>
+        
+        <p className="admin-delete-confirm-modal-message">
+          {message}
+        </p>
+        
+        <div className="admin-delete-confirm-modal-buttons">
+          <button 
+            className="admin-delete-confirm-modal-button admin-delete-confirm-modal-button-cancel"
+            onClick={onClose}
+          >
+            취소
+          </button>
+          
+          <button 
+            className="admin-delete-confirm-modal-button admin-delete-confirm-modal-button-delete"
+            onClick={handleConfirm}
+          >
+            삭제
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // 기본 관리자 모달
 const AdminBasicModal = ({ 
   open, 
@@ -266,6 +472,8 @@ const AdminBasicModal = ({
 export {
   AdminSuccessModal,
   AdminProductEditModal,
+  AdminProductAddModal,
+  AdminDeleteConfirmModal,
   AdminBasicModal
 };
 

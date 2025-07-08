@@ -7,7 +7,7 @@ import "../css/AdminOrderPage.css";
 /*
     전체 흐름도
     1. 컴포넌트 마운트 시 주문 목록 조회
-    2. 주문 데이터 출력 (회원 이름 클릭 시 상세 페이지 이동)
+    2. 주문 데이터 출력 (상세보기 버튼 클릭 시 상세 페이지 이동)
     3. 주문 상태, 배송 상태를 한글로 변환해서 표시
 */
 
@@ -76,31 +76,35 @@ function AdminOrderPage() {
                 ) : orders.length === 0 ? (
                     <div className="admin-order-empty">주문이 없습니다.</div>
                 ) : (
-                    <>
-                        <div className="pagination-bar">
-                            <span>총 {totalElements}건 | </span>
-                            <button onClick={() => setPage(page - 1)} disabled={page <= 1}>이전</button>
-                            <span style={{ margin: "0 8px" }}>{page} / {totalPages}</span>
-                            <button onClick={() => setPage(page + 1)} disabled={page >= totalPages}>다음</button>
-                            <select
-                                value={size}
-                                onChange={(e) => setSize(Number(e.target.value))}
-                            >
-                                <option value={10}>10개씩</option>
-                                <option value={20}>20개씩</option>
-                                <option value={50}>50개씩</option>
-                            </select>
-                        </div>
-
-                        <table className="admin-order-table">
-                            <thead>
-                                <tr>
-                                    <th>주문번호</th>
-                                    <th>회원</th>
-                                    <th>주문 상태</th>
-                                    <th>배송 상태</th>
-                                    <th>총금액</th>
-                                    <th>날짜</th>
+                    <table className="admin-order-table">
+                        <thead>
+                            <tr>
+                                <th>주문번호</th>
+                                <th>회원</th>
+                                <th>주문 상태</th>
+                                <th>배송 상태</th>
+                                <th>총금액</th>
+                                <th>날짜</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {orders.map(order => (
+                                <tr key={order.orderId}>
+                                    <td>{order.orderId}</td>
+                                    <td>{order.memberName}</td>
+                                    <td>{orderStatusMap[order.orderStatus] || order.orderStatus}</td>
+                                    <td>{deliveryStatusMap[order.deliveryStatus] || order.deliveryStatus}</td>
+                                    <td>{order.totalPrice?.toLocaleString()}원</td>
+                                    <td>{order.orderDate?.slice(0, 10)}</td>
+                                    <td>
+                                        <button 
+                                            className="detail-button"
+                                            onClick={() => navigate(`/admin/orders/${order.orderId}`)}
+                                        >
+                                            상태 변경
+                                        </button>
+                                    </td>
                                 </tr>
                             </thead>
                             <tbody>
