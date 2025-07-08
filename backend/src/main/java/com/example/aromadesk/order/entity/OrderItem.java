@@ -3,6 +3,9 @@ package com.example.aromadesk.order.entity;
 import com.example.aromadesk.product.entity.Product;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
+
+import java.util.List;
 
 @Builder
 @AllArgsConstructor
