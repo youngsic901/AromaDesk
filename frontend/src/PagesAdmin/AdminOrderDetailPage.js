@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import AdminLayout from "../components/admin/layout/AdminLayout";
 import apiClient from "../api/axiosConfig";
-import { AdminBasicModal } from "../components/admin/UnifiedAdminModal";
+import { AdminBasicModal, AdminSuccessModal } from "../components/admin/UnifiedAdminModal";
 import "../css/AdminOrderDetailPage.css";
 
 function AdminOrderDetailPage() {
@@ -13,9 +13,10 @@ function AdminOrderDetailPage() {
     const [orderStatus, setOrderStatus] = useState("");
     const [deliveryStatus, setDeliveryStatus] = useState("");
 
-    const [confirmOpen, setConfirmOpen] = useState(false);
-    const [confirmMessage, setConfirmMessage] = useState("");
-    const [onConfirm, setOnConfirm] = useState(() => () => {});
+    // 성공/실패 모달 상태
+    const [successModalOpen, setSuccessModalOpen] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
+    const [isError, setIsError] = useState(false);
 
     const orderStatusMap = {
         ORDERED: "주문 완료",
@@ -40,22 +41,32 @@ function AdminOrderDetailPage() {
             .catch(() => setOrder(null));
     }, [orderId]);
 
-    const handleConfirm = (message, callback) => {
-        setConfirmMessage(message);
-        setOnConfirm(() => callback);
-        setConfirmOpen(true);
-    };
-
     const updateOrderStatus = async () => {
-        await apiClient.put(`/api/admin/orders/${orderId}/order-status`, { orderStatus });
-        setConfirmOpen(false);
+        try {
+            await apiClient.put(`/api/admin/orders/${orderId}/order-status`, { orderStatus });
+            setSuccessMessage("주문 상태가 성공적으로 변경되었습니다.");
+            setIsError(false);
+            setSuccessModalOpen(true);
+        } catch (e) {
+            setSuccessMessage("주문 상태 변경에 실패했습니다.");
+            setIsError(true);
+            setSuccessModalOpen(true);
+        }
     };
 
     const updateDeliveryStatus = async () => {
         const deliveryId = order.deliveryId;
         if (!deliveryId) return;
-        await apiClient.put(`/api/deliveries/${deliveryId}/status/${deliveryStatus}`);
-        setConfirmOpen(false);
+        try {
+            await apiClient.put(`/api/deliveries/${deliveryId}/status/${deliveryStatus}`);
+            setSuccessMessage("배송 상태가 성공적으로 변경되었습니다.");
+            setIsError(false);
+            setSuccessModalOpen(true);
+        } catch (e) {
+            setSuccessMessage("배송 상태 변경에 실패했습니다.");
+            setIsError(true);
+            setSuccessModalOpen(true);
+        }
     };
 
     if (!order) {
@@ -75,9 +86,7 @@ function AdminOrderDetailPage() {
                 <h2 style={{fontSize: '16px', color: '#888', marginBottom: '24px'}}>주문번호: {order.orderId}</h2>
 
                 <div className="top-bar">
-                    <button className="back-button" onClick={() => navigate("/admin/orders")}>
-                        ← 목록으로 돌아가기
-                    </button>
+                    <button className="back-button" onClick={() => navigate("/admin/orders")}>← 목록으로 돌아가기</button>
                 </div>
 
                 <div className="order-detail-wrapper">
@@ -113,22 +122,17 @@ function AdminOrderDetailPage() {
                             <div className="status-grid">
                                 <div className="status-item">
                                     <label>주문 상태</label>
-                                    <span className={`status-badge ${orderStatus.toLowerCase()}`}>
-                                        {orderStatusMap[orderStatus]}
-                                    </span>
+                                    <span className={`status-badge ${orderStatus.toLowerCase()}`}>{orderStatusMap[orderStatus]}</span>
                                 </div>
                                 <div className="status-item">
                                     <label>배송 상태</label>
-                                    <span className={`status-badge ${deliveryStatus.toLowerCase()}`}>
-                                        {deliveryStatusMap[deliveryStatus]}
-                                    </span>
+                                    <span className={`status-badge ${deliveryStatus.toLowerCase()}`}>{deliveryStatusMap[deliveryStatus]}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div className="control-section">
                             <h3>상태 변경</h3>
-                            
                             <div className="order-detail-control">
                                 <label>주문 상태 변경</label>
                                 <select
@@ -141,12 +145,7 @@ function AdminOrderDetailPage() {
                                 </select>
                                 <button
                                     className="save-button"
-                                    onClick={() => handleConfirm(
-                                        <>
-                                            <strong>주문 상태를 '{orderStatusMap[order.orderStatus]}' → <span style={{ color: "#dc2626" }}>{orderStatusMap[orderStatus]}</span>' 로 변경하시겠습니까?</strong>
-                                        </>,
-                                        updateOrderStatus
-                                    )}
+                                    onClick={updateOrderStatus}
                                 >저장</button>
                             </div>
 
@@ -163,12 +162,7 @@ function AdminOrderDetailPage() {
                                 </select>
                                 <button
                                     className="save-button"
-                                    onClick={() => handleConfirm(
-                                        <>
-                                            <strong>배송 상태를 '{deliveryStatusMap[order.deliveryStatus]}' → <span style={{ color: "#dc2626" }}>{deliveryStatusMap[deliveryStatus]}</span>' 로 변경하시겠습니까?</strong>
-                                        </>,
-                                        updateDeliveryStatus
-                                    )}
+                                    onClick={updateDeliveryStatus}
                                 >저장</button>
                             </div>
                         </div>
@@ -176,17 +170,12 @@ function AdminOrderDetailPage() {
                 </div>
             </div>
 
-            <AdminBasicModal
-                open={confirmOpen}
-                onClose={() => setConfirmOpen(false)}
-                onConfirm={onConfirm}
-                title="상태 변경 확인"
-                showCancelButton={true}
-                confirmText="변경"
-                cancelText="취소"
-            >
-                <div style={{ fontSize: "16px" }}>{confirmMessage}</div>
-            </AdminBasicModal>
+            <AdminSuccessModal
+                open={successModalOpen}
+                onClose={() => setSuccessModalOpen(false)}
+                message={successMessage}
+                isError={isError}
+            />
         </AdminLayout>
     );
 }

@@ -167,24 +167,6 @@ const ProductDetailPage = () => {
             >
               바로구매
             </button>
-            <button className="btn btn-outline-secondary btn-lg" title="찜하기">
-              <FaHeart />
-            </button>
-          </div>
-          <div className="d-flex align-items-center gap-2 mb-2">
-            <span className="text-warning">
-              <FaStar />
-              <FaStar />
-              <FaStar />
-              <FaStar />
-              <FaRegStar />
-            </span>
-            <span className="text-muted" style={{ fontSize: 15 }}>
-              (리뷰 12)
-            </span>
-            <span className="ms-3 text-secondary" style={{ fontSize: 15 }}>
-              <FaRegCommentDots className="me-1" /> 문의 3
-            </span>
           </div>
         </div>
       </div>
