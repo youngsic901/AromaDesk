@@ -5,6 +5,7 @@ import { FaShoppingCart, FaUser, FaBars } from "react-icons/fa";
 import { Dropdown } from "react-bootstrap";
 import { logout } from "../../app/slices/userSlice";
 import apiClient from "../../api/axiosConfig";
+import SearchBox from "../common/SearchBox";
 
 const Header = ({ setSidebarOpen }) => {
   const navigate = useNavigate();
@@ -16,9 +17,7 @@ const Header = ({ setSidebarOpen }) => {
     setSidebarOpen((prev) => !prev);
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    const searchTerm = e.target.search.value.trim();
+  const handleSearch = (searchTerm) => {
     if (searchTerm) {
       navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
     }
@@ -52,100 +51,101 @@ const Header = ({ setSidebarOpen }) => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
-      <div className="container-fluid">
-        {/* 모바일 사이드바 토글 버튼 */}
+    <header
+      style={{
+        width: "100%",
+        background: "#fff",
+        borderBottom: "1px solid #e5e7eb",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "0 32px",
+        height: 64,
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
+      }}
+    >
+      {/* 모바일 사이드바 토글 버튼 */}
+      <button
+        className="btn btn-link d-lg-none me-2"
+        onClick={toggleSidebar}
+        style={{ padding: 0, fontSize: 20 }}
+      >
+        <FaBars />
+      </button>
+
+      {/* 로고 */}
+      <span
+        style={{
+          fontWeight: 800,
+          fontSize: 24,
+          color: "#2563eb",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          height: 64,
+          paddingLeft: 0,
+          paddingRight: 0,
+        }}
+        onClick={() => navigate("/main")}
+      >
+        AromaDesk
+      </span>
+
+      {/* 검색 박스 */}
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+        <SearchBox onSearch={handleSearch} />
+      </div>
+
+      {/* 우측 메뉴 */}
+      <div className="d-flex align-items-center gap-2">
+        {/* 장바구니 */}
         <button
-          className="btn btn-link d-lg-none me-2"
-          onClick={toggleSidebar}
-          style={{ padding: 0, fontSize: 20 }}
+          onClick={handleCartClick}
+          className="btn btn-outline-primary position-relative"
+          style={{ height: 44, minWidth: 44 }}
         >
-          <FaBars />
+          <FaShoppingCart />
+          {isLoggedIn && totalQuantity > 0 && (
+            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              {totalQuantity}
+            </span>
+          )}
         </button>
 
-        {/* 로고 */}
-        <Link
-          className="navbar-brand fw-bold fs-4"
-          to="/main"
-          style={{ color: "blue" }}
-        >
-          AromaDesk
-        </Link>
-
-        {/* 검색 폼 */}
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <form
-            className="d-flex mx-auto align-items-center"
-            style={{ maxWidth: 400, minHeight: 48 }}
-            onSubmit={handleSearch}
-          >
-            <input
-              className="form-control me-2"
-              type="search"
-              name="search"
-              placeholder="향수 검색..."
-              aria-label="Search"
-              style={{ height: 44, fontSize: 16 }}
-            />
-            <button
-              className="btn btn-outline-primary"
-              type="submit"
-              style={{ height: 44, minWidth: 64, fontSize: 16 }}
+        {/* 로그인/마이페이지 드롭다운 */}
+        {isLoggedIn ? (
+          <Dropdown>
+            <Dropdown.Toggle
+              variant="outline-secondary"
+              style={{ height: 44, minWidth: 44 }}
             >
-              검색
-            </button>
-          </form>
-        </div>
+              <FaUser />
+            </Dropdown.Toggle>
 
-        {/* 우측 메뉴 */}
-        <div className="d-flex align-items-center gap-2">
-          {/* 장바구니 */}
-          <button
-            onClick={handleCartClick}
-            className="btn btn-outline-primary position-relative"
-            style={{ height: 44, minWidth: 44 }}
+            <Dropdown.Menu>
+              <Dropdown.Item as={Link} to="/mypage">
+                마이페이지
+              </Dropdown.Item>
+              {/* <Dropdown.Item as={Link} to="/delivery">
+                배송조회
+              </Dropdown.Item> */}
+              <Dropdown.Divider />
+              <Dropdown.Item onClick={handleLogout}>로그아웃</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        ) : (
+          <Link
+            to="/login"
+            className="btn btn-primary"
+            style={{ height: 44, minWidth: 80 }}
           >
-            <FaShoppingCart />
-            {isLoggedIn && totalQuantity > 0 && (
-              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                {totalQuantity}
-              </span>
-            )}
-          </button>
-
-          {/* 로그인/마이페이지 드롭다운 */}
-          {isLoggedIn ? (
-            <Dropdown>
-              <Dropdown.Toggle
-                variant="outline-secondary"
-                style={{ height: 44, minWidth: 44 }}
-              >
-                <FaUser />
-              </Dropdown.Toggle>
-
-              <Dropdown.Menu>
-                <Dropdown.Item as={Link} to="/mypage">
-                  마이페이지
-                </Dropdown.Item>
-                {/* <Dropdown.Item as={Link} to="/delivery">
-                  배송조회
-                </Dropdown.Item> */}
-                <Dropdown.Divider />
-                <Dropdown.Item onClick={handleLogout}>로그아웃</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-          ) : (
-            <Link
-              to="/login"
-              className="btn btn-primary"
-              style={{ height: 44, minWidth: 80 }}
-            >
-              로그인
-            </Link>
-          )}
-        </div>
+            로그인
+          </Link>
+        )}
       </div>
-    </nav>
+    </header>
   );
 };
 
