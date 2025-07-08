@@ -63,6 +63,25 @@ const ProductCard = ({ product }) => {
   // 재고 상태 확인
   const isOutOfStock = !product.stock || product.stock <= 0;
 
+  // 카테고리 매핑 함수
+  const getGenderLabel = (gender) => {
+    const genderMap = {
+      'MALE': '남성',
+      'FEMALE': '여성',
+      'UNISEX': '남녀공용'
+    };
+    return genderMap[gender] || gender;
+  };
+
+  const getVolumeLabel = (volume) => {
+    const volumeMap = {
+      'UNDER_30ML': '30ml',
+      'UNDER_50ML': '50ml',
+      'LARGE': '대용량'
+    };
+    return volumeMap[volume] || volume;
+  };
+
   const handleAddToCart = (e) => {
     e.stopPropagation();
 
@@ -140,12 +159,12 @@ const ProductCard = ({ product }) => {
           <div className="mb-2" style={{ fontSize: 13 }}>
             {product.genderCategory && (
               <span className="badge bg-light text-dark me-1">
-                {product.genderCategory}
+                {getGenderLabel(product.genderCategory)}
               </span>
             )}
             {product.volumeCategory && (
               <span className="badge bg-light text-dark">
-                {product.volumeCategory}
+                {getVolumeLabel(product.volumeCategory)}
               </span>
             )}
             {/* 재고 상태 표시 */}
