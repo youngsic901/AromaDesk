@@ -3,6 +3,7 @@
  */
 //axios.js
 import axios from "axios";
+import qs from "qs";
 import store from "../app/store";
 import { logout as logoutAction } from "../app/slices/userSlice";
 
@@ -17,6 +18,7 @@ const apiClient = axios.create({
     "Content-Type": "application/json",
   },
   withCredentials: true, // 세션 쿠키(JSESSIONID) 자동 포함
+    paramsSerializer: params => qs.stringify(params, { arrayFormat: "repeat" }),
 });
 
 // 요청 인터셉터

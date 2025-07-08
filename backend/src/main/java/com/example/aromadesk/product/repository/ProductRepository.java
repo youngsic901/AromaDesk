@@ -14,15 +14,15 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("""
         SELECT p FROM Product p
-        WHERE p.status = 'ACTIVE'
+        WHERE p.status IN :statuses
         AND (:brand IS NULL OR p.brand = :brand)
         AND (:gender IS NULL OR p.genderCategory = :gender)
         AND (:volume IS NULL OR p.volumeCategory = :volume)
     """)
-    List<Product> findFilteredList(@Param("brand")String brand, @Param("gender")String gender, @Param("volume")String volume);
+    List<Product> findFilteredList(@Param("statuses")List<ProductStatus> statuses, @Param("brand")String brand, @Param("gender")String gender, @Param("volume")String volume);
 
     @Query("SELECT p FROM Product p " +
-            "WHERE (:status IS NULL OR p.status = :status)" +
+            "WHERE (:statuses IS NULL OR p.status IN :statuses)" +
             "AND (:brand IS NULL OR p.brand = :brand) " +
             "AND (:gender IS NULL OR p.genderCategory = :gender) " +
             "AND (:volume IS NULL OR p.volumeCategory = :volume) " +
@@ -34,5 +34,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                      @Param("gender") String gender,
                                      @Param("volume") String volume,
                                      @Param("keyword") String keyword,
-                                     @Param("status") ProductStatus status);
+                                     @Param("statuses") List<ProductStatus> statuses);
 }

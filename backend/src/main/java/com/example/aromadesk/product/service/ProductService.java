@@ -26,8 +26,8 @@ public class    ProductService {
                 .collect(Collectors.toList());
     }
 
-    public Map<String, Object> getFilteredPagedProducts(String brand, String gender, String volume, int page, int size) {
-        List<Product> all = productRepository.findFilteredList(brand, gender, volume);
+    public Map<String, Object> getFilteredPagedProducts(List<ProductStatus> statuses, String brand, String gender, String volume, int page, int size) {
+        List<Product> all = productRepository.findFilteredList(statuses, brand, gender, volume);
 
         int fromIndex = Math.max((page - 1) * size, 0);
         int toIndex = Math.min(fromIndex + size, all.size());
@@ -46,8 +46,8 @@ public class    ProductService {
 
     // 필터 + 검색 + 페이징
     public Map<String, Object> getFilteredSearchedPagedProducts(
-            String brand, String gender, String volume, String keyword, ProductStatus status, int page, int size) {
-        List<Product> all = productRepository.searchFilteredList(brand, gender, volume, keyword, status);
+            String brand, String gender, String volume, String keyword, List<ProductStatus> statuses, int page, int size) {
+        List<Product> all = productRepository.searchFilteredList(brand, gender, volume, keyword, statuses);
 
         int fromIndex = Math.max((page - 1) * size, 0);
         int toIndex = Math.min(fromIndex + size, all.size());

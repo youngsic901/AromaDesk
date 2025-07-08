@@ -26,6 +26,7 @@ const AdminProductPage = () => {
   const [gender, setGender] = useState("");
   const [volume, setVolume] = useState("");
   const [keyword, setKeyword] = useState("");
+  const [status, setStatus] = useState("");
   // 브랜드 목록 상태 (최초 1회만 받아옴)
   const [brandList, setBrandList] = useState([]);
   // 페이징 상태
@@ -75,6 +76,12 @@ const AdminProductPage = () => {
       if (gender) params.gender = gender;
       if (volume) params.volume = volume;
       if (keyword) params.keyword = keyword;
+      if (status) {
+        params.statuses = [status]; // 단일 상태도 배열로
+      } else {
+        // 기본: HOT, ACTIVE, SOLD_OUT
+        params.statuses = ["HOT", "ACTIVE", "SOLD_OUT"];
+      }
       params.page = pageParam;
       params.size = size;
       const response = await adminProductApi.getProducts(params);
@@ -200,6 +207,14 @@ const AdminProductPage = () => {
             <option value="UNDER_50ML">50ml</option>
             <option value="LARGE">대용량</option>
           </select>
+          <select value={status} onChange={(e) => setStatus(e.target.value)}>
+            <option value="">전체 상태</option>
+            <option value="ACTIVE">판매중</option>
+            <option value="HOT">인기상품</option>
+            <option value="SOLD_OUT">품절</option>
+            <option value="INACTIVE">비활성</option>
+          </select>
+
           <input
             type="text"
             placeholder="상품명/설명 검색"

@@ -34,7 +34,7 @@ public class MemberProductController {
             @RequestParam(name = "gender", required = false) String gender,
             @RequestParam(name = "volume", required = false) String volume,
             @RequestParam(name = "keyword", required = false) String keyword,
-            @RequestParam(name = "status", required = false) ProductStatus status,
+            @RequestParam(name = "statuses", required = false) List<ProductStatus> status,
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "50") int size
     ) {
