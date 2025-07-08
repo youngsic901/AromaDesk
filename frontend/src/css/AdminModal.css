@@ -326,6 +326,41 @@
     padding: 10px 25px;
     font-size: 14px;
   }
+  
+  .admin-delete-confirm-modal {
+    padding: 30px 20px;
+    margin: 20px;
+  }
+  
+  .admin-delete-confirm-modal-icon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 15px;
+  }
+  
+  .admin-delete-confirm-modal-icon svg {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .admin-delete-confirm-modal-title {
+    font-size: 20px;
+  }
+  
+  .admin-delete-confirm-modal-message {
+    font-size: 14px;
+  }
+  
+  .admin-delete-confirm-modal-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .admin-delete-confirm-modal-button {
+    padding: 10px 24px;
+    font-size: 14px;
+    min-width: 120px;
+  }
 }
 
 /* ===== 스크롤바 스타일링 ===== */
@@ -349,4 +384,108 @@
 .admin-modal::-webkit-scrollbar-thumb:hover,
 .admin-product-edit-modal::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
+} 
+
+/* ===== 삭제 확인 모달 ===== */
+.admin-delete-confirm-modal {
+  background: #fff;
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  animation: successModalSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.admin-delete-confirm-modal-icon {
+  width: 80px;
+  height: 80px;
+  background: #fef2f2;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.admin-delete-confirm-modal-icon svg {
+  width: 40px;
+  height: 40px;
+  color: #dc2626;
+  animation: warningBounce 0.6s ease-out 0.2s both;
+}
+
+@keyframes warningBounce {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.admin-delete-confirm-modal-title {
+  color: #1f2937;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.admin-delete-confirm-modal-message {
+  color: #6b7280;
+  font-size: 16px;
+  line-height: 1.5;
+  margin-bottom: 30px;
+  position: relative;
+  z-index: 1;
+}
+
+.admin-delete-confirm-modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.admin-delete-confirm-modal-button {
+  padding: 12px 24px;
+  border: 2px solid;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+.admin-delete-confirm-modal-button-cancel {
+  background: #fff;
+  color: #6b7280;
+  border-color: #d1d5db;
+}
+
+.admin-delete-confirm-modal-button-cancel:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.admin-delete-confirm-modal-button-delete {
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
+}
+
+.admin-delete-confirm-modal-button-delete:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(220, 38, 38, 0.2);
 } 

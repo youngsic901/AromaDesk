@@ -41,7 +41,7 @@ CREATE TABLE product (
     description TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(20) DEFAULT 'ACTIVE',       -- ✅ 상태 컬럼 추가
-    CHECK (status IN ('ACTIVE', 'SOLD_OUT', 'DISCONTINUED', 'INACTIVE', 'DELETED')) -- 상태 제약
+    CHECK (status IN ('ACTIVE', 'SOLD_OUT', 'DISCONTINUED', 'INACTIVE', 'DELETED', 'HOT')) -- 상태 제약
 );
 
 -- 장바구니 테이블

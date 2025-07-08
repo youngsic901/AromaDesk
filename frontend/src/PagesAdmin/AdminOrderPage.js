@@ -7,7 +7,7 @@ import "../css/AdminOrderPage.css";
 /*
     전체 흐름도
     1. 컴포넌트 마운트 시 주문 목록 조회
-    2. 주문 데이터 출력 (회원 이름 클릭 시 상세 페이지 이동)
+    2. 주문 데이터 출력 (상세보기 버튼 클릭 시 상세 페이지 이동)
     3. 주문 상태, 배송 상태를 한글로 변환해서 표시
 */
 
@@ -59,24 +59,26 @@ function AdminOrderPage() {
                                 <th>배송 상태</th>
                                 <th>총금액</th>
                                 <th>날짜</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             {orders.map(order => (
                                 <tr key={order.orderId}>
                                     <td>{order.orderId}</td>
-                                    <td>
-                                        <span
-                                            onClick={() => navigate(`/admin/orders/${order.orderId}`)}
-                                            style={{ cursor: "pointer", textDecoration: "underline", color: "#1b5e20" }}
-                                        >
-                                            {order.memberName}
-                                        </span>
-                                    </td>
+                                    <td>{order.memberName}</td>
                                     <td>{orderStatusMap[order.orderStatus] || order.orderStatus}</td>
                                     <td>{deliveryStatusMap[order.deliveryStatus] || order.deliveryStatus}</td>
                                     <td>{order.totalPrice?.toLocaleString()}원</td>
                                     <td>{order.orderDate?.slice(0, 10)}</td>
+                                    <td>
+                                        <button 
+                                            className="detail-button"
+                                            onClick={() => navigate(`/admin/orders/${order.orderId}`)}
+                                        >
+                                            상태 변경
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>

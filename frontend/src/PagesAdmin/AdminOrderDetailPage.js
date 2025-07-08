@@ -59,67 +59,118 @@ function AdminOrderDetailPage() {
     };
 
     if (!order) {
-        return <AdminLayout><div className="loading">주문 정보를 불러오는 중...</div></AdminLayout>;
+        return (
+            <AdminLayout>
+                <div className="admin-page">
+                    <div className="loading">주문 정보를 불러오는 중...</div>
+                </div>
+            </AdminLayout>
+        );
     }
 
     return (
         <AdminLayout>
-            <div className="page-wrapper">
+            <div className="admin-page">
+                <h1 style={{fontSize: '28px', fontWeight: '700', marginBottom: '8px'}}>주문 상세 정보</h1>
+                <h2 style={{fontSize: '16px', color: '#888', marginBottom: '24px'}}>주문번호: {order.orderId}</h2>
+
                 <div className="top-bar">
-                    <button className="back-button" onClick={() => navigate("/admin/orders")}>목록으로</button>
+                    <button className="back-button" onClick={() => navigate("/admin/orders")}>
+                        ← 목록으로 돌아가기
+                    </button>
                 </div>
 
                 <div className="order-detail-wrapper">
                     <div className="order-detail-card">
-                        <div>주문번호: {order.orderId}</div>
-                        <div>회원 ID: {order.memberId}</div>
-                        <div>총금액: {order.totalPrice?.toLocaleString()}원</div>
-                        <div>주문일자: {order.orderDate?.slice(0, 10)}</div>
-                        <div>배송지: {order.address}</div>
-                        <div>현재 주문 상태: {orderStatusMap[orderStatus]}</div>
-                        <div>현재 배송 상태: {deliveryStatusMap[deliveryStatus]}</div>
-
-                        <div className="order-detail-control">
-                            <label>주문 상태 변경</label>
-                            <select
-                                value={orderStatus || ""}
-                                onChange={(e) => setOrderStatus(e.target.value)}
-                            >
-                                <option value="ORDERED">주문 완료</option>
-                                <option value="PAID">결제 완료</option>
-                                <option value="CANCELLED">주문 취소</option>
-                            </select>
-                            <button
-                                className="save-button"
-                                onClick={() => handleConfirm(
-                                    <>
-                                        <strong>주문 상태를 '{orderStatusMap[order.orderStatus]}' → <span style={{ color: "#dc2626" }}>{orderStatusMap[orderStatus]}</span>' 로 변경하시겠습니까?</strong>
-                                    </>,
-                                    updateOrderStatus
-                                )}
-                            >저장</button>
+                        <div className="order-info-section">
+                            <h3>주문 정보</h3>
+                            <div className="info-grid">
+                                <div className="info-item">
+                                    <label>주문번호</label>
+                                    <span>{order.orderId}</span>
+                                </div>
+                                <div className="info-item">
+                                    <label>회원 ID</label>
+                                    <span>{order.memberId}</span>
+                                </div>
+                                <div className="info-item">
+                                    <label>총금액</label>
+                                    <span>{order.totalPrice?.toLocaleString()}원</span>
+                                </div>
+                                <div className="info-item">
+                                    <label>주문일자</label>
+                                    <span>{order.orderDate?.slice(0, 10)}</span>
+                                </div>
+                                <div className="info-item">
+                                    <label>배송지</label>
+                                    <span>{order.address}</span>
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="order-detail-control">
-                            <label>배송 상태 변경</label>
-                            <select
-                                value={deliveryStatus || ""}
-                                onChange={(e) => setDeliveryStatus(e.target.value)}
-                            >
-                                <option value="PREPARING">배송 준비 중</option>
-                                <option value="SHIPPED">배송 중</option>
-                                <option value="DELIVERED">배송 완료</option>
-                                <option value="CANCELLED">배송 취소</option>
-                            </select>
-                            <button
-                                className="save-button"
-                                onClick={() => handleConfirm(
-                                    <>
-                                        <strong>배송 상태를 '{deliveryStatusMap[order.deliveryStatus]}' → <span style={{ color: "#dc2626" }}>{deliveryStatusMap[deliveryStatus]}</span>' 로 변경하시겠습니까?</strong>
-                                    </>,
-                                    updateDeliveryStatus
-                                )}
-                            >저장</button>
+                        <div className="status-section">
+                            <h3>현재 상태</h3>
+                            <div className="status-grid">
+                                <div className="status-item">
+                                    <label>주문 상태</label>
+                                    <span className={`status-badge ${orderStatus.toLowerCase()}`}>
+                                        {orderStatusMap[orderStatus]}
+                                    </span>
+                                </div>
+                                <div className="status-item">
+                                    <label>배송 상태</label>
+                                    <span className={`status-badge ${deliveryStatus.toLowerCase()}`}>
+                                        {deliveryStatusMap[deliveryStatus]}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="control-section">
+                            <h3>상태 변경</h3>
+                            
+                            <div className="order-detail-control">
+                                <label>주문 상태 변경</label>
+                                <select
+                                    value={orderStatus || ""}
+                                    onChange={(e) => setOrderStatus(e.target.value)}
+                                >
+                                    <option value="ORDERED">주문 완료</option>
+                                    <option value="PAID">결제 완료</option>
+                                    <option value="CANCELLED">주문 취소</option>
+                                </select>
+                                <button
+                                    className="save-button"
+                                    onClick={() => handleConfirm(
+                                        <>
+                                            <strong>주문 상태를 '{orderStatusMap[order.orderStatus]}' → <span style={{ color: "#dc2626" }}>{orderStatusMap[orderStatus]}</span>' 로 변경하시겠습니까?</strong>
+                                        </>,
+                                        updateOrderStatus
+                                    )}
+                                >저장</button>
+                            </div>
+
+                            <div className="order-detail-control">
+                                <label>배송 상태 변경</label>
+                                <select
+                                    value={deliveryStatus || ""}
+                                    onChange={(e) => setDeliveryStatus(e.target.value)}
+                                >
+                                    <option value="PREPARING">배송 준비 중</option>
+                                    <option value="SHIPPED">배송 중</option>
+                                    <option value="DELIVERED">배송 완료</option>
+                                    <option value="CANCELLED">배송 취소</option>
+                                </select>
+                                <button
+                                    className="save-button"
+                                    onClick={() => handleConfirm(
+                                        <>
+                                            <strong>배송 상태를 '{deliveryStatusMap[order.deliveryStatus]}' → <span style={{ color: "#dc2626" }}>{deliveryStatusMap[deliveryStatus]}</span>' 로 변경하시겠습니까?</strong>
+                                        </>,
+                                        updateDeliveryStatus
+                                    )}
+                                >저장</button>
+                            </div>
                         </div>
                     </div>
                 </div>
