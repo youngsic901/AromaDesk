@@ -11,7 +11,7 @@ export const productApi = {
         gender,
         volume,
         keyword,
-        status,
+        statuses,
         maxPrice,
         page = 1,
         size = 10,
@@ -23,7 +23,7 @@ export const productApi = {
       if (gender) queryParams.gender = gender;
       if (volume) queryParams.volume = volume;
       if (keyword) queryParams.keyword = keyword;
-      if (status) queryParams.status = status;
+      if (statuses) queryParams.statuses = statuses;
       if (page) queryParams.page = page;
       if (size) queryParams.size = size;
 
@@ -75,7 +75,7 @@ export const productApi = {
         // 가격 필터링 (maxPrice)
         if (maxPrice) {
           filteredContent = filteredContent.filter(
-            (product) => product.price <= parseInt(maxPrice)
+              (product) => product.price <= parseInt(maxPrice)
           );
         }
 
@@ -133,8 +133,8 @@ export const productApi = {
   updateProduct: async (productId, productData) => {
     try {
       const response = await apiClient.put(
-        `/api/products/${productId}`,
-        productData
+          `/api/products/${productId}`,
+          productData
       );
       const result = handleApiSuccess(response);
 
