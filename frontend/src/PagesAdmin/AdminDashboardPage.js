@@ -328,8 +328,8 @@ const generateDummyData = {
     
     // 용량 카테고리
     const volumeCategories = [
-      { category: '30ml', count: Math.floor(Math.random() * 250) + 120 },
-      { category: '50ml', count: Math.floor(Math.random() * 250) + 180 },
+              { category: '30ml', count: Math.floor(Math.random() * 250) + 120 },
+        { category: '50ml', count: Math.floor(Math.random() * 250) + 180 },
       { category: '대용량', count: Math.floor(Math.random() * 150) + 80 }
     ];
     

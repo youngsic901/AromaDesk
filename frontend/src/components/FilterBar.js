@@ -10,14 +10,14 @@ const BRAND_OPTIONS = [
 ];
 const VOLUME_OPTIONS = [
   { value: "", label: "용량 전체" },
-  { value: "UNDER_30ML", label: "30ml 이하" },
-  { value: "UNDER_50ML", label: "50ml 이하" },
+  { value: "UNDER_30ML", label: "30ml" },
+  { value: "UNDER_50ML", label: "50ml" },
   { value: "LARGE", label: "대용량" },
 ];
 const GENDER_OPTIONS = [
   { value: "", label: "성별 전체" },
-  { value: "MALE", label: "남자향수" },
-  { value: "FEMALE", label: "여자향수" },
+  { value: "MALE", label: "남성" },
+  { value: "FEMALE", label: "여성" },
   { value: "UNISEX", label: "남녀공용" },
 ];
 const PRICE_OPTIONS = [

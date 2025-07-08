@@ -10,14 +10,14 @@ INSERT INTO common_code (code, group_name, label, parent_code, sort_order) VALUE
 
 -- 2. GENDER 하위 코드
 INSERT INTO common_code (code, group_name, label, parent_code, sort_order) VALUES
-('MALE', 'GENDER', '남성용', 'GENDER', 1),
-('FEMALE', 'GENDER', '여성용', 'GENDER', 2),
+('MALE', 'GENDER', '남성', 'GENDER', 1),
+('FEMALE', 'GENDER', '여성', 'GENDER', 2),
 ('UNISEX', 'GENDER', '남녀공용', 'GENDER', 3);
 
 -- 3. VOLUME 하위 코드
 INSERT INTO common_code (code, group_name, label, parent_code, sort_order) VALUES
-('UNDER_30ML', 'VOLUME', '30ml 이하', 'VOLUME', 1),
-('UNDER_50ML', 'VOLUME', '50ml 이하', 'VOLUME', 2),
+('UNDER_30ML', 'VOLUME', '30ml', 'VOLUME', 1),
+('UNDER_50ML', 'VOLUME', '50ml', 'VOLUME', 2),
 ('LARGE', 'VOLUME', '대용량', 'VOLUME', 3);
 
 -- 4. BRAND 하위 코드
