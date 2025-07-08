@@ -31,9 +31,9 @@ const SideBar = ({ sidebarOpen = true, setSidebarOpen }) => {
   // 카테고리 메뉴 + 브랜드향수 메뉴 추가
   const menu = [
     { label: "홈", to: "/main" },
-    { label: "남자향수", to: "/category/male" },
-    { label: "여자향수", to: "/category/female" },
-    { label: "남녀공용", to: "/category/unisex" },
+      { label: "남성", to: "/category/male" },
+  { label: "여성", to: "/category/female" },
+  { label: "남녀공용", to: "/category/unisex" },
     { label: "브랜드향수", to: "/brand" }, // 브랜드별 대신 브랜드향수로
   ];
 

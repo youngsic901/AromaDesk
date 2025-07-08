@@ -290,9 +290,9 @@ const AdminProductAddModal = ({
                 required
               >
                 <option value="">선택하세요</option>
-                <option value="30ml">30ml</option>
-                <option value="50ml">50ml</option>
-                <option value="100ml">100ml</option>
+                <option value="UNDER_30ML">30ml</option>
+                <option value="UNDER_50ML">50ml</option>
+                <option value="LARGE">대용량</option>
               </select>
             </div>
 

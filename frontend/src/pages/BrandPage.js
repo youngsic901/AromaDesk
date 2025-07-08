@@ -6,8 +6,8 @@ import apiClient from "../api/axiosConfig";
 
 const VOLUME_OPTIONS = [
   { code: "", label: "전체" },
-  { code: "UNDER_30ML", label: "30ml 이하" },
-  { code: "UNDER_50ML", label: "50ml 이하" },
+  { code: "UNDER_30ML", label: "30ml" },
+  { code: "UNDER_50ML", label: "50ml" },
   { code: "LARGE", label: "대용량" },
 ];
 

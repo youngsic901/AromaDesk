@@ -6,8 +6,8 @@ import ProductCard from "../components/common/ProductCard";
 
 const VOLUME_OPTIONS = [
   { code: "", label: "전체" },
-  { code: "UNDER_30ML", label: "30ml 이하" },
-  { code: "UNDER_50ML", label: "50ml 이하" },
+  { code: "UNDER_30ML", label: "30ml" },
+  { code: "UNDER_50ML", label: "50ml" },
   { code: "LARGE", label: "대용량" },
 ];
 
@@ -33,9 +33,9 @@ const CategoryPage = () => {
   // 카테고리 이름 매핑
   const getCategoryName = (code) => {
     const categoryMap = {
-      MALE: "남자향수",
-      FEMALE: "여자향수",
-      UNISEX: "남녀공용",
+        MALE: "남성",
+  FEMALE: "여성",
+  UNISEX: "남녀공용",
     };
     return categoryMap[code] || code;
   };

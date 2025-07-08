@@ -59,9 +59,9 @@ const ProductListPage = () => {
             className="filter-select"
           >
             <option value="">용량 전체</option>
-            <option value="30ml">30ml</option>
-            <option value="50ml">50ml</option>
-            <option value="100ml">100ml</option>
+            <option value="UNDER_30ML">30ml</option>
+            <option value="UNDER_50ML">50ml</option>
+            <option value="LARGE">대용량</option>
           </select>
 
           <select
@@ -72,9 +72,9 @@ const ProductListPage = () => {
             className="filter-select"
           >
             <option value="">성별 전체</option>
-            <option value="남성">남성</option>
-            <option value="여성">여성</option>
-            <option value="남녀공용">남녀공용</option>
+            <option value="MALE">남성</option>
+            <option value="FEMALE">여성</option>
+            <option value="UNISEX">남녀공용</option>
           </select>
 
           <select

@@ -42,16 +42,16 @@ const AdminProductPage = () => {
 
   // 성별 카테고리 매핑
   const genderCategoryMap = {
-    MALE: "남자",
-    FEMALE: "여자",
-    UNISEX: "남녀공용"
+      MALE: "남성",
+  FEMALE: "여성",
+  UNISEX: "남녀공용"
   };
 
   // 용량 카테고리 매핑
   const volumeCategoryMap = {
-    UNDER_30ML: "30ml_이하",
-    UNDER_50ML: "50ml_이하",
-    LARGE: "대용량"
+      UNDER_30ML: "30ml",
+  UNDER_50ML: "50ml",
+  LARGE: "대용량"
   };
 
   // 브랜드 목록 최초 1회만 받아오기
@@ -197,8 +197,8 @@ const AdminProductPage = () => {
           </select>
           <select value={gender} onChange={(e) => setGender(e.target.value)}>
             <option value="">성별 전체</option>
-            <option value="MALE">남자</option>
-            <option value="FEMALE">여자</option>
+            <option value="MALE">남성</option>
+            <option value="FEMALE">여성</option>
             <option value="UNISEX">남녀공용</option>
           </select>
           <select value={volume} onChange={(e) => setVolume(e.target.value)}>
