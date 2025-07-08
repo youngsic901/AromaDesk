@@ -2,6 +2,7 @@ package com.example.aromadesk.product.controller;
 
 import com.example.aromadesk.product.dto.ProductRequestDTO;
 import com.example.aromadesk.product.dto.ProductResponseDTO;
+import com.example.aromadesk.product.entity.ProductStatus;
 import com.example.aromadesk.product.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,15 +34,17 @@ public class MemberProductController {
             @RequestParam(name = "gender", required = false) String gender,
             @RequestParam(name = "volume", required = false) String volume,
             @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "status", required = false) ProductStatus status,
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "50") int size
     ) {
         return ResponseEntity.ok(
 //                productService.getFilteredPagedProducts(brand, gender, volume, page, size)
-                productService.getFilteredSearchedPagedProducts(brand, gender, volume, keyword, page, size)
+                productService.getFilteredSearchedPagedProducts(brand, gender, volume, keyword, status, page, size)
         );
     }
 
+    // 특정 상품 상세 조회
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDTO> getProduct(@PathVariable("id") Long id) {
         ProductResponseDTO dto = productService.getProductById(id);

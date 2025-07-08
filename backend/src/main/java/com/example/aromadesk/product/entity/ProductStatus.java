@@ -17,5 +17,6 @@ public enum ProductStatus {
     INACTIVE, // 일시 판매 중단
     SOLD_OUT, // 품절(재입고 가능)
     DISCONTINUED, // 단종
-    DELETED // 논리적 삭제처리
+    DELETED, // 논리적 삭제처리
+    HOT // 인기상품
 }
