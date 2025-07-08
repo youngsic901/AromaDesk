@@ -22,6 +22,25 @@ const ProductDetailPage = () => {
   const [selectedImg, setSelectedImg] = React.useState(0);
   const [quantity, setQuantity] = React.useState(1);
 
+  // 카테고리 매핑 함수
+  const getGenderLabel = (gender) => {
+    const genderMap = {
+      'MALE': '남성',
+      'FEMALE': '여성',
+      'UNISEX': '남녀공용'
+    };
+    return genderMap[gender] || gender;
+  };
+
+  const getVolumeLabel = (volume) => {
+    const volumeMap = {
+      'UNDER_30ML': '30ml',
+      'UNDER_50ML': '50ml',
+      'LARGE': '대용량'
+    };
+    return volumeMap[volume] || volume;
+  };
+
   React.useEffect(() => {
     dispatch(fetchProductById(id));
   }, [dispatch, id]);
@@ -133,10 +152,10 @@ const ProductDetailPage = () => {
           </div>
           <div className="mb-3">
             <span className="badge bg-light text-dark me-2">
-              {currentProduct.genderCategory}
+              {getGenderLabel(currentProduct.genderCategory)}
             </span>
             <span className="badge bg-light text-dark">
-              {currentProduct.volumeCategory}
+              {getVolumeLabel(currentProduct.volumeCategory)}
             </span>
           </div>
           <div className="mb-4">
