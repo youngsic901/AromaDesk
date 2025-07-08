@@ -144,16 +144,23 @@ const OrderCompletePage = () => {
                 </ul>
               </div>
             )}
-
             <div className="order-complete-delivery">
               <h4>배송 상태</h4>
               <div className="order-complete-delivery-info">
+                <div className="order-complete-delivery-row">
+                  <div className="order-complete-delivery-label">배송지</div>
+                  <div className="order-complete-delivery-value">
+                    {order.deliveryAddress || "배송지 정보가 없습니다."}
+                  </div>
+                </div>
+
                 <div className="order-complete-delivery-row">
                   <div className="order-complete-delivery-label">상태</div>
                   <div className="order-complete-delivery-value">
                     {delivery ? (statusMap[delivery.status] || delivery.status) : "배송 정보가 아직 준비되지 않았습니다."}
                   </div>
                 </div>
+
                 {delivery?.trackingNumber && (
                   <div className="order-complete-delivery-row">
                     <div className="order-complete-delivery-label">송장번호</div>

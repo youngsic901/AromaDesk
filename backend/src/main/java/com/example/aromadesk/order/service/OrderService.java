@@ -293,10 +293,12 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public OrderDetailResponseDto getOrderDetail(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다." + orderId));
+        Order order = orderRepository.findWithDeliveryById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다. orderId=" + orderId));
+
         return OrderDetailResponseDto.from(order);
     }
+
 
     /**
      * 관리자용 전체 주문 목록 조회

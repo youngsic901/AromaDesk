@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByMemberId(Long memberId);
@@ -39,5 +40,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "JOIN oi.product p " +
             "WHERE oi.order.id IN :orderIds")
     List<OrderProductNameDto> findOrderProductNamesByOrderIds(@Param("orderIds") List<Long> orderIds);
+
+    @Query("SELECT o FROM Order o JOIN FETCH o.delivery WHERE o.id = :orderId")
+    Optional<Order> findWithDeliveryById(@Param("orderId") Long orderId);
+
 
 }

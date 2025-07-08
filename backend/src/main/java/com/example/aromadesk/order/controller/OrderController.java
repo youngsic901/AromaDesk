@@ -5,6 +5,7 @@ import com.example.aromadesk.auth.service.MemberLoginService;
 import com.example.aromadesk.delivery.dto.DeliveryStatusResponseDto;
 import com.example.aromadesk.delivery.entity.Delivery;
 import com.example.aromadesk.member.entity.Member;
+import com.example.aromadesk.order.dto.OrderDetailResponseDto;
 import com.example.aromadesk.order.dto.OrderRequestDto;
 import com.example.aromadesk.order.dto.OrderResponseDto;
 import com.example.aromadesk.order.entity.Order;
@@ -105,11 +106,11 @@ public class OrderController {
      * 단건 주문 조회
      */
     @GetMapping("/{orderId}")
-    public ResponseEntity<OrderResponseDto> getOrder(@PathVariable("orderId") Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다."));
-        return ResponseEntity.ok(OrderResponseDto.from(order));
+    public ResponseEntity<OrderDetailResponseDto> getOrder(@PathVariable("orderId") Long orderId) {
+        OrderDetailResponseDto dto = orderService.getOrderDetail(orderId);
+        return ResponseEntity.ok(dto);
     }
+
 
     /**
      * 배송 정보 조회

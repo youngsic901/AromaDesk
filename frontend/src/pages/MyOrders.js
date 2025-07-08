@@ -9,7 +9,14 @@ const STATUS_LABELS = {
   SHIPPED: "배송중",
   DELIVERED: "배송 완료",
 };
+
 const STATUS_TABS = ["ALL", "PREPARING", "SHIPPED", "DELIVERED"];
+
+const PAYMENT_METHOD_LABELS = {
+  MOCK: "모의 결제",
+  CARD: "카드 결제",
+  BANK: "무통장 입금",
+};
 
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -94,7 +101,9 @@ const MyOrders = () => {
               <div className="d-flex justify-content-between align-items-center">
                 <div>
                   <h6 className="fw-bold mb-2">주문번호: {order.orderId}</h6>
-                  <p className="mb-1">결제 수단: {order.paymentMethod}</p>
+                  <p className="mb-1">
+                    결제 수단: {PAYMENT_METHOD_LABELS[order.paymentMethod] || order.paymentMethod}
+                  </p>
                   <p className="mb-1">
                     총 결제 금액: {order.totalPrice.toLocaleString()}원
                   </p>
