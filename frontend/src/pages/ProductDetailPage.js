@@ -221,11 +221,11 @@ const ProductDetailPage = () => {
                   </tr>
                   <tr>
                     <th className="bg-light">성별</th>
-                    <td>{currentProduct.genderCategory}</td>
+                    <td>{getGenderLabel(currentProduct.genderCategory)}</td>
                   </tr>
                   <tr>
                     <th className="bg-light">용량</th>
-                    <td>{currentProduct.volumeCategory}</td>
+                    <td>{getVolumeLabel(currentProduct.volumeCategory)}</td>
                   </tr>
                   <tr>
                     <th className="bg-light">가격</th>
