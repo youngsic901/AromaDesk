@@ -25,14 +25,17 @@ public class AdminOrderController {
     private final OrderService orderService;
 
     @GetMapping
-    public ResponseEntity<Page<OrderResponseDto>> getAllOrdersForAdmin(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<Page<OrderResponseDto>> getAllOrdersForAdmin(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
-        PageRequest pageRequest = PageRequest.of(page, size,  Sort.by(Sort.Direction.DESC, "createdAt"));
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        Page<Order> orderPage = orderRepository.findAll(pageRequest);   //페이지네이션
-        Page<OrderResponseDto> result = orderPage.map(OrderResponseDto::from);
+        Page<OrderResponseDto> result = orderService.getAllOrdersForAdmin(pageRequest);
+
         return ResponseEntity.ok(result);
     }
+
 
     /**
      * 주문 상세 조회 (배송 정보 포함)

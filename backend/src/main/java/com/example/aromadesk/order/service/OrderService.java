@@ -9,6 +9,7 @@ import com.example.aromadesk.delivery.repostiory.DeliveryRepository;
 import com.example.aromadesk.member.entity.Member;
 import com.example.aromadesk.member.repository.MemberRepository;
 import com.example.aromadesk.order.dto.OrderDetailResponseDto;
+import com.example.aromadesk.order.dto.OrderProductNameDto;
 import com.example.aromadesk.order.dto.OrderRequestDto;
 import com.example.aromadesk.order.dto.OrderResponseDto;
 import com.example.aromadesk.order.entity.Order;
@@ -18,6 +19,10 @@ import com.example.aromadesk.order.repository.OrderRepository;
 import com.example.aromadesk.product.entity.Product;
 import com.example.aromadesk.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -174,11 +179,11 @@ public class OrderService {
 
     /**
      * 회원의 전체 주문 목록 조회
-     * 
+     *
      * @param  member 조회할 회원
      * @return 회원의 주문 목록 DTO 리스트
      */
-    
+
     @Transactional(readOnly = true)
     public List<OrderResponseDto> getOrdersByMemberID(Member member) {
         List<Order> orders = orderRepository.findByMemberId(member.getId());
@@ -188,11 +193,11 @@ public class OrderService {
     }
 
     /**
-     * 주문 결제 완료 처리 
+     * 주문 결제 완료 처리
      * @param orderId 결제할 주문 ID
      * @throws IllegalArgumentException 주문이 존재하지 않거나 이미 결제된 경우 예외 발생
      */
-    
+
     @Transactional
     public void completePayment(Long orderId) {
         Order order = orderRepository.findById(orderId)
@@ -298,11 +303,29 @@ public class OrderService {
      * - 모든 주문 상태 및 배송 상태 포함
      */
     @Transactional(readOnly = true)
-    public List<OrderResponseDto> getAllOrdersForAdmin() {
-        List<Order> orders = orderRepository.findAll();
-        return orders.stream()
-                .map(OrderResponseDto::from)
+    public Page<OrderResponseDto> getAllOrdersForAdmin(Pageable pageable) {
+        // 주문, 배송, 회원 정보를 fetch join으로 가져옴
+        Page<Order> orderPage = orderRepository.findAllWithDeliveryAndMember(pageable);
+
+        // 주문 ID 리스트 추출
+        List<Long> orderIds = orderPage.getContent().stream()
+                .map(Order::getId)
                 .collect(Collectors.toList());
+
+        // 주문 ID별 상품명 조회
+        List<OrderProductNameDto> productNameDtos = orderRepository.findOrderProductNamesByOrderIds(orderIds);
+
+        // orderId 기준으로 상품명 그룹핑
+        Map<Long, List<String>> productNameMap = productNameDtos.stream()
+                .collect(Collectors.groupingBy(
+                        OrderProductNameDto::getOrderId,
+                        Collectors.mapping(OrderProductNameDto::getProductName, Collectors.toList())
+                ));
+
+        // Order -> OrderResponseDto 변환 (상품명 포함)
+        return orderPage.map(order ->
+                OrderResponseDto.from(order, productNameMap.getOrDefault(order.getId(), Collections.emptyList()))
+        );
     }
 
     @Transactional
