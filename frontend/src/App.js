@@ -50,11 +50,13 @@ import {
   logout as logoutAction,
 } from "./app/slices/userSlice";
 import { restoreAuth } from "./app/slices/adminSlice";
+// ChatBot
+import Chatbot from "./chatbot/Chatbot";
 
 // 관리자 인증 라우트 (Redux 상태 기반)
 function AdminRoute({ children }) {
   const { isAuthenticated } = useSelector((state) => state.admin);
-  
+
   const location = useLocation();
   if (!isAuthenticated) {
     console.log('관리자 인증 실패: Redux 상태에서 인증되지 않음');
@@ -73,16 +75,16 @@ function LoginStatusChecker({ children }) {
   useEffect(() => {
     const checkLoginStatus = async () => {
       console.log("=== 앱 시작: 로그인 상태 확인 시작 ===");
-      
+
       // 현재 경로가 어드민 페이지인지 확인
       const isAdminPage = location.pathname.startsWith('/admin');
       if (isAdminPage) {
         console.log("어드민 페이지 감지됨, 사용자 로그인 상태 확인 건너뜀");
-        
+
         // 관리자 인증 상태 복원 (localStorage에서)
         const adminUser = localStorage.getItem('AdminUser');
         const adminSessionId = localStorage.getItem('AdminSessionId');
-        
+
         if (adminUser && adminSessionId) {
           try {
             const admin = JSON.parse(adminUser);
@@ -92,11 +94,11 @@ function LoginStatusChecker({ children }) {
             console.error('관리자 인증 상태 복원 실패:', error);
           }
         }
-        
+
         setIsInitialized(true);
         return;
       }
-      
+
       try {
         console.log("백엔드 세션 확인 API 호출 중...");
         const result = await loginAPI.getUserInfo();
@@ -153,110 +155,113 @@ function LoginStatusChecker({ children }) {
 
 function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const location = useLocation(); // 현재 경로 확인
+
+  // 관리자 페이지 여부 판단
+  const isAdminPage = /^\/admin(\/.*)?$/.test(location.pathname) || location.pathname === "/adminLogin";
 
   return (
-    <Router>
-      <LoginStatusChecker>
-        <Routes>
-          {/* 관리자 페이지 라우팅: 별도 레이아웃 */}
-          <Route path="/adminLogin" element={<AdminLoginPage />} />
-          <Route
-            path="/admin"
-            element={
-              <AdminRoute>
-                <AdminMainPage />
-              </AdminRoute>
-            }
-          />
-          <Route
-            path="/admin/dashboard"
-            element={
-              <AdminRoute>
-                <AdminDashboardPage />
-              </AdminRoute>
-            }
-          />
-          <Route
-            path="/admin/products"
-            element={
-              <AdminRoute>
-                <AdminProductPage />
-              </AdminRoute>
-            }
-          />
-          <Route
-            path="/admin/orders"
-            element={
-              <AdminRoute>
-                <AdminOrderPage />
-              </AdminRoute>
-            }
-          />
-          <Route
-            path="/admin/members"
-            element={
-              <AdminRoute>
-                <AdminMemberPage />
-              </AdminRoute>
-            }
-          />
-          <Route path="/admin/orders/:orderId" 
+    <LoginStatusChecker>
+      {!isAdminPage && <Chatbot />} {/* 일반 사용자 영역에서만 챗봇 렌더링 */}
+      <Routes>
+        {/* 관리자 페이지 라우팅: 별도 레이아웃 */}
+        <Route path="/adminLogin" element={<AdminLoginPage />} />
+        <Route
+          path="/admin"
           element={
             <AdminRoute>
-              <AdminOrderDetailPage />
+              <AdminMainPage />
             </AdminRoute>
-            }
-          />
+          }
+        />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <AdminRoute>
+              <AdminDashboardPage />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/products"
+          element={
+            <AdminRoute>
+              <AdminProductPage />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/orders"
+          element={
+            <AdminRoute>
+              <AdminOrderPage />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/members"
+          element={
+            <AdminRoute>
+              <AdminMemberPage />
+            </AdminRoute>
+          }
+        />
+        <Route path="/admin/orders/:orderId"
+        element={
+          <AdminRoute>
+            <AdminOrderDetailPage />
+          </AdminRoute>
+          }
+        />
 
-          {/* 일반 사용자 페이지 라우팅: 기존 레이아웃 */}
-          <Route
-            path="/*"
-            element={
-              <>
-                <Header setSidebarOpen={setSidebarOpen} />
-                <div className="d-flex" style={{ minHeight: "100vh" }}>
-                  <Sidebar
-                    sidebarOpen={sidebarOpen}
-                    setSidebarOpen={setSidebarOpen}
-                  />
-                  <main className="flex-grow-1 p-4">
-                    <Routes>
-                      <Route path="/" element={<MainPage />} />
-                      <Route path="/main" element={<MainPage />} />
-                      <Route
-                        path="/category/:category"
-                        element={<CategoryPage />}
-                      />
-                      <Route path="/brand" element={<BrandPage />} />
-                      <Route path="/brand/:brand" element={<BrandPage />} />
-                      <Route path="/search" element={<SearchPage />} />
-                      <Route path="/products" element={<ProductListPage />} />
-                      <Route
-                        path="/products/:id"
-                        element={<ProductDetailPage />}
-                      />
-                      <Route path="/cart" element={<CartPage />} />
-                      <Route path="/mypage" element={<MyPage />} />
-                      <Route path="/mypage/edit" element={<MyPageUpdate />} />
-                      <Route path="/mypage/password" element={<MyPagePassUpdate />} />
-                      <Route path="/login" element={<LoginPage />} />
-                      <Route path="/signup" element={<SignupPage />} />
-                      <Route path="/order/payment" element={<OrderPaymentPage />} />
-                      <Route
-                        path="/order/complete"
-                        element={<OrderCompletePage />}
-                      />
-                    </Routes>
-                  </main>
-                </div>
-                <Footer />
-              </>
-            }
-          />
-        </Routes>
-        <ToastContainer />
-      </LoginStatusChecker>
-    </Router>
+        {/* 일반 사용자 페이지 라우팅: 기존 레이아웃 */}
+        <Route
+          path="/*"
+          element={
+            <>
+              <Header setSidebarOpen={setSidebarOpen} />
+              <div className="d-flex" style={{ minHeight: "100vh" }}>
+                <Sidebar
+                  sidebarOpen={sidebarOpen}
+                  setSidebarOpen={setSidebarOpen}
+                />
+                <main className="flex-grow-1 p-4">
+                  <Routes>
+                    <Route path="/" element={<MainPage />} />
+                    <Route path="/main" element={<MainPage />} />
+                    <Route
+                      path="/category/:category"
+                      element={<CategoryPage />}
+                    />
+                    <Route path="/brand" element={<BrandPage />} />
+                    <Route path="/brand/:brand" element={<BrandPage />} />
+                    <Route path="/search" element={<SearchPage />} />
+                    <Route path="/products" element={<ProductListPage />} />
+                    <Route
+                      path="/products/:id"
+                      element={<ProductDetailPage />}
+                    />
+                    <Route path="/cart" element={<CartPage />} />
+                    <Route path="/mypage" element={<MyPage />} />
+                    <Route path="/mypage/edit" element={<MyPageUpdate />} />
+                    <Route path="/mypage/password" element={<MyPagePassUpdate />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/signup" element={<SignupPage />} />
+                    <Route path="/order/payment" element={<OrderPaymentPage />} />
+                    <Route
+                      path="/order/complete"
+                      element={<OrderCompletePage />}
+                    />
+                  </Routes>
+                </main>
+              </div>
+              <Footer />
+            </>
+          }
+        />
+      </Routes>
+      <ToastContainer />
+    </LoginStatusChecker>
   );
 }
 
@@ -264,7 +269,9 @@ function AppContent() {
 const App = () => {
   return (
     <Provider store={store}>
-      <AppContent />
+      <Router>
+        <AppContent />
+      </Router>
     </Provider>
   );
 };
