@@ -89,7 +89,7 @@ public class AdminProductController {
             @RequestParam(name = "gender", required = false) String gender,
             @RequestParam(name = "volume", required = false) String volume,
             @RequestParam(name = "keyword", required = false) String keyword,
-            @RequestParam(name = "status", required = false) ProductStatus status,
+            @RequestParam(name = "statuses", required = false) List<ProductStatus> statuses,
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "20") int size
     ) {
@@ -98,7 +98,7 @@ public class AdminProductController {
         if (volume != null && volume.isEmpty()) volume = null;
         if (keyword != null && keyword.isEmpty()) keyword = null;
         return ResponseEntity.ok(
-                productService.getFilteredSearchedPagedProducts(brand, gender, volume, keyword, status, page, size)
+                productService.getFilteredSearchedPagedProducts(brand, gender, volume, keyword, statuses, page, size)
         );
     }
 

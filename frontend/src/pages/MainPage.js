@@ -21,7 +21,7 @@ const MainPage = () => {
       fetchFilteredProducts({
         page: 1,
         size: 20, // 한 번에 20개씩 로드
-        status: 'HOT',
+        statuses: ['HOT'],
       })
     );
     
@@ -49,7 +49,7 @@ const MainPage = () => {
           page: nextPage,
           size: 20,
           append: true, // 기존 상품에 추가
-          status: 'HOT',
+          statuses: ['HOT'],
         })
       );
     }
