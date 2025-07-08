@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
  /* DATE         AUTHOR          DESC.
  /*--------     ---------    ----------------------
  /*2025.07.05   SUSU           주문 상세 조회 응답 생성
+ /*2025.07.08   SUSU           배송지 추가
  /*************************************************************/
 
 @Getter
@@ -24,22 +25,26 @@ public class OrderDetailResponseDto {
     private Long orderId;
     private String memberId;
     private LocalDateTime orderDate;
-    private String orderStatus;
-    private String deliveryStatus;    // 배송 상태
+    private String status;              // ✔ 수정 (orderStatus → status)
+    private String paymentMethod;       // ✔ 추가
+    private String deliveryStatus;
     private int totalPrice;
     private String address;
     private Long deliveryId;
+    private String deliveryAddress;
 
     public static OrderDetailResponseDto from(Order order) {
         return OrderDetailResponseDto.builder()
                 .orderId(order.getId())
                 .memberId(order.getMember().getMemberId())
                 .orderDate(order.getCreatedAt())
-                .orderStatus(order.getOrderStatus().name())
+                .status(order.getOrderStatus().name())              // ✔ 수정
+                .paymentMethod(order.getPaymentMethod().name())    // ✔ 추가
                 .deliveryStatus(order.getDelivery() != null ? order.getDelivery().getStatus().name() : null)
                 .totalPrice(order.getTotalPrice())
                 .address(order.getDelivery() != null ? order.getDelivery().getAddress() : null)
                 .deliveryId(order.getDelivery() != null ? order.getDelivery().getId() : null)
+                .deliveryAddress(order.getDelivery() != null ? order.getDelivery().getAddress() : null)
                 .build();
     }
 }
