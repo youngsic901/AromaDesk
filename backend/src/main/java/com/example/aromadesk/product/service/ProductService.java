@@ -46,8 +46,8 @@ public class    ProductService {
 
     // 필터 + 검색 + 페이징
     public Map<String, Object> getFilteredSearchedPagedProducts(
-            String brand, String gender, String volume, String keyword, int page, int size) {
-        List<Product> all = productRepository.searchFilteredList(brand, gender, volume, keyword);
+            String brand, String gender, String volume, String keyword, ProductStatus status, int page, int size) {
+        List<Product> all = productRepository.searchFilteredList(brand, gender, volume, keyword, status);
 
         int fromIndex = Math.max((page - 1) * size, 0);
         int toIndex = Math.min(fromIndex + size, all.size());

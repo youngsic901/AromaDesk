@@ -11,6 +11,7 @@ export const productApi = {
         gender,
         volume,
         keyword,
+        status,
         maxPrice,
         page = 1,
         size = 10,
@@ -22,6 +23,7 @@ export const productApi = {
       if (gender) queryParams.gender = gender;
       if (volume) queryParams.volume = volume;
       if (keyword) queryParams.keyword = keyword;
+      if (status) queryParams.status = status;
       if (page) queryParams.page = page;
       if (size) queryParams.size = size;
 

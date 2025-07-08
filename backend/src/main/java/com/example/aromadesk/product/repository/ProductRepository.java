@@ -1,6 +1,7 @@
 package com.example.aromadesk.product.repository;
 
 import com.example.aromadesk.product.entity.Product;
+import com.example.aromadesk.product.entity.ProductStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,7 +22,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findFilteredList(@Param("brand")String brand, @Param("gender")String gender, @Param("volume")String volume);
 
     @Query("SELECT p FROM Product p " +
-            "WHERE p.status = 'ACTIVE'" +
+            "WHERE (:status IS NULL OR p.status = :status)" +
             "AND (:brand IS NULL OR p.brand = :brand) " +
             "AND (:gender IS NULL OR p.genderCategory = :gender) " +
             "AND (:volume IS NULL OR p.volumeCategory = :volume) " +
@@ -32,5 +33,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> searchFilteredList(@Param("brand") String brand,
                                      @Param("gender") String gender,
                                      @Param("volume") String volume,
-                                     @Param("keyword") String keyword);
+                                     @Param("keyword") String keyword,
+                                     @Param("status") ProductStatus status);
 }
