@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { loginAPI } from '../api/loginApi.js';
 import { login as loginAction, logout as logoutAction } from '../app/slices/userSlice.js';
 import { authManager } from '../api/authApi.js';
+import { logout as adminLogout } from '../app/slices/adminSlice';
 
 export const useLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +38,12 @@ export const useLogin = () => {
           
           // localStorage에 사용자 정보 저장
           localStorage.setItem('CusUser', JSON.stringify(userData));
-          
+
+          // localStorage에 관리자 정보 제거
+          dispatch(adminLogout());
+          localStorage.removeItem("AdminSessionId");
+          localStorage.removeItem("AdminUser");
+
           // authManager 캐시 업데이트
           authManager._cachedUser = userData;
           authManager._cacheTimestamp = Date.now();

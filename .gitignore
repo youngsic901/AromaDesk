@@ -1,6 +1,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/java,react,windows,macos,maven,gradle,eclipse,intellij+iml,intellij+all,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,react,windows,macos,maven,gradle,eclipse,intellij+iml,intellij+all,visualstudiocode
 
+.env.development
+.env.production
+
 ### STS ###
 .apt_generated
 .classpath

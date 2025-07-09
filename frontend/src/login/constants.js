@@ -8,16 +8,19 @@ export const API_ENDPOINTS = {
 };
 
 // 소셜 로그인 설정
+
+const FRONTEND_URL = process.env.REACT_APP_SOCIAL_REDIRECT || "http://localhost:3000";
+
 export const SOCIAL_LOGIN_CONFIG = {
   GOOGLE: {
     CLIENT_ID: "dummy-client-id", // 실제 사용 안하니까 더미 값
-    REDIRECT_URI: "http://localhost:3000", // 돌아올 주소 (임의)
+    REDIRECT_URI: FRONTEND_URL, // 돌아올 주소 (임의)
     SCOPE: "email profile",
     AUTH_URL: "https://accounts.google.com/o/oauth2/v2/auth"
   },
   KAKAO: {
     CLIENT_ID: "your-kakao-client-id", // 실제 카카오 클라이언트 ID로 변경 필요
-    REDIRECT_URI: "http://localhost:3000/auth/kakao/callback",
+    REDIRECT_URI:`${FRONTEND_URL}/auth/kakao/callback`,
     AUTH_URL: "https://kauth.kakao.com/oauth/authorize"
   }
 };
