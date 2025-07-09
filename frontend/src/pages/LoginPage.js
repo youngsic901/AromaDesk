@@ -14,6 +14,10 @@ const LoginPage = () => {
   // Redux에서 사용자 상태 가져오기
   const { user: reduxUser, isLoggedIn } = useSelector((state) => state.user);
 
+  // 환경변수로 API, 리다이렉트 URL 관리
+  const FRONTEND_URL = process.env.REACT_APP_SOCIAL_REDIRECT || "http://localhost:3000";
+  const BACKEND_URL = process.env.REACT_APP_API_URL || "http://localhost:80";
+
   // 로그인 성공 후 로딩이 완료되고 Redux 상태도 업데이트되면 페이지 이동
   useEffect(() => {
     if (loginSuccess && !isLoading && reduxUser && isLoggedIn) {
@@ -101,7 +105,7 @@ const LoginPage = () => {
         {/* 소셜 로그인 버튼들 */}
         <a
           className="google-btn"
-          href="http://localhost/oauth2/authorization/google"
+          href={`${BACKEND_URL}/oauth2/authorization/google`}
           style={{
             display: "flex",
             alignItems: "center",
@@ -113,7 +117,7 @@ const LoginPage = () => {
         </a>
         <a
           className="kakao-btn"
-          href="http://localhost/oauth2/authorization/kakao"
+          href={`${BACKEND_URL}/oauth2/authorization/kakao`}
           style={{
             display: "flex",
             alignItems: "center",
@@ -125,7 +129,7 @@ const LoginPage = () => {
         </a>
         <a
           className="naver-btn"
-          href="http://localhost/oauth2/authorization/naver"
+          href={`${BACKEND_URL}/oauth2/authorization/naver`}
           style={{
             display: "flex",
             alignItems: "center",

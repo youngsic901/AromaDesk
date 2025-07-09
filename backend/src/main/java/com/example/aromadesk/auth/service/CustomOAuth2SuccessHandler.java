@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,9 @@ import java.io.IOException;
 public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final MemberRepository memberRepository;
+
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -31,12 +35,12 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         if (exists) {
             Member member = memberRepository.findByEmail(email).get();
             request.getSession().setAttribute("CusUser", MemberDto.fromEntity(member));
-            response.sendRedirect("http://localhost:3000/main");
+            response.sendRedirect(baseUrl + "/main");
         } else {
 
             request.getSession().setAttribute("email", email);
             request.getSession().setAttribute("name", oAuth2User.getName());
-            response.sendRedirect("http://localhost:3000/signup?fromSocial=true");
+            response.sendRedirect(baseUrl + "/signup?fromSocial=true");
         }
     }
 }

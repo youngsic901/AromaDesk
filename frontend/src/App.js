@@ -77,7 +77,7 @@ function LoginStatusChecker({ children }) {
       console.log("=== 앱 시작: 로그인 상태 확인 시작 ===");
 
       // 현재 경로가 어드민 페이지인지 확인
-      const isAdminPage = location.pathname.startsWith('/admin');
+      const isAdminPage = location.pathname.startsWith('/admin/');
       if (isAdminPage) {
         console.log("어드민 페이지 감지됨, 사용자 로그인 상태 확인 건너뜀");
 
@@ -93,6 +93,9 @@ function LoginStatusChecker({ children }) {
           } catch (error) {
             console.error('관리자 인증 상태 복원 실패:', error);
           }
+        } else {
+          window.location.href = "/adminLogin";
+          return;
         }
 
         setIsInitialized(true);
